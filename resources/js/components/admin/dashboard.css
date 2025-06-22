@@ -1,0 +1,145 @@
+.dashboard-container {
+    padding: 2rem;
+    background-color: #f7f7f9;
+    font-family: Arial, sans-serif;
+    overflow-x: auto; /* Enable horizontal scrolling for small screens */
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.dashboard-subheading {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.dashboard-section {
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto; /* Ensures table scrolls on smaller screens */
+}
+
+.dashboard-table th, .dashboard-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eaeaea;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.dashboard-table th {
+    font-weight: 600;
+    color: #333;
+}
+
+.dashboard-row:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-link {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
+
+.btn-sm {
+    font-size: 0.85rem;
+}
+
+.text-danger {
+    color: #d9534f !important;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 1.5rem; /* Adjust header size for smaller screens */
+    }
+
+    .dashboard-table th, .dashboard-table td {
+        font-size: 0.8rem; /* Smaller text size for better fit */
+        padding: 0.5rem; /* Reduced padding for small screens */
+    }
+
+    .btn-sm {
+        font-size: 0.75rem; /* Smaller button size */
+    }
+
+    .dashboard-section {
+        margin-bottom: 1rem; /* Reduce section margin */
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 1rem; /* Reduce padding for very small screens */
+        overflow-x: auto; /* Allow horizontal scroll instead of stacking */
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.25rem; /* Further adjust header size */
+    }
+
+    .dashboard-subheading {
+        font-size: 0.85rem; /* Smaller subheading size */
+    }
+
+    .dashboard-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto; /* Horizontal scrolling for full-width view */
+    }
+
+    .dashboard-table th, .dashboard-table td {
+        font-size: 0.75rem; /* Smaller text for mobile */
+        padding: 0.5rem; /* Adjust padding */
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.page-button {
+    margin: 0 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 0.25rem;
+}
+
+.page-button.active {
+    background-color: #0056b3;
+}
+
+.page-button:hover:not(.active) {
+    background-color: #0056b3;
+}

@@ -1,0 +1,178 @@
+import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import { HelmetProvider } from 'react-helmet-async';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import LoadingSpinner from './layouts/frontend/Components/Loader';
+import AboutUs from './layouts/frontend/Outer/AboutUs';
+import ContactUs from './layouts/frontend/Outer/ContactUs';
+import FAQ from './layouts/frontend/Outer/FAQ';
+import Team from './layouts/frontend/Outer/Team';
+import Collections from './layouts/frontend/Outer/Collections';
+import ResendEmail from './layouts/frontend/auth/Verification';
+import VerifyEmail from './layouts/frontend/auth/Verify';
+import { CartProvider } from './layouts/frontend/Components/CartContext';
+import CartSidebar from './layouts/frontend/Components/CartSidebar';
+import Checkout from './layouts/frontend/Components/Checkout';
+import TrendingProducts from './layouts/frontend/Outer/TrendingProducts';
+import ShippingReturns from './layouts/frontend/Outer/ShippingReturns';
+import Warranty from './layouts/frontend/Outer/Warranty';
+import PrivacyPolicy from './layouts/frontend/Outer/PrivacyPolicy';
+import TermsOfServicePage from './layouts/frontend/Outer/TermsOfService';
+import OrderConfirmation from './layouts/frontend/Components/OrderConfirmation';
+import UserOrders from './layouts/frontend/Components/UserOrders';
+import UserOrderDetail from './layouts/frontend/Components/UserOrderDetail';
+import UserProfile from './layouts/frontend/Components/Profile';
+
+
+const Master = lazy(() => import('./layouts/admin/Master'));
+const Register = lazy(() => import('./layouts/frontend/auth/Register'));
+const Login = lazy(() => import('./layouts/frontend/auth/Login'));
+const AdminPrivateRoute = lazy(() => import('./AdminPrivateRoute'));
+const Navbar = lazy(() => import('./layouts/frontend/Components/Navbar'));
+const HeroSection = lazy(() => import('./layouts/frontend/Components/HeroSection'));
+const FeaturedCategories = lazy(() => import('./layouts/frontend/Components/FeaturedCategories'));
+const Products = lazy(() => import('./layouts/frontend/Components/Products'));
+const CustomerTestimonials = lazy(() => import('./layouts/frontend/Components/CustomerTestimonials'));
+const CallToActionNewsletter = lazy(() => import('./layouts/frontend/Components/CallToActionNewsletter'));
+const Footer = lazy(() => import('./layouts/frontend/Components/Footer'));
+const Store = lazy(() => import('./layouts/frontend/Outer/Store'));
+const ProductDetail = lazy(() => import('./layouts/frontend/Outer/Detail'));
+const NotFound = lazy(() => import('./layouts/frontend/Components/404'));
+const Forbidden = lazy(() => import('./layouts/frontend/Components/403'));
+const ScrollToTop = lazy(() => import('./layouts/frontend/Components/ScrollToTop'));
+
+
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+axios.defaults.baseURL = '/';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.post['Accept'] = 'application/json';
+
+axios.interceptors.request.use(function (config) {
+  const token = localStorage.getItem('auth_token');
+  config.headers.Authorization = token ? `Bearer ${token}` : '';
+  return config;
+});
+
+// Home component from the initial app
+function Home() {
+  return (
+    <>
+      <HeroSection />
+      <FeaturedCategories />
+      <Products />
+      <CustomerTestimonials />
+      <CallToActionNewsletter />
+    </>
+  );
+}
+
+function Layout() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin'); // Check if the current route is under /admin
+
+  // Create a wrapper component to handle redirection based on authentication
+  const ProtectedRoute = ({ element }) => {
+    const token = localStorage.getItem('auth_token');
+
+    if (token) {
+      return <Navigate to="/" replace />;
+    }
+
+    return element;
+  };
+
+  return (
+    <>
+      {!isAdminRoute && <Navbar />} {/* Render Navbar only if not on admin routes */}
+      <CartSidebar />
+      <Routes>
+        {/* Admin routes protected with AdminPrivateRoute */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminPrivateRoute>
+              <Master />
+            </AdminPrivateRoute>
+          }
+        />
+
+        {/* Frontend routes */}
+        <Route path="/" element={<Home />} />
+        <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
+        <Route path='/user/orders' element={<UserOrders />} />
+        <Route path="/user/order/:orderNumber" element={<UserOrderDetail />} />
+        <Route path='/user/profile' element={<UserProfile />} />
+        <Route path="/shop" element={<Store />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/collections/trending" element={<TrendingProducts />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/company/team" element={<Team />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/support/warranty" element={<Warranty />} />
+        <Route path="/support/faq" element={<FAQ />} />
+        <Route path="/support/shipping-returns" element={<ShippingReturns />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/collections/:categoryLink" element={<Collections />} />
+        <Route path="/collections/:categoryLink/:productLink" element={<ProductDetail />} />
+        <Route path="/403" element={<Forbidden />} />
+        <Route path="/login" element={<ProtectedRoute element={<Login />} />} />
+        <Route path="/register" element={<ProtectedRoute element={<Register />} />} />
+        <Route path="/email/resend" element={<ResendEmail />} />
+        <Route path="/email/verify" element={<VerifyEmail />} />
+
+        {/* Fallback route for non-existing pages */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* <Sidebar /> */}
+      {!isAdminRoute && <Footer />} {/* Render Footer only if not on admin routes */}
+    </>
+  );
+}
+
+function App() {
+    useEffect(() => {
+    const trackVisitor = async () => {
+      try {
+        await axios.post('/api/analytics/track');
+        console.log('Visitor tracked successfully!');
+      } catch (error) {
+        console.error('Error tracking visitor:', error);
+      }
+    };
+
+    trackVisitor(); // Call the async function immediately
+  }, []);        
+
+  return (
+    <div className="App font-raleway">
+      <HelmetProvider>
+        <Router>
+        <CartProvider>
+          <ScrollToTop /> {/* Scroll to the top when navigating */}
+          <Suspense fallback={<LoadingSpinner />}>
+            <Layout /> {/* Use Layout to conditionally render components */}
+          </Suspense>
+          </CartProvider>
+        </Router>
+        {/* ToastContainer for global notifications */}
+        <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          newestOnTop 
+          closeOnClick 
+          pauseOnFocusLoss 
+          draggable 
+          pauseOnHover 
+        />
+      </HelmetProvider>
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,133 @@
+[2025-06-22 11:10:52] local.ERROR: Method Illuminate\Validation\Rule::image does not exist. {"exception":"[object] (BadMethodCallException(code: 0): Method Illuminate\\Validation\\Rule::image does not exist. at C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Macroable\\Traits\\Macroable.php:89)
+[stacktrace]
+#0 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\app\\Http\\Controllers\\AdminSettingsController.php(73): Illuminate\\Validation\\Rule::__callStatic('image', Array)
+#1 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Controller.php(54): App\\Http\\Controllers\\AdminSettingsController->updateSettings(Object(Illuminate\\Http\\Request))
+#2 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(43): Illuminate\\Routing\\Controller->callAction('updateSettings', Array)
+#3 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\AdminSettingsController), 'updateSettings')
+#4 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#5 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#6 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#7 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#8 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#9 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#10 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#11 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#12 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#13 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#14 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#15 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#16 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#17 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#20 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#23 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#34 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#35 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#36 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#37 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\Admin\\\\...')
+#38 {main}
+"} 
+[2025-06-22 11:13:09] local.INFO: New logo uploaded: uploads/settings/ZpiohIgVQatQMFDARHeevrPNfFCOOIm76Qgr8qM2.png  
+[2025-06-22 11:13:16] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:13:17] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:22:27] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:22:30] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3004 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:22:30] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:22:33] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3006 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:23:28] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:23:31] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3009 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:23:32] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:23:35] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3013 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:23:41] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:23:44] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3008 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:23:44] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:23:47] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3014 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:24:18] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:24:21] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3020 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:24:22] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:24:25] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3005 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:27:09] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:27:12] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3000 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:27:12] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:27:15] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3011 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:27:18] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:27:21] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3004 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:27:21] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:27:24] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3015 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:29:19] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:29:22] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3015 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:29:23] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:29:26] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3000 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:33:30] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:33:33] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3004 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:33:33] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:33:36] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3010 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:33:42] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:33:45] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3012 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:33:45] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:33:48] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3013 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:34:26] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:34:29] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3002 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:34:29] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:34:32] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3015 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:34:40] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:34:43] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3010 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:34:43] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:34:46] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3014 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:41:53] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:41:56] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:41:59] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3013 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:43:07] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:10] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3010 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:43:10] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:14] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 11:43:15] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 11:43:15] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 11:43:15] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 11:43:15] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 11:43:15] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 11:43:15] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 11:43:15] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 11:43:32] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:35] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3004 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:43:35] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:38] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3015 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:43:49] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:52] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3008 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:43:52] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:43:55] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3012 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:44:30] local.INFO: Order Data Received: {"user_info":{"fullName":"General Grod","email":"iwuaustinchris@gmail.com","phone":"09400390366"},"shipping_address":{"address1":"ff","address2":null,"city":"ff","state":"rr","zipCode":"3443"},"items":[{"id":1,"name":"Camera","qty":1,"price":"180"}],"total_price":180,"shipping_cost":100,"grand_total":280,"payment_method":"paystack"} 
+[2025-06-22 11:44:40] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:44:43] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3000 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:44:43] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:44:46] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3007 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:44:51] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:44:54] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3011 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:44:54] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:44:57] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3004 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:45:36] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:45:38] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:45:53] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:45:55] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:47:29] local.INFO: Order status email sent to iwuaustinchris@gmail.com for order FDC-202506221144302Yju. New status: pending_confirmation  
+[2025-06-22 11:47:31] local.INFO: Telegram notification sent for order FDC-202506221144302Yju. Status: pending_confirmation  
+[2025-06-22 11:54:05] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:54:08] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3003 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:54:09] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:54:12] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3013 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 11:54:30] local.INFO: New logo uploaded: uploads/settings/1750593270.png  
+[2025-06-22 11:54:35] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 11:54:37] local.INFO: Tracking visitor with IP: 127.0.0.1  
