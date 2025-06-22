@@ -1,66 +1,250 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-commerce Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Project Overview
 
-## About Laravel
+This project is a full-stack e-commerce platform designed to provide a seamless shopping experience for customers and robust management tools for administrators. The frontend is built with React for a dynamic user interface, while the backend is powered by Laravel, offering secure API endpoints for data management, user authentication, and payment processing.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### User-Facing:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Product Browsing:** Easily browse products by categories, search, and view detailed product information.
 
-## Learning Laravel
+* **Shopping Cart:** Add, update, and remove items from the shopping cart.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* **Secure Checkout:** A multi-step checkout process with integrated payment gateways (e.g., Paystack) and bank transfer options.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* **User Authentication:** Secure user registration, login, and logout.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **User Profile Management:** Users can view and update their personal details and change passwords.
 
-## Laravel Sponsors
+* **Order Confirmation:** Dedicated page to confirm order details after successful payment.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Admin-Facing:
 
-### Premium Partners
+* **Dashboard Analytics:** Comprehensive overview of website activity, including total visitors, orders, revenue, users, daily visit trends, top viewing locations, and peak visit hours.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+* **Settings Management:** Configure general site settings such as site name, contact information, social media links, site logo, and shipping fees.
+
+* **Activity Feed:** Real-time stream of recent activities like new orders, new user registrations, and low stock alerts.
+
+## Technology Stack
+
+* **Frontend:**
+
+    * React.js
+
+    * Tailwind CSS (for styling)
+
+    * Framer Motion (for animations)
+
+    * Lucide React (for icons)
+
+    * React Toastify (for notifications)
+
+    * Axios (for API requests)
+
+    * React Helmet Async (for SEO)
+
+    * Recharts (for charts in Admin Dashboard)
+
+    * Paystack (for payment processing - integrated directly without `react-paystack` library for better compatibility)
+
+* **Backend:**
+
+    * Laravel (PHP Framework)
+
+    * MySQL (Database)
+
+    * Laravel Passport (for API authentication - assumed)
+
+    * Laravel Mail (for email handling - assumed)
+
+## Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+* PHP (>= 8.1)
+
+* Composer
+
+* Node.js (LTS recommended)
+
+* npm or Yarn
+
+* MySQL Database
+
+* Git
+
+### Backend Setup (Laravel)
+
+1.  **Clone the repository:**
+
+    ```
+    git clone <https://github.com/AustinChris1/FDC-Ecommerce>
+    cd FDC-Ecommerce
+
+
+    ```
+
+2.  **Install Composer dependencies:**
+
+    ```
+    composer install
+
+
+    ```
+
+3.  **Create a copy of your environment file:**
+
+    ```
+    cp .env.example .env
+
+
+    ```
+
+4.  **Generate an application key:**
+
+    ```
+    php artisan key:generate
+
+
+    ```
+
+5.  **Configure your `.env` file:**
+    Open the `.env` file and update your database credentials (`DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and Mail settings (`MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, etc.).
+    Also, add your Paystack Public Key:
+
+    ```
+    VITE_PAYSTACK_PUBLIC_KEY="pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Replace with your actual Test Public Key
+
+
+    ```
+
+6.  **Run database migrations:**
+
+    ```
+    php artisan migrate
+
+
+    ```
+
+    (Optional: If you have seeders for initial data, run `php artisan db:seed`)
+
+7.  **Generate Passport API keys (if using Laravel Passport):**
+
+    ```
+    php artisan passport:install
+
+
+    ```
+
+8.  **Link storage (for uploaded files):**
+
+    ```
+    php artisan storage:link
+
+
+    ```
+
+9.  **Start the Laravel development server:**
+
+    ```
+    php artisan serve
+
+
+    ```
+
+    The backend will typically run on `http://localhost:8000`.
+
+### Frontend Setup (React)
+
+1.  **Navigate to the frontend directory:**
+    Assuming your React project is in the root, or if it's in a `frontend` subdirectory:
+
+    ```
+    # If React project is in a subdirectory, e.g., 'client'
+    # cd client
+
+
+    ```
+
+2.  **Install npm dependencies:**
+
+    ```
+    npm install
+    # OR
+    yarn install
+
+
+    ```
+
+3.  **Create a `.env.local` file for frontend environment variables:**
+    (This is common for Vite/CRA projects; ensure your frontend framework picks up `VITE_PAYSTACK_PUBLIC_KEY` as needed.)
+
+    ```
+    VITE_PAYSTACK_PUBLIC_KEY="pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Must match the one in backend .env
+
+
+    ```
+
+4.  **Start the React development server:**
+
+    ```
+    npm run dev
+    # OR
+    yarn dev
+
+
+    ```
+
+    The frontend will typically run on `http://localhost:8000` (or similar).
+
+## Deployment
+
+### Backend Deployment Considerations:
+
+* Ensure your web server (Nginx/Apache) is configured to serve Laravel applications.
+
+* Update your `.env` file with production database credentials, email settings, and Paystack production keys.
+
+* Run `composer install --optimize-autoloader --no-dev`.
+
+* Run `php artisan config:cache`, `php artisan route:cache`, `php artisan view:cache`.
+
+### Frontend Deployment Considerations:
+
+* Build the React application for production: `pnpm build` (or `yarn build`).
+
+* Configure your web server to serve the static files from the `build` or `dist` directory.
+
+* Ensure the API endpoint in your React code (`API_URL`) points to your production backend.
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions are welcome! Please follow standard Git Flow:
 
-## Code of Conduct
+1.  Fork the repository.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2.  Create a new feature branch (`git checkout -b feature/AmazingFeature`).
 
-## Security Vulnerabilities
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4.  Push to the branch (`git push origin feature/AmazingFeature`).
+
+5.  Open a Pull Request.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+**Note to Developers:**
+
+* Remember to replace placeholder URLs and keys with your actual values.
+
+* Always check Laravel logs (`storage/logs/laravel.log`) for backend errors.
+
+* For frontend environment variables, ensure your build tool (Vite, Create React App) is correctly configured to read them.
