@@ -131,3 +131,31 @@
 [2025-06-22 11:54:30] local.INFO: New logo uploaded: uploads/settings/1750593270.png  
 [2025-06-22 11:54:35] local.INFO: Tracking visitor with IP: 127.0.0.1  
 [2025-06-22 11:54:37] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:20:37] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 12:20:37] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 12:20:37] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 12:20:37] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 12:20:37] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 12:20:37] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 12:20:37] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 12:20:37] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 12:20:50] local.INFO: Order Data Received: {"user_info":{"fullName":"General Grod","email":"iwuaustinchris@gmail.com","phone":"09400390366"},"shipping_address":{"address1":"ff","address2":null,"city":"ff","state":"rr","zipCode":"3443"},"items":[{"id":1,"name":"Camera","qty":1,"price":"180"}],"total_price":180,"shipping_cost":100,"grand_total":280,"payment_method":"paystack"} 
+[2025-06-22 12:44:56] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:44:59] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3016 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 12:45:00] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:45:03] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Operation timed out after 3014 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 12:45:04] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 12:45:04] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 12:45:04] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 12:45:04] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 12:45:05] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-06-22 12:45:05] local.INFO: Applying price filter: min=0, max=50000  
+[2025-06-22 12:45:05] local.INFO: Sorting by: alphaAsc  
+[2025-06-22 12:45:05] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
+[2025-06-22 12:45:14] local.INFO: Order Data Received: {"user_info":{"fullName":"dffg","email":"a@a.com","phone":"09400390366"},"shipping_address":{"address1":"ff","address2":null,"city":"ff","state":"rr","zipCode":"3443"},"items":[{"id":1,"name":"Camera","qty":1,"price":"180"}],"total_price":180,"shipping_cost":100,"grand_total":280,"payment_method":"paystack"} 
+[2025-06-22 12:45:37] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:45:40] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3014 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 12:45:40] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:45:43] local.ERROR: GeoIP lookup failed for IP: 127.0.0.1. Error: cURL error 28: Connection timed out after 3016 milliseconds (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://ipapi.co/127.0.0.1/json  
+[2025-06-22 12:48:17] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-06-22 12:48:20] local.INFO: Tracking visitor with IP: 127.0.0.1  

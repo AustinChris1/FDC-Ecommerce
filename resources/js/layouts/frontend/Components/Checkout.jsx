@@ -160,7 +160,7 @@ const Checkout = () => {
     useEffect(() => {
         if (orderNumber) {
             localStorage.setItem('checkout_order_number', orderNumber);
-            localStorage.setItem('checkout_order_total', grandTotal.toString());
+            localStorage.setItem('checkout_order_total', totalCartPrice.toString());
             localStorage.setItem('checkout_payment_method', paymentMethod);
             if (paystackReference) {
                 localStorage.setItem('checkout_paystack_reference', paystackReference);
@@ -247,7 +247,7 @@ const Checkout = () => {
         setIsSubmitting(true);
         try {
             const orderData = getOrderPayload(method);
-            const res = await axios.post(`${API_URL}/orders/${orderNumber}/update`, orderData, { 
+            const res = await axios.post(`${API_URL}/orders/${orderNumber}/update`, orderData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
@@ -299,13 +299,13 @@ const Checkout = () => {
         if (res.status === 'success' && res.transaction && orderNumber) {
             try {
                 // Ensure the payment reference from Paystack matches the one from our initiated order
-                if (res.reference !== paystackReference && res.reference !== orderNumber) {
+                if (res.reference !== paystackReference ) {
                     toast.error("Payment reference mismatch. Please contact support.");
                     setIsSubmitting(false);
                     return;
                 }
 
-                const updateRes = await axios.post(`${API_URL}/orders/update-status/${res.reference}`, {
+                const updateRes = await axios.post(`${API_URL}/orders/update-status/${orderNumber}`, {
                     status: 'completed',
                     transaction_id: res.transaction,
                     payment_method: 'paystack',
@@ -369,10 +369,16 @@ const Checkout = () => {
         toast.info(
             <div className="flex items-center">
                 <Info className="text-blue-400 mr-2" />
-                <span>Payment window closed. You can try again or choose another method.</span>
+                <span>Payment was cancelled. Please try again.</span>
             </div>,
             { icon: false }
         );
+
+        // Clear stored reference and generate a new one
+        const newRef = `FDC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        setPaystackReference(newRef);
+        localStorage.setItem('checkout_paystack_reference', newRef);
+
         setIsSubmitting(false);
     }, []);
 
@@ -380,7 +386,7 @@ const Checkout = () => {
     const paystackConfig = useMemo(() => ({
         email: email?.trim() || '',
         amount: parseInt(grandTotal) * 100, // Amount in kobo
-        publicKey: paystack_key, 
+        publicKey: paystack_key,
         reference: paystackReference,
         metadata: {
             customer_name: fullName?.trim(),

@@ -18,7 +18,7 @@ use App\Http\Controllers\AdminSettingsController;
 
 // Admin Dashboard Routes
     Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
-    Route::post('/settings/update', [AdminSettingsController::class, 'updateSettings']); // Using POST to handle multipart/form-data with _method PUT
+    Route::post('/settings/update', [AdminSettingsController::class, 'updateSettings']);
 
 Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
 Route::post('/analytics/track', [AnalyticsController::class, 'trackVisitor']);
@@ -30,7 +30,7 @@ Route::post('/orders/update-status/{identifier}', [OrderController::class, 'upda
 Route::post('/paystack-webhook', [OrderController::class, 'handleWebhook']);
 Route::get('/allOrders', [OrderController::class, 'viewOrders']);
 Route::get('/orders/view/{order_number}', [OrderController::class, 'viewOrderDetails']);
-Route::post('/orders/{orderNumber}/update', [OrderController::class, 'updateOrder']); // NEW ROUTE
+Route::post('/orders/{orderNumber}/update', [OrderController::class, 'updateOrder']);
 
 Route::post('/contact-us', [ContactMessageController::class, 'store']);
 
