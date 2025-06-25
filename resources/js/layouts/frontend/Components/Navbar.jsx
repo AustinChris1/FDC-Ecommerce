@@ -26,7 +26,7 @@ import fdcLogo from '../assets/fdcLogo.png';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const location = useLocation();
+    const location = useLocation(); // Hook to get current location
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [category, setCategory] = useState([]);
@@ -51,6 +51,7 @@ const Navbar = () => {
     const { totalCartItems, toggleCart } = useCart();
 
     // Close mobile menu on navigation and on body scroll disable
+    // This function is now the primary way to handle navigation and menu closing
     const handleNavigation = (path) => {
         setIsMobileMenuOpen(false); // Always close mobile menu on navigation
         // Also clear search results if navigating
@@ -67,6 +68,13 @@ const Navbar = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Effect to close mobile menu automatically when location changes
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            setIsMobileMenuOpen(false);
+        }
+    }, [location.pathname]); // Dependency on location.pathname ensures this runs on every route change
 
     // Fetch categories from backend on component mount
     useEffect(() => {
@@ -117,6 +125,7 @@ const Navbar = () => {
             toast.success("Logout successful (due to network error or unhandled backend response).");
         } finally {
             navigate(currentPath); // Redirect to current path to refresh auth state
+            setIsMobileMenuOpen(false); // Ensure menu closes after logout attempt
         }
     };
 
@@ -260,7 +269,7 @@ const Navbar = () => {
                         title="Categories"
                         items={category.map(cat => cat.name)}
                         links={category.map(cat => `/collections/${cat.link}`)}
-                        handleNavigation={handleNavigation}
+                        handleNavigation={handleNavigation} // Pass handleNavigation to dropdown
                         isMobile={false} // Explicitly set for desktop
                     />
                 </ul>
@@ -283,7 +292,7 @@ const Navbar = () => {
                         )}
                         {/* Search Results Dropdown */}
                         <AnimatePresence>
-                            {searchResults.length > 0 && searchTerm.length > 2 && (
+                            {searchResults.length > 0 && searchTerm.length > 1 && (
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -375,7 +384,6 @@ const Navbar = () => {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            // Changed from h-full to min-h-screen for better mobile height behavior
                             className="fixed top-0 right-0 min-h-screen w-full bg-gray-950 flex flex-col pt-20 px-6 pb-6 overflow-y-auto shadow-xl lg:hidden z-40"
                         >
                             <div className="absolute top-4 right-4 z-50"> {/* Ensure close button is above content */}
@@ -399,7 +407,7 @@ const Navbar = () => {
                                     title="Categories"
                                     items={category.map(cat => cat.name)}
                                     links={category.map(cat => `/collections/${cat.link}`)}
-                                    handleNavigation={handleNavigation}
+                                    handleNavigation={handleNavigation} 
                                     isMobile={true}
                                 />
                                 {/* Mobile Search Bar */}
@@ -430,7 +438,7 @@ const Navbar = () => {
                                             >
                                                 {searchResults.map((product) => (
                                                     <div key={product.id} className="border-b border-gray-700 py-2 last:border-b-0">
-                                                        <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} onClick={() => { setSearchResults([]); setSearchTerm(''); setIsMobileMenuOpen(false); }}>
+                                                        <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} onClick={() => { setSearchResults([]); setSearchTerm(''); handleNavigation(`/collections/${product.category?.link || 'default-category'}/${product.link}`); }}>
                                                             <span className="block text-gray-200 text-sm hover:text-cyan-400">{product.name}</span>
                                                         </Link>
                                                     </div>

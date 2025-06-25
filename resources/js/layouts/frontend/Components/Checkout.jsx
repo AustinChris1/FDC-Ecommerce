@@ -57,10 +57,8 @@ const Checkout = () => {
                 } else {
                     toast.error(res.data.message || "Failed to load site settings.");
                 }
-                console.log(res.data.settings)
             })
             .catch(err => {
-                console.error("Error fetching site settings:", err);
                 toast.error("Network error or server issue. Could not load site settings.");
             })
             .finally(() => {
@@ -69,17 +67,13 @@ const Checkout = () => {
     }, []);
 
     const paystack_key = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-    const API_URL = import.meta.env.PROD
-        ? 'https://spx.firstdigit.com.ng/api'
-        : 'http://localhost:8000/api';
-
 
     // --- Fetch Site Settings on Component Mount ---
     // This fetches the shipping fee and other general settings
     useEffect(() => {
         setLoading(true);
         setErrorSettings(false);
-        axios.get(`${API_URL}/settings/general`) // Fetch from API endpoint
+        axios.get(`/api/settings/general`) // Fetch from API endpoint
             .then(res => {
                 if (res.status === 200 && res.data.settings) {
                     setSiteSettings(res.data.settings);
@@ -96,7 +90,7 @@ const Checkout = () => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [API_URL]); // Dependency on API_URL to re-fetch if it changes (unlikely in practice)
+    }, []);
 
     const shippingCost = useMemo(() => {
         return parseFloat(siteSettings?.shipping_fee ?? 0);
@@ -135,26 +129,26 @@ const Checkout = () => {
         if (storedOrderNumber) {
             setOrderNumber(storedOrderNumber);
             setPaystackReference(storedPaystackReference || storedOrderNumber);
-            setPersistedOrderTotal(storedOrderTotal); // Store for comparison
-            setPersistedPaymentMethod(storedPaymentMethod); // Store for comparison
+            setPersistedOrderTotal(storedOrderTotal);
+            setPersistedPaymentMethod(storedPaymentMethod);
 
             // Check if cart total or payment method has changed from the persisted order
-            if (grandTotal === storedOrderTotal && paymentMethod === storedPaymentMethod) {
-                setCurrentStep(2); // If consistent, move directly to payment step
+            if (totalCartPrice === storedOrderTotal && paymentMethod === storedPaymentMethod) {
+                setCurrentStep(2);
                 toast.info("Resumed previous checkout session.");
             } else {
                 setCurrentStep(1); // If inconsistent, stay on step 1 for review/update
-                if (grandTotal !== storedOrderTotal) {
+                if (totalCartPrice !== storedOrderTotal) {
                     toast.warn("Your cart items have changed. Please review details.");
-                } else if (storedPaymentMethod !== paymentMethod) { // Only warn if payment method actually changed
+                } else if (storedPaymentMethod !== paymentMethod) {
                     toast.warn("Payment method changed. Please confirm details.");
                 } else {
                     toast.info("Resuming checkout. Review your details.");
                 }
             }
         }
-        setLoading(false); // End loading after localStorage check
-    }, [cartItems, navigate, grandTotal, paymentMethod]); // Dependencies for this effect
+        setLoading(false);
+    }, [cartItems, navigate, grandTotal, paymentMethod]);
 
     // Effect to save order details to localStorage whenever they change
     useEffect(() => {
@@ -169,9 +163,6 @@ const Checkout = () => {
     }, [orderNumber, paystackReference, grandTotal, paymentMethod]);
 
 
-    /**
-     * Prepares common order data payload for backend requests.
-     */
     const getOrderPayload = useCallback((method) => ({
         user_info: { fullName, email, phone },
         shipping_address: { address1, address2, city, state, zipCode },
@@ -187,16 +178,12 @@ const Checkout = () => {
         payment_method: method,
     }), [fullName, email, phone, address1, address2, city, state, zipCode, cartItems, totalCartPrice, shippingCost, grandTotal]);
 
-    /**
-     * Initiates a new order on the backend.
-     * @param {string} method - 'paystack' or 'bank_transfer'
-     * @returns {object|null} - Backend response data or null on failure
-     */
+    // Initiates a new order on the backend.
     const placeNewOrder = async (method) => {
         setIsSubmitting(true);
         try {
             const orderData = getOrderPayload(method);
-            const res = await axios.post(`${API_URL}/orders/place`, orderData, {
+            const res = await axios.post(`/api/orders/place`, orderData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
@@ -204,7 +191,6 @@ const Checkout = () => {
                 withCredentials: true,
             });
 
-            console.log("Order Placement Response:", res);
 
             if (res.data.status === 200 && res.data.order_number) {
                 toast.success("New order initiated. Proceeding to payment...");
@@ -214,7 +200,6 @@ const Checkout = () => {
                 }
                 return res.data;
             } else {
-                console.log("Error response data:", res.data);
                 toast.error(
                     <div className="flex items-center">
                         <XCircle className="text-red-400 mr-2" />
@@ -240,14 +225,12 @@ const Checkout = () => {
         }
     };
 
-    /**
-     * Updates an existing order on the backend.
-     */
+    //Updates an existing order on the backend.
     const updateExistingOrder = async (method) => {
         setIsSubmitting(true);
         try {
             const orderData = getOrderPayload(method);
-            const res = await axios.post(`${API_URL}/orders/${orderNumber}/update`, orderData, {
+            const res = await axios.post(`/api/orders/${orderNumber}/update`, orderData, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
@@ -255,7 +238,6 @@ const Checkout = () => {
                 withCredentials: true,
             });
 
-            console.log("Order Update Response:", res);
 
             if (res.data.status === 200 && res.data.order_number) {
                 toast.success("Order updated successfully. Proceeding to payment...");
@@ -294,18 +276,16 @@ const Checkout = () => {
     };
 
     const handlePaystackSuccess = useCallback(async (res) => {
-        console.log('Paystack Success Res:', res);
-        // The res.reference from Paystack *should* match the orderNumber/paystackReference from our backend
         if (res.status === 'success' && res.transaction && orderNumber) {
             try {
                 // Ensure the payment reference from Paystack matches the one from our initiated order
-                if (res.reference !== paystackReference ) {
+                if (res.reference !== paystackReference) {
                     toast.error("Payment reference mismatch. Please contact support.");
                     setIsSubmitting(false);
                     return;
                 }
 
-                const updateRes = await axios.post(`${API_URL}/orders/update-status/${orderNumber}`, {
+                const updateRes = await axios.post(`/api/orders/update-status/${orderNumber}`, {
                     status: 'completed',
                     transaction_id: res.transaction,
                     payment_method: 'paystack',
@@ -325,10 +305,10 @@ const Checkout = () => {
                         { icon: false }
                     );
                     clearCart();
-                    localStorage.removeItem('checkout_order_number'); // Clear persisted order data
+                    localStorage.removeItem('checkout_order_number');
                     localStorage.removeItem('checkout_paystack_reference');
                     localStorage.removeItem('checkout_order_total');
-                    localStorage.removeItem('checkout_payment_method'); // Clear persisted payment method
+                    localStorage.removeItem('checkout_payment_method');
                     localStorage.setItem('lastPaymentMethod', 'paystack');
                     navigate(`/order-confirmation/${orderNumber}`);
                 } else {
@@ -360,12 +340,12 @@ const Checkout = () => {
             );
         }
         setIsSubmitting(false);
-    }, [clearCart, navigate, orderNumber, paystackReference, API_URL]);
+    }, [clearCart, navigate, orderNumber, paystackReference]);
 
 
     // Handles Paystack payment modal closing
     const handlePaystackClose = useCallback(() => {
-        console.log('Paystack Payment Closed');
+        // console.log('Paystack Payment Closed');
         toast.info(
             <div className="flex items-center">
                 <Info className="text-blue-400 mr-2" />
@@ -424,20 +404,17 @@ const Checkout = () => {
 
         // Condition 1: No existing order, or existing order is null/invalid
         if (!orderNumber) {
-            console.log("No existing order number. Placing new order.");
             const orderRes = await placeNewOrder(paymentMethod);
             if (orderRes) {
                 orderActionSuccessful = true;
             }
         }
         // Condition 2: Existing order, but cart total or payment method has changed
-        else if (grandTotal !== persistedOrderTotal || paymentMethod !== persistedPaymentMethod) {
-            console.log("Cart total or payment method changed. Updating existing order.");
+        else if (totalCartPrice !== persistedOrderTotal || paymentMethod !== persistedPaymentMethod) {
             const orderRes = await updateExistingOrder(paymentMethod);
             if (orderRes) {
                 orderActionSuccessful = true;
             } else {
-                // If update failed, maybe prompt to create new or stay? For now, we fail
                 toast.error("Failed to update existing order. Please try again or contact support.");
                 setIsSubmitting(false);
                 return;
@@ -453,11 +430,11 @@ const Checkout = () => {
         if (orderActionSuccessful) {
             setCurrentStep(2);
         }
-        setIsSubmitting(false); // Set submitting to false after handling all cases
+        setIsSubmitting(false);
     };
 
     const handleBackStep = () => {
-        setCurrentStep(1); // Allow going back to step 1
+        setCurrentStep(1);
     };
 
 
@@ -470,7 +447,7 @@ const Checkout = () => {
         }
         try {
             console.log('Confirming bank transfer for order:', orderNumber);
-            const res = await axios.post(`${API_URL}/orders/update-status/${orderNumber}`, {
+            const res = await axios.post(`/api/orders/update-status/${orderNumber}`, {
                 status: 'pending_confirmation',
                 payment_method: 'bank_transfer',
             }, {
@@ -489,10 +466,10 @@ const Checkout = () => {
                     { icon: false }
                 );
                 clearCart();
-                localStorage.removeItem('checkout_order_number'); // Clear persisted order data
+                localStorage.removeItem('checkout_order_number');
                 localStorage.removeItem('checkout_paystack_reference');
                 localStorage.removeItem('checkout_order_total');
-                localStorage.removeItem('checkout_payment_method'); // Clear persisted payment method
+                localStorage.removeItem('checkout_payment_method');
                 localStorage.setItem('lastPaymentMethod', 'bank_transfer');
                 navigate(`/order-confirmation/${orderNumber}`);
             } else {
@@ -783,7 +760,8 @@ const Checkout = () => {
                             <span className="text-lime-400">₦{grandTotal.toLocaleString()}</span>
                         </div>
                     </div>
-                </motion.div>            </form>
+                </motion.div>
+            </form>
         </motion.div>
     );
 };

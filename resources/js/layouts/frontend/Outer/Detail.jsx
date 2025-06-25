@@ -114,7 +114,7 @@ const ProductDetail = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await axios.post(`/api/products/${product.id}/reviews`, {
+            const response = await axios.post(`/api/products/${product.id}/submit`, {
                 rating,
                 review: reviewText,
             }, {
@@ -343,8 +343,8 @@ const ProductDetail = () => {
                         {product.description || 'A stunning product with unparalleled features, designed to exceed your expectations. Experience innovation and quality in every detail.'}
                     </p>
                     <p className="text-gray-400 text-base mb-2">{`Brand: ${product.brand || 'Unknown'}`}</p>
-                    <p className={`text-base font-semibold ${product.status === 0 ? 'text-lime-400' : 'text-red-500'} mb-4`}>
-                        {product.status === 0 ? 'In Stock' : 'Out of Stock'}
+                    <p className={`text-base font-semibold ${product.status || product.quantity === 0 ? 'text-lime-400' : 'text-red-500'} mb-4`}>
+                        {product.status || product.quantity === 0 ? 'In Stock' : 'Out of Stock'}
                     </p>
 
                     <div className="flex items-center mb-6">
@@ -417,10 +417,10 @@ const ProductDetail = () => {
                             variants={buttonVariants}
                             whileHover="hover"
                             whileTap="tap"
-                            disabled={product.status !== 0}
+                            disabled={product.status || product.quantity !== 0}
                         >
                             <ShoppingCart className="w-6 h-6" />
-                            <span>{product.status === 0 ? 'Add to Cart' : 'Out of Stock'}</span>
+                            <span>{product.status || product.quantity === 0 ? 'Add to Cart' : 'Out of Stock'}</span>
                         </motion.button>
                         <motion.button
                             onClick={handleAddToWishlist}

@@ -1,1 +1,0 @@
-import{a as t,r as e}from"./main--wlwxwR1.js";const a=()=>{const{pathname:o}=t();return e.useEffect(()=>{(()=>{setTimeout(()=>{window.scrollTo({top:0,behavior:"smooth"})},100)})()},[o]),null};export{a as default};

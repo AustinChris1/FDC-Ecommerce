@@ -7,7 +7,7 @@
     <link rel="icon" href="{{ Vite::asset('resources/js/layouts/frontend/assets/fdcLogo.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>First Digits Communications</title>
+    <title>First Digit Communications</title>
 </head>
 
 <body>

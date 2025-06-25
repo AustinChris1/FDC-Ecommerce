@@ -22,7 +22,7 @@ class OrderController extends Controller
     public function placeOrder(Request $request)
     {
         // Determine if this is a POS sale based on the 'is_pos' flag from the frontend
-        $isPosSale = $request->input('is_pos', false);
+        $isPosSale = boolval($request->input('is_pos'));
 
         // 1. Define validation rules based on whether it's a POS sale or an online order
         $rules = [
@@ -30,7 +30,7 @@ class OrderController extends Controller
             // For items, the frontend now sends 'id' as product_id and 'qty' as quantity
             'items.*.id' => 'required|integer|exists:products,id', // Matches frontend 'item.id'
             'items.*.name' => 'required|string|max:255', // Added for item_json
-            'items.*.qty' => 'required|integer|min:1',   // Matches frontend 'item.qty'
+            'items.*.qty' => 'required|integer|min:1',    // Matches frontend 'item.qty'
             'items.*.price' => 'required|numeric|min:0', // Matches frontend 'item.selling_price'
 
             'grand_total' => 'required|numeric|min:0',
@@ -43,12 +43,12 @@ class OrderController extends Controller
             $rules['customer_name'] = 'nullable|string|max:255';
             $rules['customer_email'] = 'nullable|email|max:255';
             $rules['customer_phone'] = 'nullable|string|max:20';
+            // Ensure discount_amount and amount_paid are validated as numeric
             $rules['discount_amount'] = 'nullable|numeric|min:0'; // Discount is always applicable now for POS
-            $rules['amount_paid'] = 'nullable|numeric|min:0';     // For cash payments in POS
+            $rules['amount_paid'] = 'nullable|numeric|min:0';      // For cash payments in POS
             $rules['payment_method'] = 'required|string|in:cash,card_pos,bank_transfer'; // Strict POS payment methods
         } else {
-            // Online order specific validations (from your existing code)
-            // 'order_number' is REMOVED from validation, as it's now generated here on the backend
+            // Online-specific validations
             $rules['user_info.fullName'] = 'required|string|max:255';
             $rules['user_info.email'] = 'required|email|max:255';
             $rules['user_info.phone'] = 'required|string|max:20';
@@ -75,18 +75,23 @@ class OrderController extends Controller
         }
 
         try {
-            Log::info('Order Data Received:', $request->all());
+            Log::info('Order Data Received (Full Request):', $request->all());
             $user = Auth::user(); // Get the authenticated user (could be null for POS if not logged in)
 
-            // Calculate subtotal
-            $subtotal = $isPosSale ? ($request->grand_total + $request->input('discount_amount', 0)) : $request->grand_total;
+            // Calculate subtotal - ensure all values are treated as floats
+            $grandTotal = floatval($request->grand_total);
+            $discountAmount = floatval($request->input('discount_amount', 0));
+            $subtotal = $isPosSale ? ($grandTotal + $discountAmount) : $grandTotal;
 
             // Generate a unique order number
-            $orderNumber = 'FDC-' . date('YmdHis') . Str::random(4); 
+            $orderNumber = 'FDC-' . date('YmdHis') . Str::random(4);
 
             // Determine initial order status
             $status = 'pending'; // Default status
             $paystackReference = null; // Default to null, set if Paystack is used
+
+            $amountPaid = floatval($request->input('amount_paid', 0.00));
+
 
             if ($isPosSale) {
                 // POS-specific status logic
@@ -99,7 +104,8 @@ class OrderController extends Controller
                 // Online order specific status logic
                 if ($request->payment_method === 'paystack') {
                     $status = 'processing_paystack_payment';
-                    $paystackReference = $orderNumber;
+                    // If paystack_reference is sent from frontend, use that, otherwise default to orderNumber
+                    $paystackReference = $request->input('paystack_reference', $orderNumber);
                 } elseif ($request->payment_method === 'bank_transfer') {
                     $status = 'processing_bank_transfer_payment';
                 } elseif ($request->payment_method === 'cash_on_delivery') {
@@ -109,29 +115,34 @@ class OrderController extends Controller
                 }
             }
 
-            // 2. Create the Order record
-            $order = Order::create([
+            // Prepare data for Order creation
+            $orderData = [
                 'order_number' => $orderNumber, // Use the server-generated order number
                 'user_id' => $user ? $user->id : null,
-                'full_name' => $isPosSale ? ($request->customer_name ?? 'Walk-in Customer') : $request->user_info['fullName'],
-                'email' => $isPosSale ? $request->customer_email : $request->user_info['email'],
-                'phone' => $isPosSale ? $request->customer_phone : $request->user_info['phone'],
-                'shipping_address1' => $isPosSale ? null : ($request->shipping_address['address1'] ?? null),
-                'shipping_address2' => $isPosSale ? null : ($request->shipping_address['address2'] ?? null),
-                'city' => $isPosSale ? null : ($request->shipping_address['city'] ?? null),
-                'state' => $isPosSale ? null : ($request->shipping_address['state'] ?? null),
-                'zip_code' => $isPosSale ? null : ($request->shipping_address['zipCode'] ?? null),
-                'subtotal' => $subtotal,
-                'shipping_cost' => $isPosSale ? 0 : $request->shipping_cost,
-                'discount_amount' => $request->input('discount_amount', 0),
-                'grand_total' => $request->grand_total,
+                'full_name' => $isPosSale ? ($request->customer_name ?? 'Walk-in Customer') : $request->input('user_info.fullName'),
+                'email' => $isPosSale ? $request->customer_email : $request->input('user_info.email'),
+                'phone' => $isPosSale ? $request->customer_phone : $request->input('user_info.phone'),
+                'shipping_address1' => $isPosSale ? null : $request->input('shipping_address.address1'),
+                'shipping_address2' => $isPosSale ? null : $request->input('shipping_address.address2'),
+                'city' => $isPosSale ? null : $request->input('shipping_address.city'),
+                'state' => $isPosSale ? null : $request->input('shipping_address.state'),
+                'zip_code' => $isPosSale ? null : $request->input('shipping_address.zipCode'),
+                'subtotal' => $subtotal, // Correctly calculated based on POS or online
+                'shipping_cost' => $isPosSale ? 0.00 : floatval($request->input('shipping_cost', 0.00)), // Ensure float conversion and default
+                'discount_amount' => $discountAmount, // Correctly retrieved and converted to float
+                'grand_total' => $grandTotal, // Correctly retrieved and converted to float
                 'payment_method' => $request->payment_method,
                 'paystack_reference' => $paystackReference, // Use the server-determined reference
-                'amount_paid' => $request->input('amount_paid'), // Only for POS cash
+                'amount_paid' => $amountPaid, // Correctly retrieved and converted to float
                 'status' => $status,
                 'items_json' => json_encode($request->items), // Store items as JSON string
-                'is_pos_sale' => $isPosSale,
-            ]);
+                'is_pos_sale' => $isPosSale, // Correctly determined boolean (will be 0 or 1 in DB)
+            ];
+
+            Log::debug('Order Data for Eloquent Create:', $orderData);
+
+            // 2. Create the Order record
+            $order = Order::create($orderData);
 
             // 3. Reduce quantity of products
             foreach ($request->items as $item) {
@@ -154,12 +165,10 @@ class OrderController extends Controller
 
             // Return the server-generated order_number and Paystack reference
             return response()->json([
-                'status' => 200, // Still 200 as per your previous setup for "initiated"
+                'status' => 200,
                 'message' => 'Order initiated successfully!',
                 'order_number' => $order->order_number, // The server-generated unique order number
                 'paystack_reference' => $order->paystack_reference, // The server-generated Paystack reference
-                // You can return the full order object if frontend needs more details immediately
-                // 'order' => $order->fresh(),
             ], 200);
 
         } catch (\Exception $e) {
@@ -170,8 +179,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
-// Update payment status
-
+    // Update payment status
 public function updateStatus($identifier, Request $request)
 {
     // 1. Validate incoming request data

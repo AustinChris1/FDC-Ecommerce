@@ -140,9 +140,7 @@ function App() {
     const trackVisitor = async () => {
       try {
         await axios.post('/api/analytics/track');
-        console.log('Visitor tracked successfully!');
       } catch (error) {
-        console.error('Error tracking visitor:', error);
       }
     };
 

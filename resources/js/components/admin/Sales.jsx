@@ -174,7 +174,7 @@ const handleProcessSale = async () => {
                 name: item.name,            // Also send product name for items_json
             }))
         };
-
+        console.log(saleData)
         const res = await axios.post('/api/orders/place', saleData, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
         });

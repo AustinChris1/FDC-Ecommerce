@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Log; // For logging errors/information
 
 class AdminSettingsController extends Controller
 {
-    /**
-     * Fetches all general settings from the database.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getSettings()
     {
         try {
@@ -51,13 +46,6 @@ class AdminSettingsController extends Controller
         }
     }
 
-    /**
-     * Updates general settings in the database.
-     * Handles file uploads for site logo and deletion of old logo.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function updateSettings(Request $request)
     {
         // Define validation rules
@@ -122,7 +110,7 @@ class AdminSettingsController extends Controller
                 
                 $logo = $request->file('site_logo');
                 $fileName = time() . '.' . $logo->getClientOriginalExtension();
-                $destinationPath = 'uploads/settings'; // Directory within public/
+                $destinationPath = '/uploads/settings'; // Directory within public/
                 $logo->move(public_path($destinationPath), $fileName); // Move to public directory
                 $newLogoPath = $destinationPath . "/" . $fileName; // Store the relative path in DB
 

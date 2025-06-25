@@ -15,12 +15,9 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminSettingsController;
-
-// Admin Dashboard Routes
-    Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
-    Route::post('/settings/update', [AdminSettingsController::class, 'updateSettings']);
-
-Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
+   
+// Activity dashboard
+    Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
 Route::post('/analytics/track', [AnalyticsController::class, 'trackVisitor']);
 
 // Route for placing an order
@@ -34,16 +31,14 @@ Route::post('/orders/{orderNumber}/update', [OrderController::class, 'updateOrde
 
 Route::post('/contact-us', [ContactMessageController::class, 'store']);
 
-Route::middleware('auth:sanctum')->post('/products/{productId}/reviews', [ReviewController::class, 'submitReview']);
+Route::middleware('auth:sanctum')->post('/products/{productId}/submit', [ReviewController::class, 'submitReview']);
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'getReviews']);
 
 // Auth Routes
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-// Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-// });
+Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 
 Route::get('/email/verify', [AuthController::class, 'verifyEmailNotice'])->name('verification.notice');
 
@@ -70,6 +65,10 @@ Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
             'message' => 'Authenticated',
         ]);
     });
+
+    // Settings
+    Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
+    Route::post('/settings/update', [AdminSettingsController::class, 'updateSettings']);
 
     // Category Management
     Route::post('/category/store', [CategoryController::class, 'store']);

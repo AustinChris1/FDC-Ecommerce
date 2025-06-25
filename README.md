@@ -56,8 +56,6 @@ This project is a full-stack e-commerce platform designed to provide a seamless 
 
     * MySQL (Database)
 
-    * Laravel Passport (for API authentication - assumed)
-
     * Laravel Mail (for email handling - assumed)
 
 ## Getting Started

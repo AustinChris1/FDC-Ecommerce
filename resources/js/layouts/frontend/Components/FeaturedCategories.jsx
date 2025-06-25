@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag, Loader2, DollarSign } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Loader2 } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import axios from 'axios';
-import { toast } from 'react-toastify'; // Ensure toast is imported if you're using it
+import { toast } from 'react-toastify';
+
+// --- START: Embedded StarRating Component (FOR COMPILATION ONLY) ---
+// In your actual project, uncomment your original import:
+import StarRating from '../Outer/StarRating';
+
 
 const FeaturedCategories = () => {
-    // --- Data and State Management (from your query) ---
+    // --- Data and State Management ---
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
@@ -21,7 +26,7 @@ const FeaturedCategories = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8; // Number of items per page
 
-    // Fetch categories and all products from the backend
+    // Fetch categories and all products from the backend, then fetch reviews for each product
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -39,20 +44,52 @@ const FeaturedCategories = () => {
                 // Fetch All Products
                 const productsRes = await axios.get(`/api/allProducts`);
                 if (productsRes.data.status === 200) {
-                    setProducts(productsRes.data.products);
+                    const productsFromApi = productsRes.data.products;
+
+                    // Create promises to fetch reviews for each product
+                    const productsWithReviewPromises = productsFromApi.map(async (product) => {
+                        let averageRating = 0;
+                        let reviewCount = 0;
+                        try {
+                            const reviewRes = await axios.get(`/api/products/${product.id}/reviews`);
+                            if (reviewRes.data.status === 200 && Array.isArray(reviewRes.data.reviews)) {
+                                reviewCount = reviewRes.data.reviews.length;
+                                if (reviewCount > 0) {
+                                    const totalRating = reviewRes.data.reviews.reduce((sum, review) => sum + parseFloat(review.rating), 0);
+                                    averageRating = (totalRating / reviewCount).toFixed(1);
+                                }
+                            }
+                        } catch (reviewError) {
+                            console.warn(`Could not fetch reviews for product ${product.id}:`, reviewError);
+                            // Default to 0 rating and 0 reviews if fetching fails
+                        }
+
+                        const originalPrice = product.original_price;
+                        return {
+                            ...product,
+                            rating: parseFloat(averageRating),
+                            num_reviews: reviewCount,
+                            original_price: originalPrice
+                        };
+                    });
+
+                    // Wait for all review fetches to complete
+                    const productsWithReviews = await Promise.all(productsWithReviewPromises);
+                    setProducts(productsWithReviews);
+
                 } else {
                     toast.error("Unable to fetch products");
                     console.error("Backend error fetching products:", productsRes.data.message);
                 }
             } catch (error) {
-                console.error("Network or server error:", error);
+                console.error("Network or server error during data fetch:", error);
                 toast.error("Failed to load data.");
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     // --- Product Filtering Logic ---
     const filteredProducts = selectedCategory === "All"
@@ -66,7 +103,6 @@ const FeaturedCategories = () => {
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
-        // Optional: Scroll to the top of the product grid when changing page
         document.getElementById('product-grid-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
@@ -102,7 +138,7 @@ const FeaturedCategories = () => {
             className="py-16 md:py-24 bg-gray-950 text-white relative overflow-hidden"
             style={{
                 backgroundImage: `radial-gradient(at 20% 0%, rgba(20,20,50,0.4) 0%, transparent 50%),
-                                  radial-gradient(at 80% 100%, rgba(50,20,20,0.4) 0%, transparent 50%)`,
+                                 radial-gradient(at 80% 100%, rgba(50,20,20,0.4) 0%, transparent 50%)`,
                 backgroundBlendMode: 'overlay',
             }}
         >
@@ -149,27 +185,28 @@ const FeaturedCategories = () => {
                                 animate={sectionInView ? "visible" : "hidden"}
                                 custom={i}
                             >
-                                <div className="relative pt-[70%] overflow-hidden">
-                                    <img
-                                            src={category.image || `https://placehold.co/400x200/e0e0e0/555555?text=Category+Image`} // Placeholder if no image_url
+                                <Link to={`/collections/${category.link || 'default-category'}`}>
+                                    <div className="relative pt-[70%] overflow-hidden"> {/* 7:10 Aspect ratio for categories */}
+                                        <img
+                                            src={category.image || `https://placehold.co/400x280/e0e0e0/555555?text=Category+Image`}
                                             alt={category.name}
-                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-80 group-hover:opacity-100"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                </div>
-                                <div className="p-6 text-left">
-                                    <h3 className="text-2xl font-bold mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
-                                        {category.name}
-                                    </h3>
-                                    <Link
-                                        to={`/collections/${category.link}`}
-                                        className="inline-flex items-center text-blue-400 hover:text-blue-200 transition-colors duration-300 font-semibold group"
-                                    >
-                                        Shop Now
-                                        <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
-                                    </Link>
-                                </div>
-                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-80 group-hover:opacity-100"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    </div>
+                                    <div className="p-6 text-left">
+                                        <h3 className="text-2xl font-bold mb-2 text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                            {category.name}
+                                        </h3>
+                                        <div
+                                            className="inline-flex items-center text-blue-400 hover:text-blue-200 transition-colors duration-300 font-semibold group"
+                                        >
+                                            Shop Now
+                                            <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
+                                        </div>
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                                </Link>
                             </motion.div>
                         ))}
                     </div>
@@ -236,37 +273,59 @@ const FeaturedCategories = () => {
                                             animate={sectionInView ? "visible" : "hidden"}
                                             custom={i}
                                         >
-                                            {/* Product Image */}
-                                            <div className="relative pt-[100%] overflow-hidden"> {/* 1:1 Aspect ratio */}
-                                                <img
-                                                    src={`/${product.image}`} // Use actual image path
-                                                    alt={product.name}
-                                                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-80 group-hover:opacity-100"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                                            </div>
-
-                                            {/* Product Details */}
-                                            <div className="p-6 text-left">
-                                                <h3 className="text-xl font-bold mb-2 text-white group-hover:text-lime-400 transition-colors duration-300 line-clamp-2">
-                                                    {product.name}
-                                                </h3>
-                                                <p className="text-gray-400 mb-3 text-sm line-clamp-2">
-                                                    {product.description || 'No description available.'}
-                                                </p>
-                                                <div className="flex items-center justify-between mt-4">
-                                                    <p className="text-2xl font-bold text-cyan-400 flex items-center">
-                                                        ₦{product.selling_price}
-                                                    </p>
-                                                    <Link
-                                                        to={`/collections/${product.category?.link || 'default-category'}/${product.link}`}
-                                                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 flex items-center"
-                                                    >
-                                                        Details
-                                                        <ArrowRight className="w-4 h-4 ml-1" />
-                                                    </Link>
+                                            <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`}>
+                                                {/* Product Image */}
+                                                <div className="relative pt-[85%] overflow-hidden"> 
+                                                    <img
+                                                        src={product.image || `https://placehold.co/400x340/374151/9CA3AF?text=Product+Image`}
+                                                        alt={product.name}
+                                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-80 group-hover:opacity-100"
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/400x340/374151/9CA3AF?text=${product.name.substring(0, 3)}`; }}
+                                                    />
+                                                    {/* Discount Badge */}
+                                                    {product.original_price && parseFloat(product.original_price) > parseFloat(product.selling_price) && (
+                                                        <span className="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                                            -{Math.round(((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100)}%
+                                                        </span>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                                                 </div>
-                                            </div>
+
+                                                {/* Product Details */}
+                                                <div className="p-4 text-left flex flex-col justify-between"> 
+                                                    <div>
+                                                        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-lime-400 transition-colors duration-300 line-clamp-2">
+                                                            {product.name}
+                                                        </h3>
+                                                        <p className="text-gray-400 mb-3 text-sm line-clamp-2 min-h-[2.5rem]"> {/* min-h for consistent height */}
+                                                            {product.description || 'No description available.'}
+                                                        </p>
+                                                        {/* Star Rating Display */}
+                                                        {product.rating !== undefined && product.num_reviews !== undefined && (
+                                                            <div className="mb-3">
+                                                                <StarRating rating={parseFloat(product.rating)} iconSize={20} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-2 mt-4">
+                                                        {product.original_price && parseFloat(product.original_price) > parseFloat(product.selling_price) && (
+                                                            <p className="text-sm text-gray-500 line-through flex items-center">
+                                                                ₦{parseFloat(product.original_price).toLocaleString()}
+                                                            </p>
+                                                        )}
+                                                        <p className="text-2xl font-bold text-cyan-400 flex items-center">
+                                                            ₦{parseFloat(product.selling_price).toLocaleString()}
+                                                        </p>
+                                                        <div
+                                            className="inline-flex items-center text-blue-400 hover:text-blue-200 transition-colors duration-300 font-semibold group"
+                                        >
+                                            Shop Now
+                                            <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
+                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
                                         </motion.div>
                                     ))}
                                 </div>

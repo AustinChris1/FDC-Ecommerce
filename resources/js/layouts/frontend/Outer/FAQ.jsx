@@ -6,7 +6,7 @@ const faqData = [
     {
         id: 1,
         question: 'What payment methods do you accept?',
-        answer: 'We accept all major credit cards (Visa, MasterCard, American Express, Discover), PayPal, and select cryptocurrency payments (e.g., USDT, Bitcoin).',
+        answer: 'We accept all major credit cards (Visa, MasterCard, Verve), Bank Transfers and physical cash at store outlets.',
     },
     {
         id: 2,

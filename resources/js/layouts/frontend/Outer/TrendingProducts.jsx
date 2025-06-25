@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Load from '../Components/Load'; // Assuming you have a Load component for spinners
-import { ShoppingCart, Star } from 'lucide-react'; // Icons for cart and rating
+import { ShoppingCart, Star, ArrowRight } from 'lucide-react'; // Icons for cart, rating, and arrow
 
 const TrendingProducts = () => {
     const [trendingProducts, setTrendingProducts] = useState([]);
+    const [category, setCategory] = useState([]); // This state will hold the list of categories
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -23,7 +24,7 @@ const TrendingProducts = () => {
                     const featuredProducts = response.data.products
                         .filter(product => product.featured === 1)
                         .slice(0, 8);
-
+                    
                     setTrendingProducts(featuredProducts);
                 } else {
                     toast.error(response.data.message || 'Unable to fetch trending products.');
@@ -129,7 +130,7 @@ const TrendingProducts = () => {
                                 <motion.div
                                     key={product.id}
                                     className="bg-gray-800 rounded-xl shadow-xl overflow-hidden cursor-pointer border border-gray-700 relative group"
-                                    variants={itemVariants}
+                                    variants={cardHoverVariants}
                                     whileHover="hover"
                                     whileTap="tap"
                                 >
@@ -143,23 +144,30 @@ const TrendingProducts = () => {
                                         <Star className="w-3 h-3 mr-1" fill="currentColor" /> Trending
                                     </motion.div>
 
-                                    <Link to={`/collections/${product.link}`} className="block">
+                                    <Link to={`/collections/${product.category?.link}`} className="block">
                                         <motion.img
-                                            src={`/${product.image}`} // Adjust path if necessary
+                                            src={`/${product.image}`} 
                                             alt={product.name}
                                             className="w-full h-64 object-cover transform transition-transform duration-300"
                                             variants={imageHoverVariants}
                                             initial={false}
                                             whileHover="hover"
+                                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/cccccc/000000?text=Image+Error'; }} // Fallback image
                                         />
                                         <div className="p-6 bg-gray-900">
                                             <h3 className="text-xl font-bold text-white mb-2 truncate">{product.name}</h3>
                                             <p className="text-sm text-gray-400 mb-3 line-clamp-2">{product.description}</p>
                                             <div className="flex justify-between items-center mt-4">
                                                 <span className="text-lime-400 font-extrabold text-2xl">
-                                                ₦{product.selling_price}
+                                                    ₦{product.selling_price.toLocaleString()} {/* Format price */}
                                                 </span>
-                                                <button className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault(); 
+                                                        e.stopPropagation();
+                                                    }}
+                                                    className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105"
+                                                >
                                                     <ShoppingCart className="w-5 h-5 mr-2" /> Details
                                                 </button>
                                             </div>

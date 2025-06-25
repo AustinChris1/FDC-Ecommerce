@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import Load from './Load'; // Assuming Load.js exists and is your spinner
+import Load from './Load'; // Using the user's provided Load component
 import {
     ShoppingCart,
     User,
@@ -19,24 +19,29 @@ import {
     ArrowLeft,
     DollarSign,
     Info,
-    RefreshCw, // For retry payment
+    RefreshCw,
     Ban,
     Truck,
-    Hourglass
-} from 'lucide-react'; // Import necessary Lucide React icons
+    Hourglass,
+    Download // Added Download icon
+} from 'lucide-react';
 import { toast } from 'react-toastify';
+import html2canvas from 'html2canvas'; // Using direct import as requested
+import jsPDF from 'jspdf';           // Using direct import as requested
+
 
 const UserOrderDetail = () => {
-    const { orderNumber } = useParams(); // Get orderNumber from URL
+    const { orderNumber } = useParams();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
     const [order, setOrder] = useState(null);
     const [error, setError] = useState(null);
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false); // State for PDF download loading
+    const contentRef = useRef(null); // Ref to the content that will be converted to PDF
 
-    // Get the authenticated user's email from localStorage for client-side filtering
     const userEmail = localStorage.getItem('auth_email');
-    const userLoggedInId = localStorage.getItem('auth_id'); // Assuming you store user ID too for more robust check
+    const userLoggedInId = localStorage.getItem('auth_id');
 
     const API_URL = import.meta.env.PROD
         ? 'https://spx.firstdigit.com.ng/api' // your Laravel backend domain or subdomain
@@ -53,7 +58,7 @@ const UserOrderDetail = () => {
             toast.error("You must be logged in to view order details.");
             setError("Authentication required.");
             setLoading(false);
-            navigate('/login'); // Redirect to login
+            navigate('/login');
             return;
         }
 
@@ -78,7 +83,7 @@ const UserOrderDetail = () => {
                 } else {
                     toast.error("You are not authorized to view this order.");
                     setError("Unauthorized access.");
-                    navigate('/user/orders'); // Redirect to My Orders
+                    navigate('/user/orders');
                 }
             } else if (res.data.status === 404) {
                 toast.error(res.data.message || "Order not found.");
@@ -100,7 +105,119 @@ const UserOrderDetail = () => {
     useEffect(() => {
         document.title = `Order Details: ${orderNumber || 'Loading...'}`;
         fetchOrderDetails();
-    }, [fetchOrderDetails]);
+    }, [fetchOrderDetails, orderNumber]);
+
+    // Function to handle PDF download using html2canvas and jspdf
+    const handleDownloadPdf = useCallback(async () => {
+        if (!contentRef.current || !order) {
+            toast.error("Order details not loaded or content for PDF not available. Please try again.");
+            return;
+        }
+
+        setIsDownloadingPdf(true);
+        toast.info("Generating PDF receipt...", { autoClose: 3000 });
+
+        const element = contentRef.current;
+
+        // Clone the element and apply specific styles to the clone for PDF generation
+        // This prevents flickering on the actual page and ensures consistent styling in PDF
+        const clonedElement = element.cloneNode(true);
+        // Apply light background styles to the cloned element and its children
+        clonedElement.style.backgroundColor = '#FFFFFF'; // White background for the entire receipt
+        clonedElement.style.color = '#333333'; // Dark text color for the entire receipt
+        clonedElement.style.padding = '1.5rem';
+        clonedElement.style.width = 'fit-content';
+        clonedElement.style.margin = 'auto';
+        clonedElement.style.boxShadow = 'none';
+        clonedElement.style.border = 'none';
+        clonedElement.style.position = 'absolute';
+        clonedElement.style.left = '-9999px';
+        clonedElement.style.top = '-9999px';
+
+        // Override specific Tailwind-like classes for light theme
+        clonedElement.querySelectorAll('.bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF'); // Main background
+        clonedElement.querySelectorAll('.bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8'); // Card backgrounds
+        clonedElement.querySelectorAll('.bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2'); // Alternating table rows
+        clonedElement.querySelectorAll('.bg-gray-800').forEach(el => el.style.backgroundColor = '#E9E9E9'); // Table header/other backgrounds
+
+        clonedElement.querySelectorAll('.text-gray-200').forEach(el => el.style.color = '#333333');
+        clonedElement.querySelectorAll('.text-gray-300').forEach(el => el.style.color = '#555555');
+        clonedElement.querySelectorAll('.text-gray-400').forEach(el => el.style.color = '#777777');
+        clonedElement.querySelectorAll('.text-white').forEach(el => el.style.color = '#333333'); // Text that was originally white
+
+        // Adjust specific accent colors for better contrast on light background
+        clonedElement.querySelectorAll('.text-blue-400').forEach(el => el.style.color = '#0066CC'); // Darker blue
+        clonedElement.querySelectorAll('.text-yellow-300').forEach(el => el.style.color = '#CC9900'); // Darker yellow/gold
+        clonedElement.querySelectorAll('.text-emerald-400').forEach(el => el.style.color = '#008000'); // Darker green for grand total
+        clonedElement.querySelectorAll('.text-purple-400').forEach(el => el.style.color = '#800080'); // Darker purple
+        clonedElement.querySelectorAll('.text-orange-400').forEach(el => el.style.color = '#FF8C00'); // Darker orange
+
+        // Status pill backgrounds and text
+        clonedElement.querySelectorAll('.bg-green-600').forEach(el => { el.style.backgroundColor = '#D4EDDA'; el.style.color = '#155724'; });
+        clonedElement.querySelectorAll('.bg-orange-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
+        clonedElement.querySelectorAll('.bg-yellow-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
+        clonedElement.querySelectorAll('.bg-indigo-500').forEach(el => { el.style.backgroundColor = '#CCE5FF'; el.style.color = '#004085'; });
+        clonedElement.querySelectorAll('.bg-red-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
+        clonedElement.querySelectorAll('.bg-pink-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
+        clonedElement.querySelectorAll('.bg-purple-600').forEach(el => { el.style.backgroundColor = '#E2BBEB'; el.style.color = '#4A005B'; });
+        clonedElement.querySelectorAll('.bg-gray-600').forEach(el => { el.style.backgroundColor = '#E2E6EA'; el.style.color = '#495057'; });
+
+
+        clonedElement.querySelectorAll('.border-gray-800').forEach(el => el.style.borderColor = '#DDDDDD');
+        clonedElement.querySelectorAll('.divide-gray-700').forEach(el => el.style.borderColor = '#EEEEEE');
+
+
+        // Make the PDF header visible
+        const pdfHeader = clonedElement.querySelector('.pdf-header');
+        if (pdfHeader) {
+            pdfHeader.style.display = 'block';
+        }
+
+        // Append clone to body temporarily to measure/render correctly
+        document.body.appendChild(clonedElement);
+
+        try {
+            const canvas = await html2canvas(clonedElement, {
+                scale: 2, // Higher scale for better resolution
+                logging: false, // Turn off logging for cleaner console
+                useCORS: true, // Needed if you have images from other domains
+                windowWidth: clonedElement.offsetWidth, // Use offsetWidth for current rendered width
+                windowHeight: clonedElement.offsetHeight, // Use offsetHeight for current rendered height
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 1.0); // Convert canvas to image data (quality 0-1)
+            const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' format
+
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) { // Changed condition to > 0 to avoid adding an empty page
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`receipt-order-${orderNumber}.pdf`);
+            toast.success("Receipt downloaded successfully!");
+        } catch (pdfError) {
+            console.error("Error generating PDF:", pdfError);
+            toast.error("Failed to generate PDF receipt. Please try again.");
+        } finally {
+            setIsDownloadingPdf(false);
+            // Remove the cloned element from the DOM
+            if (clonedElement.parentNode) {
+                clonedElement.parentNode.removeChild(clonedElement);
+            }
+        }
+    }, [order, orderNumber]);
+
 
     // Animation variants
     const containerVariants = {
@@ -141,7 +258,7 @@ const UserOrderDetail = () => {
             case 'payment_canceled': return <XCircle className="w-4 h-4 mr-1" />;
             case 'payment_failed': return <Ban className="w-4 h-4 mr-1" />;
             case 'shipped': return <Truck className="w-4 h-4 mr-1" />;
-            case 'processing_paystack_payment':
+            case 'processing_paystack_payment': return <Hourglass className="w-4 h-4 mr-1" />;
             case 'processing_bank_transfer_payment':
             case 'pending_confirmation':
             case 'processing_mock_payment': return <Clock className="w-4 h-4 mr-1" />;
@@ -149,36 +266,6 @@ const UserOrderDetail = () => {
         }
     };
 
-    // Retry Payment / Initiate Paystack again
-    const handleRetryPayment = async () => {
-        if (!order || order.status !== 'pending_payment' || order.payment_method !== 'paystack') {
-            toast.info("This order cannot be retried for payment via Paystack.");
-            return;
-        }
-
-        setLoading(true);
-        try {
-            // Re-initiate payment through your backend
-            // You might need a specific backend endpoint for retrying payments,
-            // or modify your placeOrder to handle re-attempts if the order is pending.
-            // For now, we'll assume a direct call to Paystack.
-            // In a real scenario, you'd likely hit an API endpoint that generates a new Paystack reference
-            // or re-uses the existing one and initiates the transaction.
-            
-            // For now, we'll just redirect to checkout if the order is still pending.
-            // A more robust solution would be to generate a new Paystack transaction
-            // reference and open the modal directly from here.
-            
-            toast.info("Redirecting to checkout to retry payment...");
-            navigate('/checkout', { state: { orderToRetry: order } }); // Pass order details if checkout can resume it
-
-        } catch (err) {
-            console.error("Error retrying payment:", err);
-            toast.error("Failed to initiate payment retry. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (
@@ -235,12 +322,20 @@ const UserOrderDetail = () => {
                 <meta name="description" content={`Details for order number ${order.order_number}`} />
             </Helmet>
 
-            {/* Header section with title and Back button */}
+            {/* Header section with title and Back/Download buttons */}
             <header className="flex mt-20 flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-gray-900 rounded-xl shadow-md p-6 border border-gray-800">
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-0">
                     Order Details: <span className="text-blue-400">#{order.order_number}</span>
                 </h1>
                 <div className="flex space-x-3 mt-4 sm:mt-0">
+                    <button
+                        onClick={handleDownloadPdf}
+                        disabled={isDownloadingPdf}
+                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isDownloadingPdf ? <Load size="sm" /> : <Download className="w-5 h-5 mr-2" />}
+                        <span>{isDownloadingPdf ? 'Generating PDF...' : 'Download Receipt'}</span>
+                    </button>
                     <Link
                         to="/user/orders"
                         className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center"
@@ -250,160 +345,160 @@ const UserOrderDetail = () => {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Order Summary Card */}
-                <motion.div
-                    className="lg:col-span-2 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                >
-                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                        <ShoppingCart className="w-6 h-6 mr-3 text-blue-400" />
-                        Order Summary
-                    </h2>
-                    <div className="space-y-3 text-gray-300">
-                        <p className="flex items-center">
-                            <span className="font-semibold w-36 text-gray-400">Order Number:</span>
-                            <span className="ml-2 text-yellow-300">#{order.order_number}</span>
-                        </p>
-                        <p className="flex items-center">
-                            <span className="font-semibold w-36 text-gray-400">Status:</span>
-                            <span className={`ml-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full text-white ${getStatusColor(order.status)} flex items-center`}>
-                                {getStatusIcon(order.status)}
-                                {order.status.replace(/_/g, ' ')}
-                            </span>
-                        </p>
-                        <p className="flex items-center">
-                            <span className="font-semibold w-36 text-gray-400">Payment Method:</span>
-                            <span className="ml-2 flex items-center">
-                                <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
-                                {order.payment_method.replace(/_/g, ' ')}
-                            </span>
-                        </p>
-                        {order.paystack_reference && (
-                            <p className="flex items-center">
-                                <span className="font-semibold w-36 text-gray-400">Paystack Ref:</span>
-                                <span className="ml-2 text-blue-400 font-medium">{order.paystack_reference}</span>
-                            </p>
-                        )}
-                        <p className="flex items-center">
-                            <span className="font-semibold w-36 text-gray-400">Order Date:</span>
-                            <span className="ml-2 flex items-center">
-                                <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                                {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
-                            </span>
-                        </p>
-                        <p className="flex items-center text-xl font-bold text-emerald-400 pt-2">
-                            <span className="font-semibold w-36">Grand Total:</span>
-                            <span className="ml-2 flex items-center">
-                                ₦{order.grand_total.toLocaleString()}
-                            </span>
-                        </p>
-                        {order.status === 'pending_payment' && order.payment_method === 'paystack' && (
-                             <div className="mt-4 pt-4 border-t border-gray-700">
-                                <button
-                                    onClick={handleRetryPayment}
-                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center w-full"
-                                >
-                                    <RefreshCw className="w-5 h-5 mr-2" /> Retry Payment
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </motion.div>
+            {/* Content to be included in PDF - wrapped in a div with ref */}
+            <div ref={contentRef} className="printable-receipt-content"> {/* Use a distinct class for PDF content */}
+                {/* Add a header for the PDF itself, not shown on the main page */}
+                <div style={{ display: 'none', textAlign: 'center', marginBottom: '1rem', padding: '1rem', borderBottom: '1px solid #DDDDDD', color: '#333333', backgroundColor: '#FFFFFF' }} className="pdf-header">
+                    <h1 style={{ color: '#333333', fontSize: '24px', fontWeight: 'bold' }}>First Digits E-Commerce Receipt</h1>
+                    <p style={{ color: '#555555', fontSize: '14px' }}>Order: #{order.order_number}</p>
+                    <p style={{ color: '#555555', fontSize: '14px' }}>Date: {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                </div>
 
-                {/* Customer & Shipping Info Card */}
-                <motion.div
-                    className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    transition={{ delay: 0.1 }}
-                >
-                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                        <User className="w-6 h-6 mr-3 text-purple-400" />
-                        Customer & Shipping
-                    </h2>
-                    <div className="space-y-3 text-gray-300">
-                        <p className="flex items-center">
-                            <span className="font-semibold w-24 text-gray-400">Name:</span>
-                            <span className="ml-2">{order.full_name || 'N/A'}</span>
-                        </p>
-                        <p className="flex items-center">
-                            <span className="font-semibold w-24 text-gray-400">Email:</span>
-                            <span className="ml-2 flex items-center break-all">
-                                <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                                {order.email || 'N/A'}
-                            </span>
-                        </p>
-                        <p className="flex items-center">
-                            <span className="font-semibold w-24 text-gray-400">Phone:</span>
-                            <span className="ml-2 flex items-center">
-                                <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                                {order.phone || 'N/A'}
-                            </span>
-                        </p>
-                        {order.shipping_address1 && ( 
-                            <p className="flex items-start">
-                                <span className="font-semibold w-24 pt-1 text-gray-400">Address:</span>
-                                <span className="ml-2 flex items-start flex-grow">
-                                    <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" />
-                                    <span>
-                                        {order.shipping_address1}, {order.shipping_address2 && `${order.shipping_address2}, `}
-                                        {order.city}, {order.state}, {order.zip_code}
-                                    </span>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Order Summary Card */}
+                    <motion.div
+                        className="lg:col-span-2 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                            <ShoppingCart className="w-6 h-6 mr-3 text-blue-400" />
+                            Order Summary
+                        </h2>
+                        <div className="space-y-3 text-gray-300">
+                            <p className="flex items-center">
+                                <span className="font-semibold w-36 text-gray-400">Order Number:</span>
+                                <span className="ml-2 text-yellow-300">#{order.order_number}</span>
+                            </p>
+                            <p className="flex items-center">
+                                <span className="font-semibold w-36 text-gray-400">Status:</span>
+                                <span className={`ml-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full text-white ${getStatusColor(order.status)} flex items-center`}>
+                                    {getStatusIcon(order.status)}
+                                    {order.status.replace(/_/g, ' ')}
                                 </span>
                             </p>
-                        )}
-                         {!order.shipping_address1 && order.is_pos_sale && (
-                            <p className="text-gray-500 text-sm mt-4 italic">
-                                This was a POS sale (no shipping address recorded).
+                            <p className="flex items-center">
+                                <span className="font-semibold w-36 text-gray-400">Payment Method:</span>
+                                <span className="ml-2 flex items-center">
+                                    <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
+                                    {order.payment_method.replace(/_/g, ' ')}
+                                </span>
                             </p>
-                        )}
-                    </div>
+                            {order.paystack_reference && (
+                                <p className="flex items-center">
+                                    <span className="font-semibold w-36 text-gray-400">Paystack Ref:</span>
+                                    <span className="ml-2 text-blue-400 font-medium">{order.paystack_reference}</span>
+                                </p>
+                            )}
+                            <p className="flex items-center">
+                                <span className="font-semibold w-36 text-gray-400">Order Date:</span>
+                                <span className="ml-2 flex items-center">
+                                    <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                                    {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+                                </span>
+                            </p>
+                            <p className="flex items-center text-xl font-bold text-emerald-400 pt-2">
+                                <span className="font-semibold w-36">Grand Total:</span>
+                                <span className="ml-2 flex items-center">
+                                    ₦{order.grand_total.toLocaleString()}
+                                </span>
+                            </p>
+                        </div>
+                    </motion.div>
+
+                    {/* Customer & Shipping Info Card */}
+                    <motion.div
+                        className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ delay: 0.1 }}
+                    >
+                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                            <User className="w-6 h-6 mr-3 text-purple-400" />
+                            Customer & Shipping
+                        </h2>
+                        <div className="space-y-3 text-gray-300">
+                            <p className="flex items-center">
+                                <span className="font-semibold w-24 text-gray-400">Name:</span>
+                                <span className="ml-2">{order.full_name || 'N/A'}</span>
+                            </p>
+                            <p className="flex items-center">
+                                <span className="font-semibold w-24 text-gray-400">Email:</span>
+                                <span className="ml-2 flex items-center break-all">
+                                    <Mail className="w-4 h-4 mr-2 text-gray-500" />
+                                    {order.email || 'N/A'}
+                                </span>
+                            </p>
+                            <p className="flex items-center">
+                                <span className="font-semibold w-24 text-gray-400">Phone:</span>
+                                <span className="ml-2 flex items-center">
+                                    <Phone className="w-4 h-4 mr-2 text-gray-500" />
+                                    {order.phone || 'N/A'}
+                                </span>
+                            </p>
+                            {order.shipping_address1 && (
+                                <p className="flex items-start">
+                                    <span className="font-semibold w-24 pt-1 text-gray-400">Address:</span>
+                                    <span className="ml-2 flex items-start flex-grow">
+                                        <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" />
+                                        <span>
+                                            {order.shipping_address1}, {order.shipping_address2 && `${order.shipping_address2}, `}
+                                            {order.city}, {order.state}, {order.zip_code}
+                                        </span>
+                                    </span>
+                                </p>
+                            )}
+                            {!order.shipping_address1 && order.is_pos_sale && (
+                                <p className="text-gray-500 text-sm mt-4 italic">
+                                    This was a POS sale (no shipping address recorded).
+                                </p>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Ordered Items Card */}
+                <motion.div
+                    className="mt-6 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: 0.2 }}
+                >
+                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                        <Package className="w-6 h-6 mr-3 text-orange-400" />
+                        Ordered Items
+                    </h2>
+                    {orderItems.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-700">
+                                <thead className="bg-gray-800">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price (per item)</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-700">
+                                    {orderItems.map((item, index) => (
+                                        <tr key={index} className="even:bg-gray-850 odd:bg-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">{item.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{item.qty || item.quantity}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">₦{item.price.toLocaleString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-400">₦{(item.qty * item.price).toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <p className="text-gray-400">No items found for this order.</p>
+                    )}
                 </motion.div>
             </div>
-
-            {/* Ordered Items Card */}
-            <motion.div
-                className="mt-6 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.2 }}
-            >
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                    <Package className="w-6 h-6 mr-3 text-orange-400" />
-                    Ordered Items
-                </h2>
-                {orderItems.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-700">
-                            <thead className="bg-gray-800">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price (per item)</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-700">
-                                {orderItems.map((item, index) => (
-                                    <tr key={index} className="even:bg-gray-850 odd:bg-gray-900">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">{item.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{item.qty || item.quantity}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">₦{item.price.toLocaleString()}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-400">₦{(item.qty * item.price).toLocaleString()}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <p className="text-gray-400">No items found for this order.</p>
-                )}
-            </motion.div>
         </motion.div>
     );
 };

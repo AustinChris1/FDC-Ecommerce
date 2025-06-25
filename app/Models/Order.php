@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    use HasFactory;
+ use HasFactory;
 
     protected $fillable = [
         'order_number',
@@ -22,19 +22,26 @@ class Order extends Model
         'zip_code',
         'subtotal',
         'shipping_cost',
+        'discount_amount', 
         'grand_total',
         'payment_method',
         'paystack_reference',
+        'amount_paid',  
         'status',
         'items_json',
+        'is_pos_sale',     
     ];
 
-    // Cast items_json to array/object automatically
     protected $casts = [
         'items_json' => 'array',
-    ];
-
-    // Define relationship with User model (if applicable)
+        'is_pos_sale' => 'boolean', 
+        'subtotal' => 'float',
+        'discount_amount' => 'float',
+        'amount_paid' => 'float',
+        'grand_total' => 'float',
+        'shipping_cost' => 'float',
+    ];  
+    
     public function user()
     {
         return $this->belongsTo(User::class);

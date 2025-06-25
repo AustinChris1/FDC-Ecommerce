@@ -9,16 +9,16 @@ const testimonials = [
     {
         id: 1,
         name: 'Austin',
-        title: 'Tech Enthusiast',
+        title: 'Freelance Developer',
         rating: 5,
-        review: 'Absolutely blown away by the quality and speed of delivery! My new drone is incredible, and the customer service was top-notch. Highly recommend for any tech lover!',
+        review: 'Impressed by the unique gadgets available. Found exactly what I needed for my coding setup. The website is intuitive, and checkout was a breeze. Keep up the great work!',
         avatar: '/uploads/teams/austinc.jpg'
     },
     {
         id: 2,
         name: 'Vera',
         title: 'Smart Home Creator',
-        rating: 5,
+        rating: 4,
         review: 'Finally, a store that gets it! The smart home devices I ordered integrated seamlessly. The product descriptions were accurate, and shipping was incredibly fast. A truly premium shopping experience.',
         avatar: '/uploads/teams/vera.jpg'
     },
@@ -33,9 +33,9 @@ const testimonials = [
     {
         id: 4,
         name: 'Kingsley',
-        title: 'Freelance Developer',
-        rating: 5,
-        review: 'Impressed by the unique gadgets available. Found exactly what I needed for my coding setup. The website is intuitive, and checkout was a breeze. Keep up the great work!',
+        title: 'Tech Enthusiast',
+        rating: 4,
+        review: 'Absolutely blown away by the quality and speed of delivery! My new drone is incredible, and the customer service was top-notch. Highly recommend for any tech lover!',
         avatar: '/uploads/teams/kingsley.jpg'
     },
 ];
@@ -105,7 +105,7 @@ const CustomerTestimonials = () => {
     const handlePrev = () => {
         setCurrentIndex(prevIndex => {
             const newIndex = prevIndex - 1;
-            return newIndex < 0 ? testimonials.length - (itemsToShow - 1) -1 : newIndex;
+            return newIndex < 0 ? testimonials.length - (itemsToShow - 1) - 1 : newIndex;
         });
         clearInterval(intervalRef.current); // Pause autoplay on manual interaction
     };
@@ -233,16 +233,15 @@ const CustomerTestimonials = () => {
                             </button>
                         </>
                     )}
-                     {/* Dots for navigation */}
-                     {testimonials.length > itemsToShow && (
+                    {/* Dots for navigation */}
+                    {testimonials.length > itemsToShow && (
                         <div className="flex justify-center mt-8 gap-3">
-                            {testimonials.slice(0, testimonials.length - (itemsToShow -1)).map((_, idx) => (
+                            {testimonials.slice(0, testimonials.length - (itemsToShow - 1)).map((_, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setCurrentIndex(idx)}
-                                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                                        currentIndex === idx ? 'bg-lime-400 scale-125' : 'bg-gray-600 hover:bg-gray-500'
-                                    }`}
+                                    className={`w-3 h-3 rounded-full transition-colors duration-300 ${currentIndex === idx ? 'bg-lime-400 scale-125' : 'bg-gray-600 hover:bg-gray-500'
+                                        }`}
                                     aria-label={`Go to slide ${idx + 1}`}
                                 />
                             ))}
