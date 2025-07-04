@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import LoadingSpinner from '../LoadingSpinner'; 
+import LoadingSpinner from '../LoadingSpinner';
 
 const Products = () => {
     // State to hold fetched categories for the dropdown
@@ -23,13 +23,28 @@ const Products = () => {
         brand: '',
         featured: false,
         popular: false,
-        status: false
+        status: false,
+        // NEW: Add states for new fields
+        is_new_arrival: false,
+        is_flash_sale: false,
+        flash_sale_price: '',
+        flash_sale_starts_at: '',
+        flash_sale_ends_at: ''
     });
-    // States for image files and their previews
+    // States for image files and their previews - NOW SUPPORTING 4 IMAGES
     const [picture, setPicture] = useState(null);
     const [picture2, setPicture2] = useState(null);
+    const [picture3, setPicture3] = useState(null);
+    const [picture4, setPicture4] = useState(null);
+
     const [imagePreview, setImagePreview] = useState(null);
     const [image2Preview, setImage2Preview] = useState(null);
+    const [image3Preview, setImage3Preview] = useState(null);
+    const [image4Preview, setImage4Preview] = useState(null);
+
+    // NEW: State for specifications (array of objects {feature: '', value: ''})
+    const [specifications, setSpecifications] = useState([{ feature: '', value: '' }]);
+    const [feature, setFeature] = useState([{ feature: '' }]);
 
     // State for validation errors from backend
     const [error, setError] = useState({});
@@ -58,13 +73,13 @@ const Products = () => {
     // Handler for text, select, and checkbox inputs
     const handleInput = (e) => {
         const { name, type, value, checked } = e.target;
-        setProductsInput(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
+        setProductsInput(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    // Handler for image file inputs
+    // Handler for image file inputs - UPDATED FOR 4 IMAGES
     const handleImage = (e) => {
         const { name, files } = e.target;
         const file = files[0];
@@ -77,10 +92,18 @@ const Products = () => {
             setPicture2(file);
             setImage2Preview(file ? URL.createObjectURL(file) : null);
             setError(prev => ({ ...prev, image2: '' })); // Clear specific error
+        } else if (name === 'image3') { // Handle third image
+            setPicture3(file);
+            setImage3Preview(file ? URL.createObjectURL(file) : null);
+            setError(prev => ({ ...prev, image3: '' }));
+        } else if (name === 'image4') { // Handle fourth image
+            setPicture4(file);
+            setImage4Preview(file ? URL.createObjectURL(file) : null);
+            setError(prev => ({ ...prev, image4: '' }));
         }
     };
 
-    // Function to remove image preview and file
+    // Function to remove image preview and file - UPDATED FOR 4 IMAGES
     const removeImage = (imageNumber) => {
         if (imageNumber === 1) {
             setPicture(null);
@@ -88,10 +111,50 @@ const Products = () => {
         } else if (imageNumber === 2) {
             setPicture2(null);
             setImage2Preview(null);
+        } else if (imageNumber === 3) {
+            setPicture3(null);
+            setImage3Preview(null);
+        } else if (imageNumber === 4) {
+            setPicture4(null);
+            setImage4Preview(null);
         }
     };
 
-    // Handler for product form submission
+    // NEW: Handlers for features
+    const handleFeatureChange = (index, e) => {
+        const { name, value } = e.target;
+        const newFeature = [...feature];
+        newFeature[index][name] = value;
+        setFeature(newFeature);
+    };
+
+    const addFeature = () => {
+        setFeature([...feature, { feature: '' }]);
+    };
+
+    const removeFeature = (index) => {
+        const newFeature = feature.filter((_, i) => i !== index);
+        setFeature(newFeature);
+    };
+
+    // NEW: Handlers for specifications
+    const handleSpecificationChange = (index, e) => {
+        const { name, value } = e.target;
+        const newSpecifications = [...specifications];
+        newSpecifications[index][name] = value;
+        setSpecifications(newSpecifications);
+    };
+
+    const addSpecification = () => {
+        setSpecifications([...specifications, { feature: '', value: '' }]);
+    };
+
+    const removeSpecification = (index) => {
+        const newSpecifications = specifications.filter((_, i) => i !== index);
+        setSpecifications(newSpecifications);
+    };
+
+    // Handler for product form submission - UPDATED FOR 4 IMAGES & SPECIFICATIONS
     const productsForm = async (e) => {
         e.preventDefault();
         setAddLoading(true); // Show spinner on submit button
@@ -105,17 +168,28 @@ const Products = () => {
         formData.append('meta_title', productsInput.meta_title || '');
         formData.append('meta_keywords', productsInput.meta_keywords || '');
         formData.append('meta_description', productsInput.meta_description || '');
-        
+
         // Ensure numerical fields are numbers, default to 0 if empty
         formData.append('selling_price', parseFloat(productsInput.selling_price) || 0);
         formData.append('original_price', parseFloat(productsInput.original_price) || 0);
         formData.append('qty', parseInt(productsInput.qty) || 0);
         formData.append('brand', productsInput.brand || '');
-        
+
         // Convert checkboxes to 1 or 0
         formData.append('featured', productsInput.featured ? 1 : 0);
         formData.append('popular', productsInput.popular ? 1 : 0);
         formData.append('status', productsInput.status ? 1 : 0);
+
+        // NEW: Append new product flags and flash sale details
+        formData.append('is_new_arrival', productsInput.is_new_arrival ? 1 : 0);
+        formData.append('is_flash_sale', productsInput.is_flash_sale ? 1 : 0);
+        
+        if (productsInput.is_flash_sale) {
+            formData.append('flash_sale_price', parseFloat(productsInput.flash_sale_price) || 0);
+            formData.append('flash_sale_starts_at', productsInput.flash_sale_starts_at || '');
+            formData.append('flash_sale_ends_at', productsInput.flash_sale_ends_at || '');
+        }
+
 
         // Append image files if they exist
         if (picture) {
@@ -124,11 +198,24 @@ const Products = () => {
         if (picture2) {
             formData.append('image2', picture2);
         }
+        if (picture3) {
+            formData.append('image3', picture3);
+        }
+        if (picture4) {
+            formData.append('image4', picture4);
+        }
+
+        // NEW: Append specifications as a JSON string
+        formData.append('specifications', JSON.stringify(specifications.filter(s => s.feature && s.value)));
+
+        // NEW: Append features as a JSON string
+        formData.append('features', JSON.stringify(feature.filter(s => s.feature)));
+
 
         try {
             const res = await axios.post('/api/products/store', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data' // Axios handles this for FormData automatically, but explicit is fine
+                    'Content-Type': 'multipart/form-data'
                 }
             });
 
@@ -150,13 +237,26 @@ const Products = () => {
                     brand: '',
                     featured: false,
                     popular: false,
-                    status: false
+                    status: false,
+                    is_new_arrival: false,
+                    is_flash_sale: false,
+                    flash_sale_price: '',
+                    flash_sale_starts_at: '',
+                    flash_sale_ends_at: ''
                 });
                 // Clear image states and previews
                 setPicture(null);
                 setPicture2(null);
+                setPicture3(null);
+                setPicture4(null);
                 setImagePreview(null);
                 setImage2Preview(null);
+                setImage3Preview(null);
+                setImage4Preview(null);
+                // NEW: Reset specifications
+                setSpecifications([{ feature: '', value: '' }]);
+                setFeature([{ feature: '' }]);
+
             } else if (res.data.status === 400) {
                 setError(res.data.errors); // Set validation errors from backend
                 toast.error('Please check the input fields for errors.');
@@ -182,21 +282,15 @@ const Products = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
     };
 
-    // If a full page loading spinner is needed (e.g., for initial data fetch if any)
-    // if (loading) { // assuming a 'loading' state for initial fetches not just addLoading
-    //     return <LoadingSpinner />;
-    // }
-
     return (
         <motion.div
-            className='min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-100 text-gray-800' // Lighter background
+            className='min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-100 text-gray-800'
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            {/* Header section with title and View Products button */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 md:mb-0">Add Product</h1> {/* Darker text for header */}
+                <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 md:mb-0">Add Product</h1>
                 <Link
                     to="/admin/products/view"
                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
@@ -205,12 +299,11 @@ const Products = () => {
                 </Link>
             </header>
 
-            {/* Form container */}
             <motion.form
                 onSubmit={productsForm}
-                encType='multipart/form-data' // Important for file uploads
+                encType='multipart/form-data'
                 id='productsForm'
-                className='bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8' // White background for form card
+                className='bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8'
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -272,7 +365,7 @@ const Products = () => {
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                                     <div className="mb-5">
-                                        <label htmlFor="category_id" className="block text-gray-700 text-sm font-medium mb-2">Category</label>
+                                        <label htmlFor="category_id" className="block text-gray-700 text-sm font-medium mb-2">Category <span className="text-red-500">*</span></label>
                                         <select
                                             onChange={handleInput}
                                             value={productsInput.category_id || ''}
@@ -288,7 +381,7 @@ const Products = () => {
                                         <small className="text-red-500 text-sm mt-1 block">{error.category_id ? error.category_id[0] : ''}</small>
                                     </div>
                                     <div className="mb-5">
-                                        <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">Name</label>
+                                        <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">Name <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleInput}
                                             value={productsInput.name || ''}
@@ -302,7 +395,7 @@ const Products = () => {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                                     <div className="mb-5">
-                                        <label htmlFor="link" className="block text-gray-700 text-sm font-medium mb-2">Link</label>
+                                        <label htmlFor="link" className="block text-gray-700 text-sm font-medium mb-2">Link <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleInput}
                                             value={productsInput.link || ''}
@@ -314,7 +407,7 @@ const Products = () => {
                                         <small className="text-red-500 text-sm mt-1 block">{error.link ? error.link[0] : ''}</small>
                                     </div>
                                     <div className="mb-5">
-                                        <label htmlFor="brand" className="block text-gray-700 text-sm font-medium mb-2">Brand</label>
+                                        <label htmlFor="brand" className="block text-gray-700 text-sm font-medium mb-2">Brand <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleInput}
                                             value={productsInput.brand || ''}
@@ -342,7 +435,7 @@ const Products = () => {
                                 {/* Images Upload */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                                     <div className="mb-5">
-                                        <label htmlFor="image" className="block text-gray-700 text-sm font-medium mb-2">Image 1</label>
+                                        <label htmlFor="image" className="block text-gray-700 text-sm font-medium mb-2">Image 1 <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleImage}
                                             type="file"
@@ -375,6 +468,40 @@ const Products = () => {
                                             </div>
                                         )}
                                     </div>
+                                    <div className="mb-5">
+                                        <label htmlFor="image3" className="block text-gray-700 text-sm font-medium mb-2">Image 3</label>
+                                        <input
+                                            onChange={handleImage}
+                                            type="file"
+                                            id="image3"
+                                            name="image3"
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        />
+                                        <small className="text-red-500 text-sm mt-1 block">{error.image3 ? error.image3[0] : ''}</small>
+                                        {image3Preview && (
+                                            <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
+                                                <img src={image3Preview} alt="Image 3 Preview" className="w-20 h-20 object-cover rounded-md" />
+                                                <button type="button" onClick={() => removeImage(3)} className="text-red-600 hover:text-red-800 text-sm font-semibold">Remove</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mb-5">
+                                        <label htmlFor="image4" className="block text-gray-700 text-sm font-medium mb-2">Image 4</label>
+                                        <input
+                                            onChange={handleImage}
+                                            type="file"
+                                            id="image4"
+                                            name="image4"
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        />
+                                        <small className="text-red-500 text-sm mt-1 block">{error.image4 ? error.image4[0] : ''}</small>
+                                        {image4Preview && (
+                                            <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
+                                                <img src={image4Preview} alt="Image 4 Preview" className="w-20 h-20 object-cover rounded-md" />
+                                                <button type="button" onClick={() => removeImage(4)} className="text-red-600 hover:text-red-800 text-sm font-semibold">Remove</button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </motion.div>
                         )}
@@ -392,7 +519,7 @@ const Products = () => {
                                 aria-labelledby="seo-tags-tab"
                             >
                                 <div className="mb-5">
-                                    <label htmlFor="meta_title" className="block text-gray-700 text-sm font-medium mb-2">Meta Title</label>
+                                    <label htmlFor="meta_title" className="block text-gray-700 text-sm font-medium mb-2">Meta Title <span className="text-red-500">*</span></label>
                                     <input
                                         onChange={handleInput}
                                         value={productsInput.meta_title || ''}
@@ -444,11 +571,11 @@ const Products = () => {
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                                     <div className="mb-5">
-                                        <label htmlFor="selling_price" className="block text-gray-700 text-sm font-medium mb-2">Selling Price</label>
+                                        <label htmlFor="selling_price" className="block text-gray-700 text-sm font-medium mb-2">Selling Price <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleInput}
                                             value={productsInput.selling_price || ''}
-                                            type="number" // Changed to number type for prices
+                                            type="number"
                                             id="selling_price"
                                             name="selling_price"
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
@@ -456,11 +583,11 @@ const Products = () => {
                                         <small className="text-red-500 text-sm mt-1 block">{error.selling_price ? error.selling_price[0] : ''}</small>
                                     </div>
                                     <div className="mb-5">
-                                        <label htmlFor="original_price" className="block text-gray-700 text-sm font-medium mb-2">Original Price</label>
+                                        <label htmlFor="original_price" className="block text-gray-700 text-sm font-medium mb-2">Original Price <span className="text-red-500">*</span></label>
                                         <input
                                             onChange={handleInput}
                                             value={productsInput.original_price || ''}
-                                            type="number" // Changed to number type for prices
+                                            type="number"
                                             id="original_price"
                                             name="original_price"
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
@@ -469,81 +596,239 @@ const Products = () => {
                                     </div>
                                 </div>
                                 <div className="mb-5">
-                                    <label htmlFor="qty" className="block text-gray-700 text-sm font-medium mb-2">Quantity</label>
+                                    <label htmlFor="qty" className="block text-gray-700 text-sm font-medium mb-2">Quantity <span className="text-red-500">*</span></label>
                                     <input
                                         onChange={handleInput}
                                         value={productsInput.qty || ''}
-                                        type="number" // Changed to number type for quantity
+                                        type="number"
                                         id="qty"
                                         name="qty"
                                         className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
                                     />
                                     <small className="text-red-500 text-sm mt-1 block">{error.qty ? error.qty[0] : ''}</small>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
-                                    <div className="mb-5">
-                                        <label htmlFor="featured" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.featured}
-                                                type='checkbox'
-                                                id="featured"
-                                                name="featured"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Featured</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.featured ? error.featured[0] : ''}</small>
+
+                                {/* Product Flags */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
+                                    <div className="flex items-center mb-5">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.featured}
+                                            type="checkbox"
+                                            id="featured"
+                                            name="featured"
+                                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="featured" className="ml-3 block text-gray-700 text-sm font-medium">Featured Product</label>
                                     </div>
-                                    <div className="mb-5">
-                                        <label htmlFor="popular" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.popular}
-                                                type='checkbox'
-                                                id="popular"
-                                                name="popular"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Popular</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.popular ? error.popular[0] : ''}</small>
+                                    <div className="flex items-center mb-5">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.popular}
+                                            type="checkbox"
+                                            id="popular"
+                                            name="popular"
+                                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="popular" className="ml-3 block text-gray-700 text-sm font-medium">Popular Product</label>
                                     </div>
-                                    <div className="mb-5">
-                                        <label htmlFor="status" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.status}
-                                                type='checkbox'
-                                                id="status"
-                                                name="status"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Status</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.status ? error.status[0] : ''}</small>
+                                    <div className="flex items-center mb-5">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.status}
+                                            type="checkbox"
+                                            id="status"
+                                            name="status"
+                                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="status" className="ml-3 block text-gray-700 text-sm font-medium">Status (Hidden/Shown)</label>
                                     </div>
+                                    {/* New Arrival Checkbox */}
+                                    <div className="flex items-center mb-5">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.is_new_arrival}
+                                            type="checkbox"
+                                            id="is_new_arrival"
+                                            name="is_new_arrival"
+                                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="is_new_arrival" className="ml-3 block text-gray-700 text-sm font-medium">New Arrival</label>
+                                    </div>
+                                    {/* Flash Sale Checkbox */}
+                                    <div className="flex items-center mb-5">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.is_flash_sale}
+                                            type="checkbox"
+                                            id="is_flash_sale"
+                                            name="is_flash_sale"
+                                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor="is_flash_sale" className="ml-3 block text-gray-700 text-sm font-medium">Flash Sale</label>
+                                    </div>
+                                </div>
+
+                                {/* Flash Sale Details (conditionally rendered) */}
+                                {productsInput.is_flash_sale && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="border-t border-gray-200 pt-6 mt-6"
+                                    >
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Flash Sale Details</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+                                            <div className="mb-5">
+                                                <label htmlFor="flash_sale_price" className="block text-gray-700 text-sm font-medium mb-2">Flash Sale Price <span className="text-red-500">*</span></label>
+                                                <input
+                                                    onChange={handleInput}
+                                                    value={productsInput.flash_sale_price || ''}
+                                                    type="number"
+                                                    id="flash_sale_price"
+                                                    name="flash_sale_price"
+                                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                />
+                                                <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_price ? error.flash_sale_price[0] : ''}</small>
+                                            </div>
+                                            <div className="mb-5">
+                                                <label htmlFor="flash_sale_starts_at" className="block text-gray-700 text-sm font-medium mb-2">Sale Start Date <span className="text-red-500">*</span></label>
+                                                <input
+                                                    onChange={handleInput}
+                                                    value={productsInput.flash_sale_starts_at || ''}
+                                                    type="datetime-local"
+                                                    id="flash_sale_starts_at"
+                                                    name="flash_sale_starts_at"
+                                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                />
+                                                <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_starts_at ? error.flash_sale_starts_at[0] : ''}</small>
+                                            </div>
+                                            <div className="mb-5">
+                                                <label htmlFor="flash_sale_ends_at" className="block text-gray-700 text-sm font-medium mb-2">Sale End Date <span className="text-red-500">*</span></label>
+                                                <input
+                                                    onChange={handleInput}
+                                                    value={productsInput.flash_sale_ends_at || ''}
+                                                    type="datetime-local"
+                                                    id="flash_sale_ends_at"
+                                                    name="flash_sale_ends_at"
+                                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                />
+                                                <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_ends_at ? error.flash_sale_ends_at[0] : ''}</small>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+
+                                {/* Features Section */}
+                                <div className="border-t border-gray-200 pt-6 mt-6">
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-4 flex justify-between items-center">
+                                        Product Features
+                                        <button
+                                            type="button"
+                                            onClick={addFeature}
+                                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300"
+                                        >
+                                            Add Feature
+                                        </button>
+                                    </h3>
+                                    {feature.map((feat, index) => (
+                                        <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-x-6 items-end mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                            <div className="md:col-span-2">
+                                                <label htmlFor={`feature-${index}`} className="block text-gray-700 text-sm font-medium mb-2">Feature Name</label>
+                                                <input
+                                                    type="text"
+                                                    id={`feature-${index}`}
+                                                    name="feature"
+                                                    value={feat.feature}
+                                                    onChange={(e) => handleFeatureChange(index, e)}
+                                                    className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                    placeholder="e.g., Color, Material"
+                                                />
+                                            </div>
+                                            <div className="mt-4 md:mt-0 flex justify-end">
+                                                {feature.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeFeature(index)}
+                                                        className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 w-full"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <small className="text-red-500 text-sm mt-1 block">{error.features ? error.features[0] : ''}</small>
+                                </div>
+
+                                {/* Specifications Section */}
+                                <div className="border-t border-gray-200 pt-6 mt-6">
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-4 flex justify-between items-center">
+                                        Product Specifications
+                                        <button
+                                            type="button"
+                                            onClick={addSpecification}
+                                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300"
+                                        >
+                                            Add Specification
+                                        </button>
+                                    </h3>
+                                    {specifications.map((spec, index) => (
+                                        <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-x-6 items-end mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                            <div>
+                                                <label htmlFor={`spec-feature-${index}`} className="block text-gray-700 text-sm font-medium mb-2">Specification Feature</label>
+                                                <input
+                                                    type="text"
+                                                    id={`spec-feature-${index}`}
+                                                    name="feature"
+                                                    value={spec.feature}
+                                                    onChange={(e) => handleSpecificationChange(index, e)}
+                                                    className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                    placeholder="e.g., Screen Size"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor={`spec-value-${index}`} className="block text-gray-700 text-sm font-medium mb-2">Specification Value</label>
+                                                <input
+                                                    type="text"
+                                                    id={`spec-value-${index}`}
+                                                    name="value"
+                                                    value={spec.value}
+                                                    onChange={(e) => handleSpecificationChange(index, e)}
+                                                    className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                    placeholder="e.g., 6.7 inches"
+                                                />
+                                            </div>
+                                            <div className="mt-4 md:mt-0 flex justify-end">
+                                                {specifications.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeSpecification(index)}
+                                                        className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 w-full"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <small className="text-red-500 text-sm mt-1 block">{error.specifications ? error.specifications[0] : ''}</small>
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                {/* Submit Button */}
-                <button
-                    className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 float-right"
-                    type='submit'
-                    disabled={addLoading}
-                >
-                    {addLoading ? (
-                        <LoadingSpinner size="sm" />
-                    ) : (
-                        'Add Product'
-                    )}
-                </button>
+                <div className="mt-8 flex justify-end">
+                    <button
+                        type="submit"
+                        className="px-8 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center min-w-[120px]"
+                        disabled={addLoading}
+                    >
+                        {addLoading ? <LoadingSpinner /> : 'Add Product'}
+                    </button>
+                </div>
             </motion.form>
         </motion.div>
     );

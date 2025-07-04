@@ -14,22 +14,22 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Aliases for route middleware
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
             'isApiAdmin' => \App\Http\Middleware\ApiAdminMiddleware::class,
-            'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'api' => [
-                \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-                'throttle:api',
-                \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ],
+        ]);
+
+        // Middleware group for 'api'
+        $middleware->group('api', [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // var_dump($exceptions);
         $exceptions->render(function (\Symfony\Component\Routing\Exception\RouteNotFoundException $e) {
-            // var_dump($e);
             return response()->json(['error' => 'Unauthorized'], 401);
         });
     })

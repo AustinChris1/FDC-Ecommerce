@@ -275,7 +275,7 @@ const Store = () => {
                 animate="visible"
                 whileHover="hover"
                 viewport={{ once: true, amount: 0.2 }} // Animate when 20% in view
-                className="relative bg-gray-800 rounded-xl shadow-lg flex flex-col p-5 overflow-hidden border border-gray-700 group cursor-pointer"
+                className="relative bg-gray-800 rounded-xl shadow-lg flex flex-col p-2 overflow-hidden border border-gray-700 group cursor-pointer"
               >
                 <Link
                   to={`/collections/${product.category?.link || 'default-category'}/${product.link}`}
@@ -284,7 +284,7 @@ const Store = () => {
                   <img
                     src={`/${product.image}`}
                     alt={product.name}
-                    className="w-full h-48 object-contain rounded-md mb-4 transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
+                    className="w-full h-48 object-contain rounded-md mb-2 transform group-hover:scale-105 transition-transform duration-300 ease-in-out"
                   />
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-100 mb-2 truncate group-hover:text-cyan-400 transition-colors duration-200">

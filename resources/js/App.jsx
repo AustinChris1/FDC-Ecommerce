@@ -15,6 +15,7 @@ import ResendEmail from './layouts/frontend/auth/Verification';
 import VerifyEmail from './layouts/frontend/auth/Verify';
 import { CartProvider } from './layouts/frontend/Components/CartContext';
 import CartSidebar from './layouts/frontend/Components/CartSidebar';
+import { WishlistProvider } from './layouts/frontend/Components/WishlistContext';
 import Checkout from './layouts/frontend/Components/Checkout';
 import TrendingProducts from './layouts/frontend/Outer/TrendingProducts';
 import ShippingReturns from './layouts/frontend/Outer/ShippingReturns';
@@ -25,6 +26,9 @@ import OrderConfirmation from './layouts/frontend/Components/OrderConfirmation';
 import UserOrders from './layouts/frontend/Components/UserOrders';
 import UserOrderDetail from './layouts/frontend/Components/UserOrderDetail';
 import UserProfile from './layouts/frontend/Components/Profile';
+import Wishlist from './layouts/frontend/Outer/WishList';
+import TrackOrder from './layouts/frontend/Components/TrackOrder';
+import FlashSale from './layouts/frontend/Outer/FlashSale';
 
 
 const Master = lazy(() => import('./layouts/admin/Master'));
@@ -33,7 +37,7 @@ const Login = lazy(() => import('./layouts/frontend/auth/Login'));
 const AdminPrivateRoute = lazy(() => import('./AdminPrivateRoute'));
 const Navbar = lazy(() => import('./layouts/frontend/Components/Navbar'));
 const HeroSection = lazy(() => import('./layouts/frontend/Components/HeroSection'));
-const FeaturedCategories = lazy(() => import('./layouts/frontend/Components/FeaturedCategories'));
+const ProductShowcase = lazy(() => import('./layouts/frontend/Components/ProductShowcase'));
 const Products = lazy(() => import('./layouts/frontend/Components/Products'));
 const CustomerTestimonials = lazy(() => import('./layouts/frontend/Components/CustomerTestimonials'));
 const CallToActionNewsletter = lazy(() => import('./layouts/frontend/Components/CallToActionNewsletter'));
@@ -62,7 +66,7 @@ function Home() {
   return (
     <>
       <HeroSection />
-      <FeaturedCategories />
+      <ProductShowcase />
       <Products />
       <CustomerTestimonials />
       <CallToActionNewsletter />
@@ -102,13 +106,16 @@ function Layout() {
 
         {/* Frontend routes */}
         <Route path="/" element={<Home />} />
+        <Route path='/track-order' element={<TrackOrder/>}/>
+        <Route path='/flash-sales' element={<FlashSale/>}/>
         <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
         <Route path='/user/orders' element={<UserOrders />} />
         <Route path="/user/order/:orderNumber" element={<UserOrderDetail />} />
         <Route path='/user/profile' element={<UserProfile />} />
         <Route path="/shop" element={<Store />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/collections/trending" element={<TrendingProducts />} />
+        <Route path="/trending" element={<TrendingProducts />} />
+        <Route path='/wishlist' element={<Wishlist />} /> 
         <Route path="/about" element={<AboutUs />} />
         <Route path="/company/team" element={<Team />} />
         <Route path="/contact" element={<ContactUs />} />
@@ -152,10 +159,12 @@ function App() {
       <HelmetProvider>
         <Router>
         <CartProvider>
+          <WishlistProvider>
           <ScrollToTop /> {/* Scroll to the top when navigating */}
           <Suspense fallback={<LoadingSpinner />}>
             <Layout /> {/* Use Layout to conditionally render components */}
           </Suspense>
+          </WishlistProvider>
           </CartProvider>
         </Router>
         {/* ToastContainer for global notifications */}

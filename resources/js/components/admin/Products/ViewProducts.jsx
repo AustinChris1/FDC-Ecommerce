@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'; // Import useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
@@ -13,11 +13,13 @@ import {
     CheckCircle,
     XCircle,
     Search,
-    Boxes,       // For Total Products
-    Calculator,   // For Total Quantity
-    DollarSign,   // For Total Value
-    AlertTriangle // For Low Stock
-} from 'lucide-react'; // Import Lucide React icons
+    Boxes,          // For Total Products
+    Calculator,     // For Total Quantity
+    DollarSign,      // Replaced DollarSign with DollarSign
+    AlertTriangle,  // For Low Stock
+    Sparkles,       // For New Arrival
+    Zap             // For Flash Sale
+} from 'lucide-react'; // Import Lucide React icons, including DollarSign, Sparkles, and Zap
 
 const ViewProducts = () => {
     const [loading, setLoading] = useState(true);
@@ -96,12 +98,16 @@ const ViewProducts = () => {
     const offset = currentPage * itemsPerPage;
     const displayedProducts = filteredProducts.slice(offset, offset + itemsPerPage);
 
-    //  Dashboard Calculations (using useMemo for performance) 
+    // Dashboard Calculations (using useMemo for performance)
     const dashboardStats = useMemo(() => {
         const totalProducts = products.length;
         let totalQuantity = 0;
         let totalStockValue = 0;
         let lowStockItems = 0;
+        let newArrivals = 0;
+        let activeFlashSales = 0;
+
+        const now = new Date();
 
         products.forEach(product => {
             const qty = parseInt(product.qty, 10) || 0; // Convert qty to an integer, default to 0
@@ -113,6 +119,18 @@ const ViewProducts = () => {
             if (qty <= lowStockThreshold) {
                 lowStockItems++;
             }
+
+            if (product.is_new_arrival) {
+                newArrivals++;
+            }
+
+            if (product.is_flash_sale && product.flash_sale_starts_at && product.flash_sale_ends_at) {
+                const startsAt = new Date(product.flash_sale_starts_at);
+                const endsAt = new Date(product.flash_sale_ends_at);
+                if (now >= startsAt && now <= endsAt) {
+                    activeFlashSales++;
+                }
+            }
         });
 
         return {
@@ -120,9 +138,11 @@ const ViewProducts = () => {
             totalQuantity,
             totalStockValue,
             lowStockItems,
+            newArrivals,
+            activeFlashSales,
         };
     }, [products, lowStockThreshold]);
-    //  End Dashboard Calculations 
+    // End Dashboard Calculations
 
 
     if (loading) {
@@ -166,8 +186,6 @@ const ViewProducts = () => {
                     Add Product
                 </Link>
             </header>
-
-            
 
             {/* Dashboard Section */}
             <h2 className="text-2xl font-bold text-gray-800 mb-6 mt-8">Inventory Overview</h2>
@@ -226,9 +244,34 @@ const ViewProducts = () => {
                         <p className="text-sm text-red-500 mt-2">Threshold: {lowStockThreshold} units</p>
                     )}
                 </motion.div>
+
+                {/* New Arrivals Card */}
+                <motion.div
+                    className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center text-center border border-gray-200"
+                    variants={dashboardCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: 0.5 }}
+                >
+                    <Sparkles className="w-10 h-10 text-yellow-500 mb-3" />
+                    <h3 className="text-xl font-semibold text-gray-700">New Arrivals</h3>
+                    <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardStats.newArrivals}</p>
+                </motion.div>
+
+                {/* Active Flash Sales Card */}
+                <motion.div
+                    className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center text-center border border-gray-200"
+                    variants={dashboardCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: 0.6 }}
+                >
+                    <Zap className="w-10 h-10 text-orange-500 mb-3" />
+                    <h3 className="text-xl font-semibold text-gray-700">Active Flash Sales</h3>
+                    <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardStats.activeFlashSales}</p>
+                </motion.div>
             </div>
 
-            
 
             {/* Search Bar */}
             <div className="relative mb-8 bg-white rounded-xl shadow-md p-4">
@@ -250,13 +293,29 @@ const ViewProducts = () => {
                             {displayedProducts.map((item) => (
                                 <motion.div
                                     key={item.id}
-                                    className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col transition-all duration-200"
+                                    className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col transition-all duration-200 relative" // Added relative for absolute positioning of badges
                                     variants={cardVariants}
                                     initial="hidden"
                                     animate="visible"
                                     exit="exit"
                                     whileHover="hover"
                                 >
+                                    {/* Badges for New Arrival and Flash Sale */}
+                                    {(item.is_new_arrival || item.is_flash_sale) && (
+                                        <div className="absolute top-2 right-2 flex space-x-2 z-10">
+                                            {item.is_new_arrival && (
+                                                <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                                                    <Sparkles className="w-3 h-3 mr-1" /> New
+                                                </span>
+                                            )}
+                                            {item.is_flash_sale && (
+                                                <span className="bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                                                    <Zap className="w-3 h-3 mr-1" /> Flash Sale
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+
                                     {/* Product Image */}
                                     <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                                         <img
@@ -277,17 +336,31 @@ const ViewProducts = () => {
                                             <Tag className="w-4 h-4 mr-2 text-gray-400" />
                                             <span className="truncate">{item.category?.name || 'N/A'}</span>
                                         </p>
-                                        
+
                                         {/* Prices & Quantity */}
                                         <div className="mb-2">
-                                            <p className="text-lg font-semibold text-emerald-600 flex items-center">
-                                                ₦{item.selling_price ? item.selling_price.toLocaleString() : '0'}
-                                                {item.original_price && item.original_price > item.selling_price && (
-                                                    <span className="ml-2 text-sm text-gray-500 line-through">
-                                                        ₦{item.original_price.toLocaleString()}
-                                                    </span>
-                                                )}
-                                            </p>
+                                            {item.is_flash_sale && item.flash_sale_price ? (
+                                                <>
+                                                    <p className="text-lg font-semibold text-purple-600 flex items-center">
+                                                        ₦{item.flash_sale_price.toLocaleString()}
+                                                        <span className="ml-2 text-sm text-gray-500 line-through">
+                                                            ₦{item.original_price ? item.original_price.toLocaleString() : item.selling_price?.toLocaleString() || '0'}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-xs text-orange-500 mt-1">
+                                                        Flash Sale Ends: {item.flash_sale_ends_at ? new Date(item.flash_sale_ends_at).toLocaleDateString() : 'N/A'}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-lg font-semibold text-emerald-600 flex items-center">
+                                                    ₦{item.selling_price ? item.selling_price.toLocaleString() : '0'}
+                                                    {item.original_price && item.original_price > item.selling_price && (
+                                                        <span className="ml-2 text-sm text-gray-500 line-through">
+                                                            ₦{item.original_price.toLocaleString()}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            )}
                                             <p className={`text-sm mt-1 flex items-center ${item.qty <= lowStockThreshold ? 'text-red-500 font-semibold' : 'text-gray-600'}`}>
                                                 <Boxes className="w-4 h-4 mr-2" />
                                                 Quantity: {item.qty} {item.qty <= lowStockThreshold && '(Low Stock!)'}

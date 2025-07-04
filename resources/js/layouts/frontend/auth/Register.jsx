@@ -60,6 +60,7 @@ const Register = () => {
                             localStorage.setItem("auth_name", res.data.username);
                             localStorage.setItem("auth_email", res.data.email);
                             localStorage.setItem("role", res.data.role);
+                            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
 
                             setError({});
                             toast.success(res.data.message);

@@ -3,14 +3,16 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import Load from '../Components/Load'; // Assuming you have a Load component for spinners
+import Load from '../Components/Load'; 
+import LoadingSpinner from '../Components/Loader';
 import { ShoppingCart, Star, ArrowRight } from 'lucide-react'; // Icons for cart, rating, and arrow
+import { useCart } from '../Components/CartContext';
 
 const TrendingProducts = () => {
     const [trendingProducts, setTrendingProducts] = useState([]);
-    const [category, setCategory] = useState([]); // This state will hold the list of categories
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addToCart } = useCart(); // Destructure addToCart from useCart
 
     useEffect(() => {
         const fetchTrendingProducts = async () => {
@@ -20,11 +22,10 @@ const TrendingProducts = () => {
                 const response = await axios.get('/api/allProducts');
 
                 if (response.data.status === 200 && response.data.products) {
-                    // Filter products where featured == 1 and limit to first 8
                     const featuredProducts = response.data.products
                         .filter(product => product.featured === 1)
                         .slice(0, 8);
-                    
+
                     setTrendingProducts(featuredProducts);
                 } else {
                     toast.error(response.data.message || 'Unable to fetch trending products.');
@@ -79,7 +80,7 @@ const TrendingProducts = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex justify-center items-center" style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }}>
-                <Load />
+                <LoadingSpinner />
             </div>
         );
     }
@@ -87,7 +88,7 @@ const TrendingProducts = () => {
     return (
         <motion.section
             className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 text-gray-200"
-            style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }} // Very dark background
+            style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -126,55 +127,66 @@ const TrendingProducts = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         <AnimatePresence>
-                            {trendingProducts.map((product) => (
-                                <motion.div
-                                    key={product.id}
-                                    className="bg-gray-800 rounded-xl shadow-xl overflow-hidden cursor-pointer border border-gray-700 relative group"
-                                    variants={cardHoverVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                >
-                                    {/* Trending Badge */}
-                                    <motion.div
-                                        className="absolute top-4 left-4 bg-lime-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase z-10 flex items-center"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.5, duration: 0.3 }}
-                                    >
-                                        <Star className="w-3 h-3 mr-1" fill="currentColor" /> Trending
-                                    </motion.div>
+                            {trendingProducts.map((product) => {
+                                const handleAddToCart = (e) => {
+                                    e.preventDefault(); // Prevent default link behavior
+                                    e.stopPropagation(); // Stop event bubbling
 
-                                    <Link to={`/collections/${product.category?.link}`} className="block">
-                                        <motion.img
-                                            src={`/${product.image}`} 
-                                            alt={product.name}
-                                            className="w-full h-64 object-cover transform transition-transform duration-300"
-                                            variants={imageHoverVariants}
-                                            initial={false}
-                                            whileHover="hover"
-                                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/cccccc/000000?text=Image+Error'; }} // Fallback image
-                                        />
-                                        <div className="p-6 bg-gray-900">
-                                            <h3 className="text-xl font-bold text-white mb-2 truncate">{product.name}</h3>
-                                            <p className="text-sm text-gray-400 mb-3 line-clamp-2">{product.description}</p>
-                                            <div className="flex justify-between items-center mt-4">
-                                                <span className="text-lime-400 font-extrabold text-2xl">
-                                                    ₦{product.selling_price.toLocaleString()} {/* Format price */}
-                                                </span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault(); 
-                                                        e.stopPropagation();
-                                                    }}
-                                                    className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105"
-                                                >
-                                                    <ShoppingCart className="w-5 h-5 mr-2" /> Details
-                                                </button>
+                                    if (product.status !== 0 || product.qty <= 0) {
+                                        toast.error("This product is currently out of stock.");
+                                        return;
+                                    }
+
+                                    addToCart(product, 1);
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={product.id}
+                                        className="bg-gray-800 rounded-xl shadow-xl overflow-hidden cursor-pointer border border-gray-700 relative group"
+                                        variants={cardHoverVariants}
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                    >
+                                        {/* Trending Badge */}
+                                        <motion.div
+                                            className="absolute top-4 left-4 bg-lime-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase z-10 flex items-center"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.5, duration: 0.3 }}
+                                        >
+                                            <Star className="w-3 h-3 mr-1" fill="currentColor" /> Trending
+                                        </motion.div>
+
+                                        <Link to={`/collections/${product.category?.link}/${product.link}`} className="block">
+                                            <motion.img
+                                                src={`/${product.image}`}
+                                                alt={product.name}
+                                                className="w-full h-64 object-cover transform transition-transform duration-300"
+                                                variants={imageHoverVariants}
+                                                initial={false}
+                                                whileHover="hover"
+                                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/cccccc/000000?text=Image+Error'; }} // Fallback image
+                                            />
+                                            <div className="p-6 bg-gray-900">
+                                                <h3 className="text-xl font-bold text-white mb-2 truncate">{product.name}</h3>
+                                                <p className="text-sm text-gray-400 mb-3 line-clamp-2">{product.description}</p>
+                                                <div className="flex justify-between items-center mt-4">
+                                                    <span className="text-lime-400 font-extrabold text-2xl">
+                                                        ₦{product.selling_price.toLocaleString()} {/* Format price */}
+                                                    </span>
+                                                    <button
+                                                        onClick={handleAddToCart} // Call the local handleAddToCart
+                                                        className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105"
+                                                    >
+                                                        <ShoppingCart className="w-5 h-5 mr-2" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            ))}
+                                        </Link>
+                                    </motion.div>
+                                );
+                            })}
                         </AnimatePresence>
                     </div>
                 )}

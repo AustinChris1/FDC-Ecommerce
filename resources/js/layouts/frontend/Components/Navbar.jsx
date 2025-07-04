@@ -29,6 +29,7 @@ const Navbar = () => {
     const location = useLocation(); // Hook to get current location
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    // category state will now store objects with name, link, and image
     const [category, setCategory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -43,15 +44,13 @@ const Navbar = () => {
     );
 
     useEffect(() => {
-            document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
     }, [darkMode]);
 
     // Access totalCartItems and toggleCart from your CartContext
     const { totalCartItems, toggleCart } = useCart();
 
-    // Close mobile menu on navigation and on body scroll disable
-    // This function is now the primary way to handle navigation and menu closing
     const handleNavigation = (path) => {
         setIsMobileMenuOpen(false); // Always close mobile menu on navigation
         // Also clear search results if navigating
@@ -81,7 +80,13 @@ const Navbar = () => {
         axios.get('/api/getCategory')
             .then(res => {
                 if (res.data.status === 200) {
-                    setCategory(res.data.category);
+                    // Map the fetched categories to include name, link, and image
+                    const formattedCategories = res.data.category.map(cat => ({
+                        name: cat.name,
+                        link: `/collections/${cat.link}`, // Adjust link path as per your routing
+                        image: cat.image ? `/${cat.image}` : `https://placehold.co/180x180/e0e0e0/555555?text=${cat.name}`
+                    }));
+                    setCategory(formattedCategories);
                 } else {
                     toast.error("Unable to fetch categories for Navbar.");
                 }
@@ -267,8 +272,8 @@ const Navbar = () => {
                     {/* Categories Dropdown */}
                     <NewDropdownMenu
                         title="Categories"
-                        items={category.map(cat => cat.name)}
-                        links={category.map(cat => `/collections/${cat.link}`)}
+                        // Pass the entire category objects as items
+                        items={category}
                         handleNavigation={handleNavigation} // Pass handleNavigation to dropdown
                         isMobile={false} // Explicitly set for desktop
                     />
@@ -315,7 +320,7 @@ const Navbar = () => {
                                     </ul>
                                 </motion.div>
                             )}
-                            {searchTerm.length > 2 && !isLoading && searchResults.length === 0 && (
+                            {searchTerm.length > 1 && !isLoading && searchResults.length === 0 && (
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -384,7 +389,7 @@ const Navbar = () => {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="fixed top-0 right-0 min-h-screen w-full bg-gray-950 flex flex-col pt-20 px-6 pb-6 overflow-y-auto shadow-xl lg:hidden z-40"
+                            className="fixed top-0 right-0 min-h-screen w-full bg-gray-950 flex flex-col pt-20 px-6 pb-1 overflow-y-auto shadow-xl lg:hidden z-40"
                         >
                             <div className="absolute top-4 right-4 z-50"> {/* Ensure close button is above content */}
                                 <button onClick={() => setIsMobileMenuOpen(false)} aria-label="Close Menu" className="text-gray-300 hover:text-white transition-colors">
@@ -405,9 +410,9 @@ const Navbar = () => {
                                 {/* Mobile Categories Dropdown */}
                                 <NewDropdownMenu
                                     title="Categories"
-                                    items={category.map(cat => cat.name)}
-                                    links={category.map(cat => `/collections/${cat.link}`)}
-                                    handleNavigation={handleNavigation} 
+                                    // Pass the entire category objects as items for mobile
+                                    items={category}
+                                    handleNavigation={handleNavigation}
                                     isMobile={true}
                                 />
                                 {/* Mobile Search Bar */}
@@ -458,7 +463,7 @@ const Navbar = () => {
                                 </li>
                             </ul>
                             {/* Auth and Admin Links for Mobile */}
-                            <div className="mt-auto pt-4 border-t border-gray-700 flex flex-col space-y-4">
+                            <div className="mt-auto border-t border-gray-700 pt-2 flex flex-col space-y-3">
                                 {localStorage.getItem('auth_token') ? (
                                     <>
                                         <Link to="/user/orders" onClick={() => handleNavigation('/user/orders')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800 text-xl font-semibold w-fit">
@@ -483,6 +488,9 @@ const Navbar = () => {
                                         <span>Admin</span>
                                     </Link>
                                 )}
+                                <div className="flex items-center py-8 px-3 w-fit">
+                                </div>
+
                             </div>
                         </motion.div>
                     )}

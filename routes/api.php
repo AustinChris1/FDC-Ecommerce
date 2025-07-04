@@ -15,9 +15,16 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminSettingsController;
-   
+use App\Http\Controllers\API\WishlistController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Wishlist Routes
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist/add', [WishlistController::class, 'add']);
+    Route::delete('/wishlist/remove/{product_id}', [WishlistController::class, 'remove']);
+});
 // Activity dashboard
-    Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
+Route::get('/analytics/dashboard', [AnalyticsController::class, 'dashboard']);
 Route::post('/analytics/track', [AnalyticsController::class, 'trackVisitor']);
 
 // Route for placing an order

@@ -3,12 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-// --- IMPORTANT: Adjust this path based on your actual file structure ---
-// As per your instruction, setting the path to '../LoadingSpinner'.
-// If EditProducts.jsx is directly in 'src/pages/' (or similar) and LoadingSpinner
-// is in 'src/components/', then this path should be '../../components/LoadingSpinner'.
-// Please manually adjust this import path if it's still incorrect.
-import LoadingSpinner from '../LoadingSpinner'; 
+import LoadingSpinner from '../LoadingSpinner';
 
 const EditProducts = () => {
     const { id } = useParams(); // Get product ID from URL parameters
@@ -29,19 +24,34 @@ const EditProducts = () => {
         original_price: '',
         qty: '',
         brand: '',
-        // image: '', // Removed from productsInput as it's handled by 'picture' states
-        // image2: '', // Removed from productsInput as it's handled by 'picture2' states
         featured: false,
         popular: false,
-        status: false
+        status: false,
+        // NEW: Add states for new fields
+        is_new_arrival: false,
+        is_flash_sale: false,
+        flash_sale_price: '',
+        flash_sale_starts_at: '',
+        flash_sale_ends_at: ''
     });
     // States for image files and their previews
     const [picture, setPicture] = useState(null); // File object for image 1 (new upload)
     const [picture2, setPicture2] = useState(null); // File object for image 2 (new upload)
+    const [picture3, setPicture3] = useState(null); // NEW: File object for image 3
+    const [picture4, setPicture4] = useState(null); // NEW: File object for image 4
+
     const [imagePreview, setImagePreview] = useState(null); // URL for image 1 preview
     const [image2Preview, setImage2Preview] = useState(null); // URL for image 2 preview
+    const [image3Preview, setImage3Preview] = useState(null); // NEW: URL for image 3 preview
+    const [image4Preview, setImage4Preview] = useState(null); // NEW: URL for image 4 preview
+
     const [currentImage1Path, setCurrentImage1Path] = useState(''); // Store original image 1 path
     const [currentImage2Path, setCurrentImage2Path] = useState(''); // Store original image 2 path
+    const [currentImage3Path, setCurrentImage3Path] = useState(''); // NEW: Store original image 3 path
+    const [currentImage4Path, setCurrentImage4Path] = useState(''); // NEW: Store original image 4 path
+
+    const [specifications, setSpecifications] = useState([{ feature: '', value: '' }]); // NEW: State for specifications
+    const [feature, setFeature] = useState([{ feature: '' }]); // NEW: State for feature
 
     const [error, setError] = useState({}); // Stores validation errors from backend
     const [activeTab, setActiveTab] = useState('home'); // State to manage active tab
@@ -61,6 +71,16 @@ const EditProducts = () => {
             setImage2Preview(file ? URL.createObjectURL(file) : null);
             setCurrentImage2Path(''); // Clear old path if new image selected
             setError(prev => ({ ...prev, image2: '' })); // Clear specific error
+        } else if (name === 'image3') { // NEW: Handle image 3
+            setPicture3(file);
+            setImage3Preview(file ? URL.createObjectURL(file) : null);
+            setCurrentImage3Path('');
+            setError(prev => ({ ...prev, image3: '' }));
+        } else if (name === 'image4') { // NEW: Handle image 4
+            setPicture4(file);
+            setImage4Preview(file ? URL.createObjectURL(file) : null);
+            setCurrentImage4Path('');
+            setError(prev => ({ ...prev, image4: '' }));
         }
     };
 
@@ -74,16 +94,76 @@ const EditProducts = () => {
             setPicture2(null);
             setImage2Preview(null);
             setCurrentImage2Path(''); // Signal to backend to remove this image
+        } else if (imageNumber === 3) { // NEW: Remove image 3
+            setPicture3(null);
+            setImage3Preview(null);
+            setCurrentImage3Path('');
+        } else if (imageNumber === 4) { // NEW: Remove image 4
+            setPicture4(null);
+            setImage4Preview(null);
+            setCurrentImage4Path('');
         }
     };
 
     // Handler for text, select, and checkbox inputs
     const handleInput = (e) => {
         const { name, type, value, checked } = e.target;
-        setProductsInput(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        setProductsInput(prev => {
+            const newState = {
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            };
+
+            // If is_flash_sale is unchecked, clear flash sale related fields
+            if (name === 'is_flash_sale' && !checked) {
+                newState.flash_sale_price = '';
+                newState.flash_sale_starts_at = '';
+                newState.flash_sale_ends_at = '';
+                // Also clear errors for these fields if they exist
+                setError(prevErrors => {
+                    const newErrors = { ...prevErrors };
+                    delete newErrors.flash_sale_price;
+                    delete newErrors.flash_sale_starts_at;
+                    delete newErrors.flash_sale_ends_at;
+                    return newErrors;
+                });
+            }
+            return newState;
+        });
+    };
+
+    // NEW: Handlers for specifications
+    const handleSpecificationChange = (index, event) => {
+        const { name, value } = event.target;
+        const newSpecifications = [...specifications];
+        newSpecifications[index][name] = value;
+        setSpecifications(newSpecifications);
+    };
+
+    const addSpecification = () => {
+        setSpecifications([...specifications, { feature: '', value: '' }]);
+    };
+
+    const removeSpecification = (index) => {
+        const newSpecifications = specifications.filter((_, i) => i !== index);
+        setSpecifications(newSpecifications);
+    };
+
+    // NEW: Handlers for feature
+    const handleFeatureChange = (index, event) => {
+        const { name, value } = event.target;
+        const newfeature = [...feature];
+        newfeature[index][name] = value;
+        setFeature(newfeature);
+    };
+
+    const addFeature = () => {
+        setFeature([...feature, { feature: '' }]);
+    };
+
+    const removeFeature = (index) => {
+        const newfeature = feature.filter((_, i) => i !== index);
+        setFeature(newfeature);
     };
 
     // Effect to fetch categories and product data on component mount/id change
@@ -123,13 +203,54 @@ const EditProducts = () => {
                         brand: productData.brand || '',
                         featured: productData.featured === 1 ? true : false,
                         popular: productData.popular === 1 ? true : false,
-                        status: productData.status === 1 ? true : false
+                        status: productData.status === 1 ? true : false,
+                        // NEW: Populate new fields
+                        is_new_arrival: productData.is_new_arrival === 1 ? true : false,
+                        is_flash_sale: productData.is_flash_sale === 1 ? true : false,
+                        flash_sale_price: productData.flash_sale_price || '',
+                        // Format dates for input[type="date"]
+                        flash_sale_starts_at: productData.flash_sale_starts_at ? new Date(productData.flash_sale_starts_at).toISOString().split('T')[0] : '',
+                        flash_sale_ends_at: productData.flash_sale_ends_at ? new Date(productData.flash_sale_ends_at).toISOString().split('T')[0] : ''
                     });
                     // Set current image paths and initial previews
                     setCurrentImage1Path(productData.image || '');
                     setImagePreview(productData.image ? `/${productData.image}` : null); // Prepend '/' if needed for public path
                     setCurrentImage2Path(productData.image2 || '');
                     setImage2Preview(productData.image2 ? `/${productData.image2}` : null); // Prepend '/' if needed for public path
+                    // NEW: Set current image paths and initial previews for image3 and image4
+                    setCurrentImage3Path(productData.image3 || '');
+                    setImage3Preview(productData.image3 ? `/${productData.image3}` : null);
+                    setCurrentImage4Path(productData.image4 || '');
+                    setImage4Preview(productData.image4 ? `/${productData.image4}` : null);
+
+                    // NEW: Set specifications if available
+                    if (productData.specifications) {
+                        try {
+                            const parsedSpecs = JSON.parse(productData.specifications);
+                            setSpecifications(parsedSpecs.length > 0 ? parsedSpecs : [{ feature: '', value: '' }]);
+                        } catch (parseError) {
+                            console.error("Error parsing specifications JSON:", parseError);
+                            setSpecifications([{ feature: '', value: '' }]);
+                        }
+                    } else {
+                        setSpecifications([{ feature: '', value: '' }]);
+                    }
+
+                    // NEW: Set Feature if available
+                    if (productData.features) {
+                        try {
+                            const parsedFeatures = typeof productData.features === 'string'
+                                ? JSON.parse(productData.features)
+                                : productData.features;
+
+                            setFeature(Array.isArray(parsedFeatures) && parsedFeatures.length > 0 ? parsedFeatures : [{ feature: '' }]);
+                        } catch (parseError) {
+                            console.error("Error parsing Feature JSON:", parseError);
+                            setFeature([{ feature: '' }]);
+                        }
+                    } else {
+                        setFeature([{ feature: '' }]);
+                    }
 
                 } else if (res.status === 404) {
                     toast.error(res.data.message);
@@ -155,7 +276,7 @@ const EditProducts = () => {
 
         const formData = new FormData();
         formData.append('_method', 'POST'); // Important for Laravel's PUT/PATCH method spoofing
-        
+
         // Append all product data
         formData.append('category_id', productsInput.category_id || '');
         formData.append('name', productsInput.name || '');
@@ -171,6 +292,24 @@ const EditProducts = () => {
         formData.append('featured', productsInput.featured ? 1 : 0);
         formData.append('popular', productsInput.popular ? 1 : 0);
         formData.append('status', productsInput.status ? 1 : 0);
+
+        // NEW: Append new fields
+        formData.append('is_new_arrival', productsInput.is_new_arrival ? 1 : 0);
+        formData.append('is_flash_sale', productsInput.is_flash_sale ? 1 : 0);
+        
+        // Only append flash sale details if is_flash_sale is true
+        if (productsInput.is_flash_sale) {
+            formData.append('flash_sale_price', parseFloat(productsInput.flash_sale_price) || '');
+            formData.append('flash_sale_starts_at', productsInput.flash_sale_starts_at || '');
+            formData.append('flash_sale_ends_at', productsInput.flash_sale_ends_at || '');
+        } else {
+            // Explicitly send empty or null values if flash sale is unchecked,
+            // so backend can clear existing values.
+            formData.append('flash_sale_price', '');
+            formData.append('flash_sale_starts_at', '');
+            formData.append('flash_sale_ends_at', '');
+        }
+
 
         // Handle image 1
         if (picture) {
@@ -193,7 +332,27 @@ const EditProducts = () => {
             // If no new picture and old path exists, retain it
             // No need to append if backend keeps existing image by default when not provided
         }
-        
+
+        // NEW: Handle image 3
+        if (picture3) {
+            formData.append('image3', picture3);
+        } else if (currentImage3Path === '' && !picture3) {
+            formData.append('image3', 'REMOVE_IMAGE');
+        }
+
+        // NEW: Handle image 4
+        if (picture4) {
+            formData.append('image4', picture4);
+        } else if (currentImage4Path === '' && !picture4) {
+            formData.append('image4', 'REMOVE_IMAGE');
+        }
+
+        // NEW: Append specifications as a JSON string
+        formData.append('specifications', JSON.stringify(specifications.filter(s => s.feature && s.value)));
+
+        // NEW: Append feature as a JSON string
+        formData.append('features', JSON.stringify(feature.filter(s => s.feature)));
+
         try {
             const res = await axios.post(`/api/products/update/${id}`, formData, {
                 headers: {
@@ -226,7 +385,7 @@ const EditProducts = () => {
             setEditLoading(false); // Hide submit button spinner
         }
     };
-    
+
     // Framer Motion variants for main container entry
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
@@ -302,6 +461,19 @@ const EditProducts = () => {
                             aria-selected={activeTab === 'otherdetails'}
                         >
                             Other Details
+                        </button>
+                    </li>
+                    {/* NEW: Specifications Tab */}
+                    <li className="nav-item" role="presentation">
+                        <button
+                            className={`px-5 py-3 text-lg font-semibold border-b-2 border-transparent transition-colors duration-300 ${activeTab === 'specifications' ? 'text-blue-600 border-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
+                            onClick={() => setActiveTab('specifications')}
+                            type="button"
+                            role="tab"
+                            aria-controls="specifications"
+                            aria-selected={activeTab === 'specifications'}
+                        >
+                            Specifications & Features
                         </button>
                     </li>
                 </ul>
@@ -404,19 +576,19 @@ const EditProducts = () => {
                                         <small className="text-red-500 text-sm mt-1 block">{error.image ? error.image[0] : ''}</small>
                                         {(imagePreview || currentImage1Path) && (
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
-                                                <img 
+                                                <img
                                                     src={imagePreview || (currentImage1Path ? `/${currentImage1Path}` : null)} // Prioritize new preview, then current path
-                                                    alt="Image 1 Preview" 
-                                                    className="w-20 h-20 object-cover rounded-md" 
+                                                    alt="Image 1 Preview"
+                                                    className="w-20 h-20 object-cover rounded-md"
                                                     onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
                                                 />
                                                 <div>
                                                     <p className="text-gray-700 text-sm font-medium">
                                                         {picture ? picture.name : (currentImage1Path ? 'Current Image 1' : 'No Image')}
                                                     </p>
-                                                    <button 
-                                                        type="button" 
-                                                        onClick={() => removeImage(1)} 
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(1)}
                                                         className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
                                                     >
                                                         Remove Image 1
@@ -437,22 +609,92 @@ const EditProducts = () => {
                                         <small className="text-red-500 text-sm mt-1 block">{error.image2 ? error.image2[0] : ''}</small>
                                         {(image2Preview || currentImage2Path) && (
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
-                                                <img 
-                                                    src={image2Preview || (currentImage2Path ? `/${currentImage2Path}` : null)} // Prioritize new preview, then current path
-                                                    alt="Image 2 Preview" 
-                                                    className="w-20 h-20 object-cover rounded-md" 
+                                                <img
+                                                    src={image2Preview || (currentImage2Path ? `/${currentImage2Path}` : null)}
+                                                    alt="Image 2 Preview"
+                                                    className="w-20 h-20 object-cover rounded-md"
                                                     onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
                                                 />
                                                 <div>
                                                     <p className="text-gray-700 text-sm font-medium">
                                                         {picture2 ? picture2.name : (currentImage2Path ? 'Current Image 2' : 'No Image')}
                                                     </p>
-                                                    <button 
-                                                        type="button" 
-                                                        onClick={() => removeImage(2)} 
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(2)}
                                                         className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
                                                     >
                                                         Remove Image 2
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* NEW: Image 3 and Image 4 Uploads */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                                    <div className="mb-5">
+                                        <label htmlFor="image3" className="block text-gray-700 text-sm font-medium mb-2">Image 3 (Optional)</label>
+                                        <input
+                                            type="file"
+                                            id="image3"
+                                            name="image3"
+                                            onChange={handleImage}
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        />
+                                        <small className="text-red-500 text-sm mt-1 block">{error.image3 ? error.image3[0] : ''}</small>
+                                        {(image3Preview || currentImage3Path) && (
+                                            <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
+                                                <img
+                                                    src={image3Preview || (currentImage3Path ? `/${currentImage3Path}` : null)}
+                                                    alt="Image 3 Preview"
+                                                    className="w-20 h-20 object-cover rounded-md"
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                />
+                                                <div>
+                                                    <p className="text-gray-700 text-sm font-medium">
+                                                        {picture3 ? picture3.name : (currentImage3Path ? 'Current Image 3' : 'No Image')}
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(3)}
+                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
+                                                    >
+                                                        Remove Image 3
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mb-5">
+                                        <label htmlFor="image4" className="block text-gray-700 text-sm font-medium mb-2">Image 4 (Optional)</label>
+                                        <input
+                                            type="file"
+                                            id="image4"
+                                            name="image4"
+                                            onChange={handleImage}
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        />
+                                        <small className="text-red-500 text-sm mt-1 block">{error.image4 ? error.image4[0] : ''}</small>
+                                        {(image4Preview || currentImage4Path) && (
+                                            <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
+                                                <img
+                                                    src={image4Preview || (currentImage4Path ? `/${currentImage4Path}` : null)}
+                                                    alt="Image 4 Preview"
+                                                    className="w-20 h-20 object-cover rounded-md"
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                />
+                                                <div>
+                                                    <p className="text-gray-700 text-sm font-medium">
+                                                        {picture4 ? picture4.name : (currentImage4Path ? 'Current Image 4' : 'No Image')}
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(4)}
+                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
+                                                    >
+                                                        Remove Image 4
                                                     </button>
                                                 </div>
                                             </div>
@@ -489,11 +731,11 @@ const EditProducts = () => {
                                 <div className="mb-5">
                                     <label htmlFor="meta_keywords" className="block text-gray-700 text-sm font-medium mb-2">Meta Keywords</label>
                                     <textarea
-                                        id="meta_keywords"
-                                        name="meta_keywords"
                                         onChange={handleInput}
                                         value={productsInput.meta_keywords || ''}
-                                        rows="4"
+                                        id="meta_keywords"
+                                        name="meta_keywords"
+                                        rows="3"
                                         className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
                                     />
                                     <small className="text-red-500 text-sm mt-1 block">{error.meta_keywords ? error.meta_keywords[0] : ''}</small>
@@ -501,11 +743,11 @@ const EditProducts = () => {
                                 <div className="mb-5">
                                     <label htmlFor="meta_description" className="block text-gray-700 text-sm font-medium mb-2">Meta Description</label>
                                     <textarea
-                                        id="meta_description"
-                                        name="meta_description"
                                         onChange={handleInput}
                                         value={productsInput.meta_description || ''}
-                                        rows="4"
+                                        id="meta_description"
+                                        name="meta_description"
+                                        rows="3"
                                         className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
                                     />
                                     <small className="text-red-500 text-sm mt-1 block">{error.meta_description ? error.meta_description[0] : ''}</small>
@@ -516,7 +758,7 @@ const EditProducts = () => {
                         {/* Other Details Tab Pane */}
                         {activeTab === 'otherdetails' && (
                             <motion.div
-                                key="otherDetailsTab"
+                                key="otherdetailsTab"
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
@@ -564,72 +806,240 @@ const EditProducts = () => {
                                     <small className="text-red-500 text-sm mt-1 block">{error.qty ? error.qty[0] : ''}</small>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
-                                    <div className="mb-5">
-                                        <label htmlFor="featured" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.featured}
-                                                type='checkbox'
-                                                id="featured"
-                                                name="featured"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Featured</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.featured ? error.featured[0] : ''}</small>
+                                    <div className="mb-5 flex items-center">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.featured}
+                                            type="checkbox"
+                                            id="featured"
+                                            name="featured"
+                                            className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <label htmlFor="featured" className="ml-2 block text-gray-700 text-sm font-medium">Featured (shown on homepage)</label>
                                     </div>
-                                    <div className="mb-5">
-                                        <label htmlFor="popular" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.popular}
-                                                type='checkbox'
-                                                id="popular"
-                                                name="popular"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Popular</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.popular ? error.popular[0] : ''}</small>
+                                    <div className="mb-5 flex items-center">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.popular}
+                                            type="checkbox"
+                                            id="popular"
+                                            name="popular"
+                                            className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <label htmlFor="popular" className="ml-2 block text-gray-700 text-sm font-medium">Popular (hot products)</label>
                                     </div>
-                                    <div className="mb-5">
-                                        <label htmlFor="status" className="relative inline-flex items-center cursor-pointer mr-3">
-                                            <input
-                                                onChange={handleInput}
-                                                checked={productsInput.status}
-                                                type='checkbox'
-                                                id="status"
-                                                name="status"
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-200 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-500 peer-checked:bg-blue-600"></div>
-                                            <span className="ml-3 text-gray-700 text-sm font-medium">Status</span>
-                                        </label>
-                                        <small className="text-red-500 text-sm mt-1 block">{error.status ? error.status[0] : ''}</small>
+                                    <div className="mb-5 flex items-center">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.status}
+                                            type="checkbox"
+                                            id="status"
+                                            name="status"
+                                            className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <label htmlFor="status" className="ml-2 block text-gray-700 text-sm font-medium">Status (checked=hidden)</label>
                                     </div>
                                 </div>
+                                <hr className="my-6 border-gray-300" />
+                                {/* NEW: New Arrival and Flash Sale Fields */}
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4">Promotional Settings</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                                    <div className="mb-5 flex items-center">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.is_new_arrival}
+                                            type="checkbox"
+                                            id="is_new_arrival"
+                                            name="is_new_arrival"
+                                            className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                        />
+                                        <label htmlFor="is_new_arrival" className="ml-2 block text-gray-700 text-sm font-medium">Is New Arrival?</label>
+                                        <small className="text-red-500 text-sm mt-1 block">{error.is_new_arrival ? error.is_new_arrival[0] : ''}</small>
+                                    </div>
+                                    <div className="mb-5 flex items-center">
+                                        <input
+                                            onChange={handleInput}
+                                            checked={productsInput.is_flash_sale}
+                                            type="checkbox"
+                                            id="is_flash_sale"
+                                            name="is_flash_sale"
+                                            className="h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                        />
+                                        <label htmlFor="is_flash_sale" className="ml-2 block text-gray-700 text-sm font-medium">Is Flash Sale?</label>
+                                        <small className="text-red-500 text-sm mt-1 block">{error.is_flash_sale ? error.is_flash_sale[0] : ''}</small>
+                                    </div>
+                                </div>
+
+                                {/* Conditional Flash Sale Fields */}
+                                {productsInput.is_flash_sale && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="mt-4 p-4 border border-purple-300 rounded-lg bg-purple-50"
+                                    >
+                                        <h4 className="text-lg font-semibold text-purple-800 mb-4">Flash Sale Details</h4>
+                                        <div className="mb-5">
+                                            <label htmlFor="flash_sale_price" className="block text-gray-700 text-sm font-medium mb-2">Flash Sale Price</label>
+                                            <input
+                                                onChange={handleInput}
+                                                value={productsInput.flash_sale_price || ''}
+                                                type="number"
+                                                id="flash_sale_price"
+                                                name="flash_sale_price"
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                            />
+                                            <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_price ? error.flash_sale_price[0] : ''}</small>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                                            <div className="mb-5">
+                                                <label htmlFor="flash_sale_starts_at" className="block text-gray-700 text-sm font-medium mb-2">Flash Sale Start Date</label>
+                                                <input
+                                                    onChange={handleInput}
+                                                    value={productsInput.flash_sale_starts_at || ''}
+                                                    type="date"
+                                                    id="flash_sale_starts_at"
+                                                    name="flash_sale_starts_at"
+                                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                />
+                                                <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_starts_at ? error.flash_sale_starts_at[0] : ''}</small>
+                                            </div>
+                                            <div className="mb-5">
+                                                <label htmlFor="flash_sale_ends_at" className="block text-gray-700 text-sm font-medium mb-2">Flash Sale End Date</label>
+                                                <input
+                                                    onChange={handleInput}
+                                                    value={productsInput.flash_sale_ends_at || ''}
+                                                    type="datetime-local"
+                                                    id="flash_sale_ends_at"
+                                                    name="flash_sale_ends_at"
+                                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                />
+                                                <small className="text-red-500 text-sm mt-1 block">{error.flash_sale_ends_at ? error.flash_sale_ends_at[0] : ''}</small>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* Specifications & Features Tab Pane */}
+                        {activeTab === 'specifications' && (
+                            <motion.div
+                                key="specificationsTab"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="tab-pane bg-white rounded-lg p-6 border border-gray-200"
+                                role="tabpanel"
+                                aria-labelledby="specifications-tab"
+                            >
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4">Product Specifications</h3>
+                                {specifications.map((spec, index) => (
+                                    <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 items-center">
+                                        <div className="md:col-span-2">
+                                            <label htmlFor={`feature-${index}`} className="block text-gray-700 text-sm font-medium mb-1">Feature</label>
+                                            <input
+                                                type="text"
+                                                id={`feature-${index}`}
+                                                name="feature"
+                                                value={spec.feature}
+                                                onChange={(e) => handleSpecificationChange(index, e)}
+                                                className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                placeholder="e.g., Color"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label htmlFor={`value-${index}`} className="block text-gray-700 text-sm font-medium mb-1">Value</label>
+                                            <input
+                                                type="text"
+                                                id={`value-${index}`}
+                                                name="value"
+                                                value={spec.value}
+                                                onChange={(e) => handleSpecificationChange(index, e)}
+                                                className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                placeholder="e.g., Red"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-1 flex items-end justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeSpecification(index)}
+                                                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={addSpecification}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 mb-8"
+                                >
+                                    Add Specification
+                                </button>
+
+                                <hr className="my-8 border-gray-300" />
+
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4">Product Features</h3>
+                                {feature.map((feat, index) => (
+                                    <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 items-center">
+                                        <div className="md:col-span-4">
+                                            <label htmlFor={`single-feature-${index}`} className="block text-gray-700 text-sm font-medium mb-1">Feature</label>
+                                            <input
+                                                type="text"
+                                                id={`single-feature-${index}`}
+                                                name="feature"
+                                                value={feat.feature}
+                                                onChange={(e) => handleFeatureChange(index, e)}
+                                                className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                                                placeholder="e.g., 5.5-inch display"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-1 flex items-end justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFeature(index)}
+                                                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={addFeature}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                                >
+                                    Add Feature
+                                </button>
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
                 {/* Submit Button */}
-                <button
-                    className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 float-right"
-                    type='submit'
-                    disabled={editLoading}
-                >
-                    {editLoading ? (
-                        <LoadingSpinner size="sm" />
-                    ) : (
-                        'Update Product'
-                    )}
-                </button>
+                <div className="mt-8 flex justify-end">
+                    <button
+                        type="submit"
+                        className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:ring-offset-2 flex items-center justify-center"
+                        disabled={editLoading}
+                    >
+                        {editLoading ? (
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        ) : null}
+                        {editLoading ? 'Updating...' : 'Update Product'}
+                    </button>
+                </div>
             </motion.form>
         </motion.div>
     );
-};
+}
 
 export default EditProducts;

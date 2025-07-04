@@ -1,40 +1,511 @@
-[2025-06-25 12:48:24] local.INFO: Order Data Received (Full Request): {"is_pos":1,"customer_name":"dffg","customer_email":"iwuaustinchris@gmail.com","customer_phone":"09400390366","payment_method":"cash","amount_paid":500,"discount_amount":50,"grand_total":350,"items":[{"id":2,"qty":2,"price":200,"name":"Solar Battery"}]} 
-[2025-06-25 12:48:24] local.DEBUG: Order Data for Eloquent Create: {"order_number":"FDC-20250625124824heI1","user_id":null,"full_name":"dffg","email":"iwuaustinchris@gmail.com","phone":"09400390366","shipping_address1":null,"shipping_address2":null,"city":null,"state":null,"zip_code":null,"subtotal":400.0,"shipping_cost":0.0,"discount_amount":50.0,"grand_total":350.0,"payment_method":"cash","paystack_reference":null,"amount_paid":500.0,"status":"completed","items_json":"[{\"id\":2,\"qty\":2,\"price\":200,\"name\":\"Solar Battery\"}]","is_pos_sale":true} 
-[2025-06-25 12:52:31] local.INFO: Order Data Received (Full Request): {"is_pos":1,"customer_name":"dffg","customer_email":"a@a.com","customer_phone":"09400390366","payment_method":"cash","amount_paid":4999.98,"discount_amount":299.99,"grand_total":600.01,"items":[{"id":1,"qty":5,"price":180,"name":"Camera"}]} 
-[2025-06-25 12:52:31] local.DEBUG: Order Data for Eloquent Create: {"order_number":"FDC-20250625125231qFa6","user_id":null,"full_name":"dffg","email":"a@a.com","phone":"09400390366","shipping_address1":null,"shipping_address2":null,"city":null,"state":null,"zip_code":null,"subtotal":900.0,"shipping_cost":0.0,"discount_amount":299.99,"grand_total":600.01,"payment_method":"cash","paystack_reference":null,"amount_paid":4999.98,"status":"completed","items_json":"[{\"id\":1,\"qty\":5,\"price\":180,\"name\":\"Camera\"}]","is_pos_sale":true} 
-[2025-06-25 12:53:52] local.INFO: Order status email sent to iwuaustinchris@gmail.com for order FDC-20250622124514D5ov. New status: pending_confirmation  
-[2025-06-25 12:53:54] local.INFO: Telegram notification sent for order FDC-20250622124514D5ov. Status: pending_confirmation  
-[2025-06-25 12:54:21] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
-[2025-06-25 12:54:21] local.INFO: Applying price filter: min=0, max=50000  
-[2025-06-25 12:54:21] local.INFO: Sorting by: alphaAsc  
-[2025-06-25 12:54:21] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
-[2025-06-25 12:54:22] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
-[2025-06-25 12:54:22] local.INFO: Applying price filter: min=0, max=50000  
-[2025-06-25 12:54:22] local.INFO: Sorting by: alphaAsc  
-[2025-06-25 12:54:22] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
-[2025-06-25 12:54:33] local.INFO: Order Data Received (Full Request): {"user_info":{"fullName":"General Grod","email":"iwuaustinchris@gmail.com","phone":"09400390366"},"shipping_address":{"address1":"ff","address2":null,"city":"ff","state":"rr","zipCode":"3443"},"items":[{"id":1,"name":"Camera","qty":1,"price":"180"}],"total_price":180,"shipping_cost":100,"grand_total":280,"payment_method":"bank_transfer"} 
-[2025-06-25 12:54:33] local.DEBUG: Order Data for Eloquent Create: {"order_number":"FDC-20250625125433hLKN","user_id":null,"full_name":"General Grod","email":"iwuaustinchris@gmail.com","phone":"09400390366","shipping_address1":"ff","shipping_address2":null,"city":"ff","state":"rr","zip_code":"3443","subtotal":280.0,"shipping_cost":100.0,"discount_amount":0.0,"grand_total":280.0,"payment_method":"bank_transfer","paystack_reference":null,"amount_paid":0.0,"status":"processing_bank_transfer_payment","items_json":"[{\"id\":1,\"name\":\"Camera\",\"qty\":1,\"price\":\"180\"}]","is_pos_sale":false} 
-[2025-06-25 12:54:45] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
-[2025-06-25 12:54:45] local.INFO: Applying price filter: min=0, max=50000  
-[2025-06-25 12:54:45] local.INFO: Sorting by: alphaAsc  
-[2025-06-25 12:54:45] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
-[2025-06-25 12:54:45] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
-[2025-06-25 12:54:45] local.INFO: Applying price filter: min=0, max=50000  
-[2025-06-25 12:54:45] local.INFO: Sorting by: alphaAsc  
-[2025-06-25 12:54:45] local.INFO: ProductController@products: Final product count for page: {"count":4,"total":4,"currentPage":1,"lastPage":1} 
-[2025-06-25 12:58:04] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 12:58:06] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 12:58:13] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 12:58:14] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:07:48] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:07:50] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:15:05] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:15:06] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:16:34] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:16:35] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:25:57] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:25:58] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:26:13] local.INFO: Old logo deleted: C:\Users\Admin\Desktop\Sites\Ecom\public\uploads/settings/1750593270.png  
-[2025-06-25 13:26:13] local.INFO: New logo uploaded: /uploads/settings/1750857973.png  
-[2025-06-25 13:26:17] local.INFO: Tracking visitor with IP: 127.0.0.1  
-[2025-06-25 13:26:19] local.INFO: Tracking visitor with IP: 127.0.0.1  
+[2025-07-04 00:08:19] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:08:38] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:38] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:38] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:38] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:08:39] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:39] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:39] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:39] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:08:40] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:08:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:08:42] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:42] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:42] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:42] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:08:42] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:42] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:42] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:42] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:08:57] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:57] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:57] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:57] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:08:57] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:08:57] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:08:57] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:08:57] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:09:41] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:09:41] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:09:41] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:09:41] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:09:42] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:09:42] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:09:42] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:09:42] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:10:06] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:10:06] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:10:06] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:10:06] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:10:06] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:10:06] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:10:06] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:10:06] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:10:13] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:10:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:10:14] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:10:14] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:10:14] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:10:14] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:10:15] local.INFO: ProductController@products: Incoming request params: {"category":"All","min_price":"0","max_price":"50000","sort":"alphaAsc","itemsPerPage":"8","page":"1"} 
+[2025-07-04 00:10:15] local.INFO: Applying price filter: min=0, max=50000  
+[2025-07-04 00:10:15] local.INFO: Sorting by: alphaAsc  
+[2025-07-04 00:10:15] local.INFO: ProductController@products: Final product count for page: {"count":5,"total":5,"currentPage":1,"lastPage":1} 
+[2025-07-04 00:24:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:24:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:24:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:24:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:24:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:25:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:25:40] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:25:45] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:25:46] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:26:56] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:26:57] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:00] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:00] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:01] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:01] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:07] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:07] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:11] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:12] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:12] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:13] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:20] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:20] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:25] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:26] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:26] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:29:26] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:30:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:30:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:33:19] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:33:20] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:35:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:35:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:35:56] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:35:56] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:36:10] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:36:10] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:40:35] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:40:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:43:30] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:43:31] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:43:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:43:42] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:44:45] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:44:46] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:50:40] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 00:50:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:19:17] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:19:17] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:19:53] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:19:54] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:20:35] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:20:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:21:56] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:21:56] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:22:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:22:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:35:25] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:35:26] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:39:29] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:39:29] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:43:05] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:43:05] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:43:27] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:43:27] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:49:18] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:49:18] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:55:10] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 01:55:11] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:01:54] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:01:55] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:10:18] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:10:19] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:11:24] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:11:25] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:15:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:15:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:15:47] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:15:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:17:29] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:17:29] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:18:05] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:18:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:18:28] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:19:33] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:19:33] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:26:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:26:49] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:28:45] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:28:46] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:32:30] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:32:30] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:41:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:41:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:41:49] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:41:50] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:42:15] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:42:15] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:45:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:45:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:46:37] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:46:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:47:26] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:47:27] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:48:40] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:48:46] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:48:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:48:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:50:04] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:50:05] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:52:16] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:52:16] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:54:15] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 02:54:16] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:35] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:37] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:43] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:43] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:44] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:50] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:50] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:50] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:58] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:58] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:02:59] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:03:13] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:03:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:03:14] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:03:23] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:03:24] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:05:51] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:05:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:09:50] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:09:51] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:09:51] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:10:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:10:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:15:11] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:15:12] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:15:12] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:29:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:29:41] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:06] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:16] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:16] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:54] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:54] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:32:54] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:03] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:09] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:09] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:10] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:33:48] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:42] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:42] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:43] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:43] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:44] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:44] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:35:52] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:36:37] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:36:37] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:36:38] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:32] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:32] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:32] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:33] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:33] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:37:34] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:40:58] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:40:58] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:40:59] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:58:55] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 03:58:55] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:03:20] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:03:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:03:21] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:05:23] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:05:24] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:08:39] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:08:39] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:10:35] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:10:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:10:36] local.INFO: Visitor from IP 127.0.0.1 already tracked within the last 24 hours. Skipping.  
+[2025-07-04 09:30:27] local.ERROR: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, SQL: select * from `personal_access_tokens` where `personal_access_tokens`.`id` = 100 limit 1) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 2002): SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, SQL: select * from `personal_access_tokens` where `personal_access_tokens`.`id` = 100 limit 1) at C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:825)
+[stacktrace]
+#0 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(979): Illuminate\\Database\\Connection->runQueryCallback('select * from `...', Array, Object(Closure))
+#1 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(958): Illuminate\\Database\\Connection->tryAgainIfCausedByLostConnection(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#2 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(781): Illuminate\\Database\\Connection->handleQueryException(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#3 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(398): Illuminate\\Database\\Connection->run('select * from `...', Array, Object(Closure))
+#4 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3130): Illuminate\\Database\\Connection->select('select * from `...', Array, true)
+#5 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3115): Illuminate\\Database\\Query\\Builder->runSelect()
+#6 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3703): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#7 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3114): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#8 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(759): Illuminate\\Database\\Query\\Builder->get(Array)
+#9 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(741): Illuminate\\Database\\Eloquent\\Builder->getModels(Array)
+#10 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Concerns\\BuildsQueries.php(344): Illuminate\\Database\\Eloquent\\Builder->get(Array)
+#11 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(459): Illuminate\\Database\\Eloquent\\Builder->first(Array)
+#12 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Traits\\ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->find('100')
+#13 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Model.php(2367): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'find', Array)
+#14 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Model.php(2379): Illuminate\\Database\\Eloquent\\Model->__call('find', Array)
+#15 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\PersonalAccessToken.php(66): Illuminate\\Database\\Eloquent\\Model::__callStatic('find', Array)
+#16 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Guard.php(67): Laravel\\Sanctum\\PersonalAccessToken::findToken('SSfugA6HWhYJQnL...')
+#17 [internal function]: Laravel\\Sanctum\\Guard->__invoke(Object(Illuminate\\Http\\Request), NULL)
+#18 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\RequestGuard.php(57): call_user_func(Object(Laravel\\Sanctum\\Guard), Object(Illuminate\\Http\\Request), NULL)
+#19 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\GuardHelpers.php(56): Illuminate\\Auth\\RequestGuard->user()
+#20 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(83): Illuminate\\Auth\\RequestGuard->check()
+#21 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(62): Illuminate\\Auth\\Middleware\\Authenticate->authenticate(Object(Illuminate\\Http\\Request), Array)
+#22 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#23 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->Laravel\\Sanctum\\Http\\Middleware\\{closure}(Object(Illuminate\\Http\\Request))
+#25 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(24): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#27 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#30 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#31 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#32 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#33 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#34 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#35 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#36 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#42 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#43 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#44 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#48 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#50 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#52 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#53 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#54 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#55 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#56 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\Admin\\\\...')
+#57 {main}
+
+[previous exception] [object] (PDOException(code: 2002): SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it at C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php:66)
+[stacktrace]
+#0 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(66): PDO->__construct('mysql:host=loca...', 'root', Object(SensitiveParameterValue), Array)
+#1 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(85): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=loca...', 'root', '', Array)
+#2 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(48): Illuminate\\Database\\Connectors\\Connector->tryAgainIfCausedByLostConnection(Object(PDOException), 'mysql:host=loca...', 'root', '', Array)
+#3 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=loca...', Array, Array)
+#4 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\ConnectionFactory.php(185): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#5 [internal function]: Illuminate\\Database\\Connectors\\ConnectionFactory->Illuminate\\Database\\Connectors\\{closure}()
+#6 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(1231): call_user_func(Object(Closure))
+#7 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(1267): Illuminate\\Database\\Connection->getPdo()
+#8 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(512): Illuminate\\Database\\Connection->getReadPdo()
+#9 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(407): Illuminate\\Database\\Connection->getPdoForSelect(true)
+#10 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(812): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('select * from `...', Array)
+#11 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(979): Illuminate\\Database\\Connection->runQueryCallback('select * from `...', Array, Object(Closure))
+#12 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(958): Illuminate\\Database\\Connection->tryAgainIfCausedByLostConnection(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#13 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(781): Illuminate\\Database\\Connection->handleQueryException(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#14 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(398): Illuminate\\Database\\Connection->run('select * from `...', Array, Object(Closure))
+#15 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3130): Illuminate\\Database\\Connection->select('select * from `...', Array, true)
+#16 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3115): Illuminate\\Database\\Query\\Builder->runSelect()
+#17 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3703): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#18 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3114): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#19 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(759): Illuminate\\Database\\Query\\Builder->get(Array)
+#20 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(741): Illuminate\\Database\\Eloquent\\Builder->getModels(Array)
+#21 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Concerns\\BuildsQueries.php(344): Illuminate\\Database\\Eloquent\\Builder->get(Array)
+#22 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php(459): Illuminate\\Database\\Eloquent\\Builder->first(Array)
+#23 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Traits\\ForwardsCalls.php(23): Illuminate\\Database\\Eloquent\\Builder->find('100')
+#24 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Model.php(2367): Illuminate\\Database\\Eloquent\\Model->forwardCallTo(Object(Illuminate\\Database\\Eloquent\\Builder), 'find', Array)
+#25 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Model.php(2379): Illuminate\\Database\\Eloquent\\Model->__call('find', Array)
+#26 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\PersonalAccessToken.php(66): Illuminate\\Database\\Eloquent\\Model::__callStatic('find', Array)
+#27 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Guard.php(67): Laravel\\Sanctum\\PersonalAccessToken::findToken('SSfugA6HWhYJQnL...')
+#28 [internal function]: Laravel\\Sanctum\\Guard->__invoke(Object(Illuminate\\Http\\Request), NULL)
+#29 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\RequestGuard.php(57): call_user_func(Object(Laravel\\Sanctum\\Guard), Object(Illuminate\\Http\\Request), NULL)
+#30 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\GuardHelpers.php(56): Illuminate\\Auth\\RequestGuard->user()
+#31 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(83): Illuminate\\Auth\\RequestGuard->check()
+#32 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(62): Illuminate\\Auth\\Middleware\\Authenticate->authenticate(Object(Illuminate\\Http\\Request), Array)
+#33 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#34 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->Laravel\\Sanctum\\Http\\Middleware\\{closure}(Object(Illuminate\\Http\\Request))
+#36 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(24): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#38 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#39 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#40 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#41 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#42 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#43 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#44 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#45 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#46 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#47 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#48 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#50 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#52 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#53 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#54 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#55 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#56 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#57 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#58 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#59 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#60 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#61 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#62 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#63 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#64 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#65 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#66 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#67 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\Admin\\\\...')
+#68 {main}
+"} 
+[2025-07-04 09:30:43] local.ERROR: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, SQL: select * from `cache` where `key` in (5c785c036466adea360111aa28563bfd556b5fba)) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 2002): SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, SQL: select * from `cache` where `key` in (5c785c036466adea360111aa28563bfd556b5fba)) at C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:825)
+[stacktrace]
+#0 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(979): Illuminate\\Database\\Connection->runQueryCallback('select * from `...', Array, Object(Closure))
+#1 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(958): Illuminate\\Database\\Connection->tryAgainIfCausedByLostConnection(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#2 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(781): Illuminate\\Database\\Connection->handleQueryException(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#3 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(398): Illuminate\\Database\\Connection->run('select * from `...', Array, Object(Closure))
+#4 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3130): Illuminate\\Database\\Connection->select('select * from `...', Array, true)
+#5 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3115): Illuminate\\Database\\Query\\Builder->runSelect()
+#6 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3703): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#7 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3114): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#8 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\DatabaseStore.php(127): Illuminate\\Database\\Query\\Builder->get()
+#9 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\DatabaseStore.php(102): Illuminate\\Cache\\DatabaseStore->many(Array)
+#10 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\Repository.php(118): Illuminate\\Cache\\DatabaseStore->get('5c785c036466ade...')
+#11 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\RateLimiter.php(175): Illuminate\\Cache\\Repository->get('5c785c036466ade...', 0)
+#12 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\RateLimiter.php(102): Illuminate\\Cache\\RateLimiter->attempts('5c785c036466ade...')
+#13 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\ThrottleRequests.php(154): Illuminate\\Cache\\RateLimiter->tooManyAttempts('5c785c036466ade...', 60)
+#14 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\ThrottleRequests.php(92): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#15 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#17 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->Laravel\\Sanctum\\Http\\Middleware\\{closure}(Object(Illuminate\\Http\\Request))
+#18 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(24): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#20 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#23 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#24 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#25 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#26 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#27 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#28 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#46 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#47 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#48 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#49 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\Admin\\\\...')
+#50 {main}
+
+[previous exception] [object] (PDOException(code: 2002): SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it at C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php:66)
+[stacktrace]
+#0 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(66): PDO->__construct('mysql:host=loca...', 'root', Object(SensitiveParameterValue), Array)
+#1 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(85): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=loca...', 'root', '', Array)
+#2 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\Connector.php(48): Illuminate\\Database\\Connectors\\Connector->tryAgainIfCausedByLostConnection(Object(PDOException), 'mysql:host=loca...', 'root', '', Array)
+#3 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=loca...', Array, Array)
+#4 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connectors\\ConnectionFactory.php(185): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#5 [internal function]: Illuminate\\Database\\Connectors\\ConnectionFactory->Illuminate\\Database\\Connectors\\{closure}()
+#6 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(1231): call_user_func(Object(Closure))
+#7 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(1267): Illuminate\\Database\\Connection->getPdo()
+#8 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(512): Illuminate\\Database\\Connection->getReadPdo()
+#9 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(407): Illuminate\\Database\\Connection->getPdoForSelect(true)
+#10 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(812): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('select * from `...', Array)
+#11 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(979): Illuminate\\Database\\Connection->runQueryCallback('select * from `...', Array, Object(Closure))
+#12 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(958): Illuminate\\Database\\Connection->tryAgainIfCausedByLostConnection(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#13 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(781): Illuminate\\Database\\Connection->handleQueryException(Object(Illuminate\\Database\\QueryException), 'select * from `...', Array, Object(Closure))
+#14 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(398): Illuminate\\Database\\Connection->run('select * from `...', Array, Object(Closure))
+#15 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3130): Illuminate\\Database\\Connection->select('select * from `...', Array, true)
+#16 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3115): Illuminate\\Database\\Query\\Builder->runSelect()
+#17 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3703): Illuminate\\Database\\Query\\Builder->Illuminate\\Database\\Query\\{closure}()
+#18 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Query\\Builder.php(3114): Illuminate\\Database\\Query\\Builder->onceWithColumns(Array, Object(Closure))
+#19 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\DatabaseStore.php(127): Illuminate\\Database\\Query\\Builder->get()
+#20 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\DatabaseStore.php(102): Illuminate\\Cache\\DatabaseStore->many(Array)
+#21 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\Repository.php(118): Illuminate\\Cache\\DatabaseStore->get('5c785c036466ade...')
+#22 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\RateLimiter.php(175): Illuminate\\Cache\\Repository->get('5c785c036466ade...', 0)
+#23 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Cache\\RateLimiter.php(102): Illuminate\\Cache\\RateLimiter->attempts('5c785c036466ade...')
+#24 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\ThrottleRequests.php(154): Illuminate\\Cache\\RateLimiter->tooManyAttempts('5c785c036466ade...', 60)
+#25 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\ThrottleRequests.php(92): Illuminate\\Routing\\Middleware\\ThrottleRequests->handleRequest(Object(Illuminate\\Http\\Request), Object(Closure), Array)
+#26 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\ThrottleRequests->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(25): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->Laravel\\Sanctum\\Http\\Middleware\\{closure}(Object(Illuminate\\Http\\Request))
+#29 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\sanctum\\src\\Http\\Middleware\\EnsureFrontendRequestsAreStateful.php(24): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#31 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Laravel\\Sanctum\\Http\\Middleware\\EnsureFrontendRequestsAreStateful->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#34 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#35 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#36 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#37 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#38 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#39 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#40 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#41 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#45 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#46 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#47 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#48 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#49 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#50 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#51 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#52 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#53 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#54 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#55 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#56 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#57 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#58 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#59 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#60 C:\\Users\\Admin\\Desktop\\Sites\\Ecom\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\Admin\\\\...')
+#61 {main}
+"} 

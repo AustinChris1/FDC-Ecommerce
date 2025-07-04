@@ -3,27 +3,30 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import Load from '../Components/Load'; // Assuming you have a Load component for spinners
-import { ArrowRight } from 'lucide-react'; // For subtle link arrows
+import Load from '../Components/Load'; 
+import LoadingSpinner from '../Components/Loader'; 
+import { ArrowRight, ShoppingCart } from 'lucide-react';
+import { useCart } from '../Components/CartContext';
 
 const Collections = () => {
-    const { categoryLink } = useParams(); // Get category link from the URL
-    const [categories, setCategories] = useState([]); // Categories data
-    const [products, setProducts] = useState([]); // All products data
-    const [filteredProducts, setFilteredProducts] = useState([]); // Products filtered by category
-    const [selectedCategoryName, setSelectedCategoryName] = useState('Products'); // For page title
-    const [loading, setLoading] = useState(true); // Loading state
-    const [error, setError] = useState(null); // Error state
+    const { categoryLink } = useParams();
+    const [categories, setCategories] = useState([]); 
+    const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [selectedCategoryName, setSelectedCategoryName] = useState('Products');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // --- Pagination State ---
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(12); // Number of products to display per page
+    const [productsPerPage] = useState(12);
+    const { addToCart } = useCart();
 
     // --- Data Fetching: Fetch all products and categories once ---
     useEffect(() => {
         const fetchCategoriesAndProducts = async () => {
             setLoading(true);
-            setError(null); // Clear previous errors
+            setError(null);
             try {
                 const productsRes = await axios.get(`/api/allProducts`);
                 if (productsRes.data.status === 200) {
@@ -75,9 +78,9 @@ const Collections = () => {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
     const paginate = (pageNumber) => {
-        if (pageNumber < 1 || pageNumber > totalPages) return; // Prevent invalid page numbers
+        if (pageNumber < 1 || pageNumber > totalPages) return; 
         setCurrentPage(pageNumber);
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on page change
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // Framer Motion Variants
@@ -132,7 +135,7 @@ const Collections = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex justify-center items-center bg-zinc-950">
-                <Load />
+                <LoadingSpinner />
             </div>
         );
     }
@@ -140,7 +143,6 @@ const Collections = () => {
     return (
         <motion.div
             className="w-full min-h-screen p-6 text-gray-200"
-            // Changed the background gradient to be a bit darker
             style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }}
             variants={containerVariants}
             initial="hidden"
@@ -196,42 +198,60 @@ const Collections = () => {
                 <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                         <AnimatePresence>
-                            {currentProducts.map((product) => (
-                                <motion.div
-                                    key={product.id}
-                                    className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-105 bg-gray-800 border-gray-700"
-                                    variants={itemVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                >
-                                    <Link to={`/collections/${categoryLink}/${product.link}`} className="block">
-                                        <motion.img
-                                            src={`/${product.image}`}
-                                            alt={product.name}
-                                            className="w-full h-56 object-contain transition duration-300"
-                                            variants={imageHoverVariants}
-                                            initial={false}
-                                            whileHover="hover"
-                                        />
-                                        <div className="p-4 bg-gray-900"> {/* Adjusted to match dark theme */}
-                                            <h3 className="text-lg font-semibold text-blue-400">{product.name}</h3>
-                                            <p className="text-sm text-gray-300 mt-2">
-                                                {product.description.length > 100
-                                                    ? `${product.description.slice(0, 100)}...`
-                                                    : product.description}
-                                            </p>
-                                            <div className="flex justify-between items-center mt-4">
-                                                <span className="text-lime-400 font-extrabold text-xl">
-                                                ₦{product.selling_price}
-                                                </span>
-                                                <button className="inline-flex items-center bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105">
-                                                    Details
-                                                </button>
+                            {currentProducts.map((product) => {
+                                const handleAddToCart = (e) => {
+                                    e.preventDefault(); 
+                                    e.stopPropagation(); 
+
+                                    // Check product availability
+                                    if (product.status !== 0 || product.qty <= 0) {
+                                        toast.error("This product is currently out of stock.");
+                                        return;
+                                    }
+
+                                    addToCart(product, 1);
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={product.id}
+                                        className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-105 bg-gray-800 border-gray-700"
+                                        variants={itemVariants}
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                    >
+                                        <Link to={`/collections/${categoryLink}/${product.link}`} className="block">
+                                            <motion.img
+                                                src={`/${product.image}`}
+                                                alt={product.name}
+                                                className="w-full h-56 object-contain transition duration-300"
+                                                variants={imageHoverVariants}
+                                                initial={false}
+                                                whileHover="hover"
+                                            />
+                                            <div className="p-4 bg-gray-900">
+                                                <h3 className="text-lg font-semibold text-blue-400">{product.name}</h3>
+                                                <p className="text-sm text-gray-300 mt-2">
+                                                    {product.description.length > 100
+                                                        ? `${product.description.slice(0, 100)}...`
+                                                        : product.description}
+                                                </p>
+                                                <div className="flex justify-between items-center mt-4">
+                                                    <span className="text-lime-400 font-extrabold text-xl">
+                                                        ₦{product.selling_price.toLocaleString()}
+                                                    </span>
+                                                    <button
+                                                        onClick={handleAddToCart} 
+                                                        className="inline-flex items-center bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105"
+                                                    >
+                                                        <ShoppingCart className="w-5 h-5 mr-2" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            ))}
+                                        </Link>
+                                    </motion.div>
+                                );
+                            })}
                         </AnimatePresence>
                     </div>
 

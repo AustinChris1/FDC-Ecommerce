@@ -6,6 +6,7 @@ import Load from './Load';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate'; // Import ReactPaginate
 import {
+    Heart,
     ShoppingCart,
     Package,
     Clock,
@@ -189,14 +190,26 @@ const UserOrders = () => {
             initial="hidden"
             animate="visible"
         >
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-0">My Orders</h1>
-                <Link
-                    to="/user/profile"
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center"
-                >
-                    <User className="w-5 h-5 mr-2" /> View Profile
-                </Link>
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 bg-gray-900 rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-800">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-white">My Orders</h1>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                    <Link
+                        to="/user/profile"
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-md transition-transform duration-300 transform hover:scale-105 flex items-center"
+                    >
+                        <User className="w-5 h-5 mr-2" />
+                        View Profile
+                    </Link>
+
+                    <Link
+                        to="/wishlist"
+                        className="px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-xl shadow-md transition-transform duration-300 transform hover:scale-105 flex items-center"
+                    >
+                        <Heart className="w-5 h-5 mr-2" />
+                        View Wishlist
+                    </Link>
+                </div>
             </header>
 
             {userOrders.length > 0 ? (

@@ -15,12 +15,12 @@ class AnalyticsController extends Controller
 
         // Fetch all visits within the last 7 days (including today) using Eloquent
         $recentVisits = Visit::where('visited_at', '>=', $startDate)
-                              ->get();
+            ->get();
 
         // Consider a reasonable time frame (e.g., last 30/90 days) for allVisits
         // if your 'visits' table is very large to prevent performance issues.
         // For now, it fetches all, which might be slow on large datasets.
-        $allVisits = Visit::all(); 
+        $allVisits = Visit::all();
 
         // 1. Visitors by day (last 7 days)
         $visitorsPerDayRaw = [];
@@ -92,7 +92,7 @@ class AnalyticsController extends Controller
             // Note: This still uses the raw 'device' (User-Agent) from the DB.
             // If you want parsed device names for this dashboard widget,
             // you'd need to either store the parsed name in the DB, or parse it here for each visit.
-            $device = $visit->device ?? 'Unknown'; 
+            $device = $visit->device ?? 'Unknown';
             $devicesRaw[$device] = ($devicesRaw[$device] ?? 0) + 1;
         }
         $topDevices = collect($devicesRaw)
@@ -108,7 +108,7 @@ class AnalyticsController extends Controller
         $platformsRaw = [];
         foreach ($allVisits as $visit) {
             // This now uses the 'platform' column, which will store "Device Name (Model)"
-            $platform = $visit->platform ?? 'Unknown'; 
+            $platform = $visit->platform ?? 'Unknown';
             $platformsRaw[$platform] = ($platformsRaw[$platform] ?? 0) + 1;
         }
         $topPlatforms = collect($platformsRaw)
@@ -140,22 +140,26 @@ class AnalyticsController extends Controller
 
         $country = 'Unknown';
         $city = 'Unknown';
+        // Define the window for unique visits (e.g., 24 hours)
+        $uniqueVisitorWindowHours = 24;
 
+        // Check if this IP has visited recently
+        $recentVisit = Visit::where('ip', $ip)
+            ->where('created_at', '>=', now()->subHours($uniqueVisitorWindowHours))
+            ->first();
+
+        if ($recentVisit) {
+            Log::info("Visitor from IP {$ip} already tracked within the last {$uniqueVisitorWindowHours} hours. Skipping.");
+            return response()->json(['message' => 'Visitor already tracked recently'], 200);
+        }
         try {
-            Log::info("Tracking visitor with IP: {$ip}");
-            // Added a timeout to the HTTP request to prevent long delays or failures
             $geo = Http::timeout(3)->get("https://ipapi.co/{$ip}/json")->json();
             $country = $geo['country_name'] ?? 'Unknown';
             $city = $geo['city'] ?? 'Unknown';
         } catch (\Exception $e) {
-            // Log the error if GeoIP lookup fails, but allow the tracking to continue
-            Log::error("GeoIP lookup failed for IP: {$ip}. Error: {$e->getMessage()}");
+            Log::error("GeoIP lookup failed for IP: {$ip}.");
         }
 
-        // --- Custom User-Agent Parsing (NO LIBRARY) ---
-        // This is a basic attempt to parse the User-Agent string without external libraries.
-        // It will not be as comprehensive or accurate as dedicated UA parsing libraries
-        // (like deviceinfo.me uses) and will require manual updates for new devices/OSes.
         $platformInfo = 'Unknown Platform';
         $deviceName = 'Unknown Device';
         $deviceModel = '';
@@ -248,20 +252,20 @@ class AnalyticsController extends Controller
                 }
                 $platformInfo .= ')';
             } elseif (!empty($deviceModel) && stripos($platformInfo, $deviceModel) === false) {
-                 // If no specific deviceName but a model exists
+                // If no specific deviceName but a model exists
                 $platformInfo .= ' (' . $deviceModel . ')';
             }
-            
+
             // Refine device name for generic OS if a more specific one wasn't found
             if ($osName === 'Windows' || $osName === 'macOS' || $osName === 'Linux' || $osName === 'Chrome OS') {
                 $deviceName = 'Desktop';
             } elseif (stripos($userAgent, 'Mobile') !== false || stripos($userAgent, 'Android') !== false || stripos($userAgent, 'iPhone') !== false) {
-                 $deviceName = 'Mobile Phone';
+                $deviceName = 'Mobile Phone';
             } elseif (stripos($userAgent, 'Tablet') !== false || stripos($userAgent, 'iPad') !== false) {
-                 $deviceName = 'Tablet';
+                $deviceName = 'Tablet';
             }
         }
-        
+
         // Final fallback for platformInfo if still generic
         if ($platformInfo === 'Unknown Platform') {
             if (preg_match('/Mobile|Mobi/i', $userAgent)) {
@@ -273,24 +277,12 @@ class AnalyticsController extends Controller
             }
         }
 
-        // You might want to store browser details in separate columns if needed for future analytics
-        // $browser = $browserName . (!empty($browserVersion) ? ' ' . $browserVersion : '');
-        // Log::info('Parsed User-Agent:', [
-        //     'osName' => $osName,
-        //     'osVersion' => $osVersion,
-        //     'deviceName' => $deviceName,
-        //     'deviceModel' => $deviceModel,
-        //     'browserName' => $browserName,
-        //     'browserVersion' => $browserVersion,
-        //     'platformInfo' => $platformInfo
-        // ]);
-
         Visit::create([
             'ip' => $ip,
             'country' => $country,
             'city' => $city,
-            'device' => $userAgent, // Stores the full User-Agent string
-            'platform' => $platformInfo, // Now stores "OS Name Version (Device Name Model)" or similar
+            'device' => $deviceName .' '. $deviceModel, 
+            'platform' => $platformInfo, 
             'visited_at' => date('Y-m-d H:i:s'),
         ]);
 

@@ -47,6 +47,9 @@ const Login = () => {
                         localStorage.setItem("auth_name", res.data.username);
                         localStorage.setItem("auth_email", res.data.email);
                         localStorage.setItem("role", res.data.role);
+
+                        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+
                         toast.success(res.data.message);
 
                         if (res.data.role === "admin") {
@@ -56,14 +59,13 @@ const Login = () => {
                         }
                     } else if (res.data.status === 401) {
                         toast.error(res.data.message);
-                        setError({ general: res.data.message }); // Set general error for 401
+                        setError({ general: res.data.message });
                     } else {
-                        // If validation errors exist, set them in the error state
                         setError(res.data.validation_errors || {});
                         if (res.data.validation_errors) {
-                             Object.values(res.data.validation_errors).forEach(errArr => {
-                                 errArr.forEach(err => toast.error(err));
-                             });
+                            Object.values(res.data.validation_errors).forEach(errArr => {
+                                errArr.forEach(err => toast.error(err));
+                            });
                         } else {
                             toast.error("An unexpected error occurred.");
                         }
@@ -85,11 +87,11 @@ const Login = () => {
                     }
                 })
                 .finally(() => {
-                    setLoading(false); // Stop loading
+                    setLoading(false);
                 });
         })
         .catch((csrfError) => {
-            setLoading(false); // Stop loading if CSRF fails
+            setLoading(false);
             toast.error("Failed to prepare login. Please try again later.");
             setError({ general: "CSRF token error." });
             console.error("CSRF Error:", csrfError);
