@@ -21,7 +21,7 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
 
     return (
         <motion.div
-        className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-gray-800 rounded-xl overflow-hidden shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-transparent hover:border-lime-600 flex flex-col"
+        className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-gray-900 rounded-xl overflow-hidden shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-transparent hover:border-lime-600 flex flex-col"
         // Adjusted max-width and height for smaller cards
             style={{ maxWidth: '280px', maxHeight: '400px' }} 
             variants={{

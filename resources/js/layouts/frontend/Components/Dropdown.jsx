@@ -151,7 +151,9 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
                                         setIsOpen(false); // Close dropdown after navigation
                                     }}
                                 >
-                                    {item.image && (
+                                    {/* MODIFIED: Check for item.icon (React component) or item.image (path) */}
+                                    {item.icon && React.createElement(item.icon, { className: "w-6 h-6 mr-3 text-gray-500 dark:text-gray-400" })}
+                                    {item.image && typeof item.image === 'string' && (
                                         <img
                                             src={item.image}
                                             alt={item.name}
@@ -162,6 +164,7 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
                                 </Link>
                             </motion.li>
                         ))}
+
                     </motion.ul>
                 )}
             </AnimatePresence>

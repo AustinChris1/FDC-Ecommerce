@@ -2,24 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-.fade-anim img {
-    animation: fadeAnim 2s ease-out;
-}
-@keyframes fadeAnim {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-.fade-in {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.opacity-0 {
-    opacity: 0;
-    transform: translateY(20px);
-}
+  
+  /* Individual toast card styling */
+  .custom-toast {
+    border-radius: 8px !important; /* Softer corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; /* Stronger, darker shadow */
+    background: rgba(30, 30, 30, 0.95) !important; /* Slightly lighter dark background, or more translucent */
+    color: #e0e0e0 !important; /* Slightly off-white for text */
+    font-family: 'Inter', sans-serif; /* Use your site's font */
+    font-size: 0.9rem !important; /* Slightly smaller or larger text */
+  }
+  
+  /* Success toast specific overrides */
+  .Toastify__toast--success {
+    border-left: 5px solid #2ecc71 !important; /* Green border for success */
+  }
+  
+  /* Error toast specific overrides */
+  .Toastify__toast--error {
+    border-left: 5px solid #e74c3c !important; /* Red border for error */
+  }
+  
+  /* Warning toast specific overrides */
+  .Toastify__toast--warning {
+    border-left: 5px solid #f39c12 !important; /* Orange border for warning */
+  }
+  
+  /* Info toast specific overrides */
+  .Toastify__toast--info {
+    border-left: 5px solid #3498db !important; /* Blue border for info */
+  }
+  
+  /* Text inside the toast */
+  .custom-toast-body {
+    padding: 10px 15px !important; /* Adjust internal padding */
+  }
+  
+  /* Progress bar at the bottom */
+  .custom-toast-progress {
+    background: linear-gradient to right, #4CAF50, #8BC34A) !important; /* Custom gradient for success, or simple accent color */
+    /* You'd typically want to target specific progress bars with their type */
+    /* .Toastify__progress-bar--success { background-color: #2ecc71 !important; } */
+  }

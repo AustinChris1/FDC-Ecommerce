@@ -19,7 +19,7 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|integer|exists:categories,id', // Added exists validation
-            'meta_title' => 'required|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
             'link' => 'required|string|max:255|unique:products,link', // Added unique validation
             'selling_price' => 'required|numeric',
@@ -210,7 +210,7 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|integer|exists:categories,id',
-            'meta_title' => 'required|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
             'link' => 'required|string|max:255|unique:products,link,' . $id, // Unique check, excluding current product
             'selling_price' => 'required|numeric',

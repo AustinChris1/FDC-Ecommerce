@@ -898,7 +898,7 @@ const EditProducts = () => {
                                                 <input
                                                     onChange={handleInput}
                                                     value={productsInput.flash_sale_starts_at || ''}
-                                                    type="date"
+                                                    type="datetime-local"
                                                     id="flash_sale_starts_at"
                                                     name="flash_sale_starts_at"
                                                     className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"

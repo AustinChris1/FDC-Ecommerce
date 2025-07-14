@@ -29,6 +29,8 @@ import UserProfile from './layouts/frontend/Components/Profile';
 import Wishlist from './layouts/frontend/Outer/WishList';
 import TrackOrder from './layouts/frontend/Components/TrackOrder';
 import FlashSale from './layouts/frontend/Outer/FlashSale';
+import ScrollToTopButton from './layouts/frontend/Components/hooks/ScrollToTopButton';
+import ChatSupportButton from './layouts/frontend/Components/ChatSupportButton';
 
 
 const Master = lazy(() => import('./layouts/admin/Master'));
@@ -36,7 +38,7 @@ const Register = lazy(() => import('./layouts/frontend/auth/Register'));
 const Login = lazy(() => import('./layouts/frontend/auth/Login'));
 const AdminPrivateRoute = lazy(() => import('./AdminPrivateRoute'));
 const Navbar = lazy(() => import('./layouts/frontend/Components/Navbar'));
-const HeroSection = lazy(() => import('./layouts/frontend/Components/HeroSection'));
+const Top = lazy(() => import('./layouts/frontend/Components/Top'));
 const ProductShowcase = lazy(() => import('./layouts/frontend/Components/ProductShowcase'));
 const Products = lazy(() => import('./layouts/frontend/Components/Products'));
 const CustomerTestimonials = lazy(() => import('./layouts/frontend/Components/CustomerTestimonials'));
@@ -56,130 +58,142 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.post['Accept'] = 'application/json';
 
 axios.interceptors.request.use(function (config) {
-  const token = localStorage.getItem('auth_token');
-  config.headers.Authorization = token ? `Bearer ${token}` : '';
-  return config;
+    const token = localStorage.getItem('auth_token');
+    config.headers.Authorization = token ? `Bearer ${token}` : '';
+    return config;
 });
 
 // Home component from the initial app
 function Home() {
-  return (
-    <>
-      <HeroSection />
-      <ProductShowcase />
-      <Products />
-      <CustomerTestimonials />
-      <CallToActionNewsletter />
-    </>
-  );
+    return (
+        <>
+            <Top />
+            <ProductShowcase />
+            <Products />
+            <CustomerTestimonials />
+            <CallToActionNewsletter />
+        </>
+    );
 }
 
 function Layout() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin'); // Check if the current route is under /admin
+    const location = useLocation();
+    const isAdminRoute = location.pathname.startsWith('/admin');
 
-  // Create a wrapper component to handle redirection based on authentication
-  const ProtectedRoute = ({ element }) => {
-    const token = localStorage.getItem('auth_token');
+    const ProtectedRoute = ({ element }) => {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            return <Navigate to="/" replace />;
+        }
+        return element;
+    };
 
-    if (token) {
-      return <Navigate to="/" replace />;
-    }
-
-    return element;
-  };
-
-  return (
-    <>
-      {!isAdminRoute && <Navbar />} {/* Render Navbar only if not on admin routes */}
-      <CartSidebar />
-      <Routes>
-        {/* Admin routes protected with AdminPrivateRoute */}
-        <Route
-          path="/admin/*"
-          element={
-            <AdminPrivateRoute>
-              <Master />
-            </AdminPrivateRoute>
-          }
-        />
-
-        {/* Frontend routes */}
-        <Route path="/" element={<Home />} />
-        <Route path='/track-order' element={<TrackOrder/>}/>
-        <Route path='/flash-sales' element={<FlashSale/>}/>
-        <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
-        <Route path='/user/orders' element={<UserOrders />} />
-        <Route path="/user/order/:orderNumber" element={<UserOrderDetail />} />
-        <Route path='/user/profile' element={<UserProfile />} />
-        <Route path="/shop" element={<Store />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/trending" element={<TrendingProducts />} />
-        <Route path='/wishlist' element={<Wishlist />} /> 
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/company/team" element={<Team />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/support/warranty" element={<Warranty />} />
-        <Route path="/support/faq" element={<FAQ />} />
-        <Route path="/support/shipping-returns" element={<ShippingReturns />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfServicePage />} />
-        <Route path="/collections/:categoryLink" element={<Collections />} />
-        <Route path="/collections/:categoryLink/:productLink" element={<ProductDetail />} />
-        <Route path="/403" element={<Forbidden />} />
-        <Route path="/login" element={<ProtectedRoute element={<Login />} />} />
-        <Route path="/register" element={<ProtectedRoute element={<Register />} />} />
-        <Route path="/email/resend" element={<ResendEmail />} />
-        <Route path="/email/verify" element={<VerifyEmail />} />
-
-        {/* Fallback route for non-existing pages */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      {/* <Sidebar /> */}
-      {!isAdminRoute && <Footer />} {/* Render Footer only if not on admin routes */}
-    </>
-  );
+    return (
+        <>
+            {!isAdminRoute && <Navbar />}
+            <CartSidebar />
+            <Routes>
+                <Route
+                    path="/admin/*"
+                    element={
+                        <AdminPrivateRoute>
+                            <Master />
+                        </AdminPrivateRoute>
+                    }
+                />
+                <Route path="/" element={<Home />} />
+                <Route path='/track-order' element={<TrackOrder />} />
+                <Route path='/flash-sales' element={<FlashSale />} />
+                <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
+                <Route path='/user/orders' element={<UserOrders />} />
+                <Route path="/user/order/:orderNumber" element={<UserOrderDetail />} />
+                <Route path='/user/profile' element={<UserProfile />} />
+                <Route path="/shop" element={<Store />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/trending" element={<TrendingProducts />} />
+                <Route path='/wishlist' element={<Wishlist />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/company/team" element={<Team />} />
+                <Route path="/contact" element={<ContactUs />} />
+                <Route path="/support/warranty" element={<Warranty />} />
+                <Route path="/support/faq" element={<FAQ />} />
+                <Route path="/support/shipping-returns" element={<ShippingReturns />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfServicePage />} />
+                <Route path="/collections/:categoryLink" element={<Collections />} />
+                <Route path="/collections/:categoryLink/:productLink" element={<ProductDetail />} />
+                <Route path="/403" element={<Forbidden />} />
+                <Route path="/login" element={<ProtectedRoute element={<Login />} />} />
+                <Route path="/register" element={<ProtectedRoute element={<Register />} />} />
+                <Route path="/email/resend" element={<ResendEmail />} />
+                <Route path="/email/verify" element={<VerifyEmail />} />
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+            {!isAdminRoute && <Footer />}
+        </>
+    );
 }
 
 function App() {
+    const [appLoading, setAppLoading] = useState(true);
+
     useEffect(() => {
-    const trackVisitor = async () => {
-      try {
-        await axios.post('/api/analytics/track');
-      } catch (error) {
-      }
-    };
+        const trackVisitorAndPreload = async () => {
+            try {
+                await axios.post('/api/analytics/track');
+            } catch (error) {
+                console.error("Initial load error:", error);
+            } finally {
+                setTimeout(() => {
+                    setAppLoading(false);
+                }, 1000);
+            }
+        };
 
-    trackVisitor(); // Call the async function immediately
-  }, []);        
+        trackVisitorAndPreload();
+    }, []);
 
-  return (
-    <div className="App font-raleway">
-      <HelmetProvider>
-        <Router>
-        <CartProvider>
-          <WishlistProvider>
-          <ScrollToTop /> {/* Scroll to the top when navigating */}
-          <Suspense fallback={<LoadingSpinner />}>
-            <Layout /> {/* Use Layout to conditionally render components */}
-          </Suspense>
-          </WishlistProvider>
-          </CartProvider>
-        </Router>
-        {/* ToastContainer for global notifications */}
-        <ToastContainer 
-          position="top-right" 
-          autoClose={3000} 
-          newestOnTop 
-          closeOnClick 
-          pauseOnFocusLoss 
-          draggable 
-          pauseOnHover 
-        />
-      </HelmetProvider>
-    </div>
-  );
+    return (
+        <div className="App font-raleway">
+            <HelmetProvider>
+                <Router>
+                    <CartProvider>
+                        <WishlistProvider>
+                            <ScrollToTop />
+                            {/* Global loading spinner */}
+                            {appLoading ? (
+                                <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 z-[9999]">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : (
+                                <Suspense fallback={<LoadingSpinner />}> 
+                                    <Layout />
+                                    <ScrollToTopButton/>
+                                    {/* <ChatSupportButton/> */}
+                                </Suspense>
+                            )}
+                        </WishlistProvider>
+                    </CartProvider>
+                </Router>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="dark"
+                    className="custom-toast-container"
+                    toastClassName="custom-toast"
+                    bodyClassName="custom-toast-body"
+                    progressClassName="custom-toast-progress"
+                />
+            </HelmetProvider>
+        </div>
+    );
 }
 
 export default App;

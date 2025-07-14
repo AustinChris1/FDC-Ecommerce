@@ -1,8 +1,7 @@
-// HeroSection.jsx (Your HeroSlider component from the previous response)
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ArrowRight, Sparkles, Gift, Flame, Package, Wallet, Tag, Cloud, Zap, Percent, ShoppingCart, Truck, CreditCard, Star } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Sparkles, Gift, Flame, Package, Wallet, Tag, Cloud, Zap, Percent, ShoppingCart, Truck, CreditCard, Star } from 'lucide-react'; // Added more icons
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -23,8 +22,8 @@ const contentContainerVariants = {
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.08,
-            delayChildren: 0.1,
+            staggerChildren: 0.08, // Even faster stagger for immediate impact
+            delayChildren: 0.1, // Minimal delay for quick reveal
         }
     }
 };
@@ -38,8 +37,8 @@ const slideItemVariants = {
         filter: 'blur(0px)',
         rotateX: 0,
         transition: {
-            duration: 0.7,
-            ease: [0.22, 1, 0.36, 1],
+            duration: 0.7, // Slightly longer for more impact, but still quick
+            ease: [0.22, 1, 0.36, 1], // More aggressive "easeOutExpo" like curve
         }
     }
 };
@@ -53,36 +52,41 @@ const slides = [
         subtitle: "Grab jaw-dropping discounts on electronics, fashion, and more before they vanish!",
         buttonText: "Ignite Savings",
         buttonLink: "/flash-sales",
-        buttonIcon: <Flame className="w-5 h-5 mr-2" />,
-        icon: <Zap className="w-8 h-8 mr-3 text-yellow-300 transform rotate-[-10deg]" />,
+        buttonIcon: <Flame className="w-5 h-5 mr-2" />, // More thematic icon for the button
+        icon: <Zap className="w-8 h-8 mr-3 text-yellow-300 transform rotate-[-10deg]" />, // Larger, slightly rotated lead icon
+        // --- UPDATED BACKGROUND IMAGE ---
         backgroundImage: 'https://plus.unsplash.com/premium_photo-1661682801696-e499fa39ac0e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aGFwcHklMjBibGFjayUyMHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D',
+        // Removed explicit bgColor as it's not used when backgroundImage is present
         uniqueAnimationProps: {
             preTitle: { y: -50, opacity: 0, scale: 0.8 },
-            title: { rotateX: -90, opacity: 0, scale: 0.5, transformOrigin: 'bottom' },
-            subtitle: { x: -100, opacity: 0, skewX: -20 },
-            button: { y: 150, opacity: 0, scale: 0.7, rotateZ: 30 },
+            title: { rotateX: -90, opacity: 0, scale: 0.5, transformOrigin: 'bottom' }, // More dramatic 3D rotation
+            subtitle: { x: -100, opacity: 0, skewX: -20 }, // Skewed entry
+            button: { y: 150, opacity: 0, scale: 0.7, rotateZ: 30 }, // Larger movement, slight rotation
         },
         backgroundElements: (
             <>
+                {/* Large, swirling background shapes for energy */}
                 <motion.div
-                    className="absolute top-[5%] left-[10%] w-[180px] h-[180px] sm:w-[280px] sm:h-[280px] bg-red-600/25 rounded-full"
+                    className="absolute top-[10%] left-[10%] w-[180px] h-[180px] sm:w-[280px] sm:h-[280px] bg-red-600/25 rounded-full" // Responsive sizing
                     style={{ filter: 'blur(120px)' }}
                     animate={{ scale: [0.9, 1.3, 0.9], opacity: [0.5, 0.9, 0.5], rotate: [0, 360] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                    className="absolute bottom-[3%] right-[15%] w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] bg-orange-500/25 rounded-full"
+                    className="absolute bottom-[5%] right-[15%] w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] bg-orange-500/25 rounded-full" // Responsive sizing
                     style={{ filter: 'blur(110px)' }}
                     animate={{ scale: [1.3, 0.9, 1.3], opacity: [0.9, 0.5, 0.9], rotate: [360, 0] }}
                     transition={{ duration: 9, repeat: Infinity, ease: "linear", delay: 0.5 }}
                 />
+
+                {/* Smaller, scattered icons/elements for detail */}
                 <motion.div
                     className="absolute top-[20%] left-[45%] text-red-400/70"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: [0, 1, 0], y: [-20, 0, 20] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.2, ease: "easeInOut" }}
                 >
-                    <Percent className="w-8 h-8 sm:w-10 sm:h-10" />
+                    <Percent className="w-8 h-8 sm:w-10 sm:h-10" /> {/* Responsive icon size */}
                 </motion.div>
                 <motion.div
                     className="absolute bottom-[25%] left-[20%] text-yellow-400/70"
@@ -90,7 +94,7 @@ const slides = [
                     animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5], rotate: [0, 180] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
                 >
-                    <Tag className="w-10 h-10 sm:w-12 sm:h-12" />
+                    <Tag className="w-10 h-10 sm:w-12 sm:h-12" /> {/* Responsive icon size */}
                 </motion.div>
                 <motion.div
                     className="absolute top-[35%] right-[5%] text-orange-400/70"
@@ -98,7 +102,7 @@ const slides = [
                     animate={{ opacity: [0, 1, 0], x: [20, 0, -20] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 0.8, ease: "easeInOut" }}
                 >
-                    <Star className="w-8 h-8 sm:w-10 sm:h-10" />
+                    <Star className="w-8 h-8 sm:w-10 sm:h-10" /> {/* Responsive icon size */}
                 </motion.div>
                 <motion.div
                     className="absolute top-[5%] right-[25%] text-red-500/60"
@@ -106,7 +110,7 @@ const slides = [
                     animate={{ opacity: [0, 0.8, 0], scale: [0.7, 1.1, 0.7], rotate: [0, 90, 180] }}
                     transition={{ duration: 2.5, repeat: Infinity, delay: 0.3, ease: "easeInOut" }}
                 >
-                    <Zap className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <Zap className="w-6 h-6 sm:w-8 sm:h-8" /> {/* Responsive icon size */}
                 </motion.div>
                 <motion.div
                     className="absolute bottom-[10%] left-[40%] text-yellow-500/60"
@@ -114,7 +118,7 @@ const slides = [
                     animate={{ opacity: [0, 0.8, 0], y: [-30, 0, 30] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.6, ease: "easeInOut" }}
                 >
-                    <Flame className="w-7 h-7 sm:w-9 sm:h-9" />
+                    <Flame className="w-7 h-7 sm:w-9 sm:h-9" /> {/* Responsive icon size */}
                 </motion.div>
             </>
         ),
@@ -190,7 +194,7 @@ const slides = [
         title: "🚀 Warp Speed Delivery: Your Goods Await!",
         subtitle: "Experience lightning-fast delivery across Lagos. Get your orders in record time!",
         buttonText: "Track Your Order",
-        buttonLink: "/track-order",
+        buttonLink: "/user/orders",
         buttonIcon: <Truck className="w-5 h-5 mr-2" />,
         icon: <Package className="w-8 h-8 mr-3 text-sky-400 animate-pulse" />,
         backgroundImage: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhhcHB5JTIwYmxhY2slMjBwZXJzb258ZW58MHx8MHx8fDA%3D',
@@ -202,24 +206,27 @@ const slides = [
         },
         backgroundElements: (
             <>
+                {/* Speed lines effect */}
                 <motion.div
-                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] bg-cyan-400/15"
+                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] bg-cyan-400/15" // Responsive height
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["-100%", "100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] bg-indigo-400/15"
+                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] bg-indigo-400/15" // Responsive height
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["100%", "-100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear", delay: 1 }}
                 />
+                {/* Subtle grid pattern for futuristic feel */}
                 <motion.div
-                    className="absolute inset-0 [mask-image:radial-gradient(transparent,black)] [background-size:20px_20px] sm:[background-size:40px_40px] [background-image:linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] opacity-20"
+                    className="absolute inset-0 [mask-image:radial-gradient(transparent,black)] [background-size:20px_20px] sm:[background-size:40px_40px] [background-image:linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] opacity-20" // Responsive background-size
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1, opacity: [0.1, 0.25, 0.1] }}
                     transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 ></motion.div>
+                {/* More delivery-themed icons */}
                 <motion.div
                     className="absolute top-[25%] left-[15%] text-white/50"
                     initial={{ opacity: 0, y: -30 }}
@@ -258,7 +265,7 @@ const slides = [
         icon: <ShoppingBag className="w-8 h-8 mr-3 text-purple-400 transform scale-110" />,
         backgroundImage: 'https://images.unsplash.com/photo-1542849887-f70517865241?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         uniqueAnimationProps: {
-            preTitle: { opacity: 0, y: 20 },
+            preTitle: { opacity: 0, y: -20 },
             title: { scale: 0.7, opacity: 0, rotateZ: -10 },
             subtitle: { x: -80, opacity: 0 },
             button: { y: 60, opacity: 0, scale: 0.8 },
@@ -266,13 +273,13 @@ const slides = [
         backgroundElements: (
             <>
                 <motion.div
-                    className="absolute top-[10%] left-[10%] w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] bg-purple-500/20 rounded-full"
+                    className="absolute top-[10%] left-[10%] w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] bg-purple-500/20 rounded-full" // Responsive sizing
                     style={{ filter: 'blur(150px)', transform: 'translate(-50%, -50%)' }}
                     animate={{ opacity: [0.3, 0.8, 0.3], scale: [1, 1.05, 1] }}
                     transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute bottom-[10%] right-[10%] w-[150px] h-[150px] sm:w-[250px] sm:h-[250px] bg-fuchsia-400/20 rounded-full"
+                    className="absolute bottom-[10%] right-[10%] w-[150px] h-[150px] sm:w-[250px] sm:h-[250px] bg-fuchsia-400/20 rounded-full" // Responsive sizing
                     style={{ filter: 'blur(100px)' }}
                     animate={{ y: ["-15%", "15%"], x: ["-15%", "15%"] }}
                     transition={{ duration: 11, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
@@ -314,9 +321,9 @@ const slides = [
     }
 ];
 
-const HeroSlider = ({ products = [], handleAddToCart }) => {
+const HeroSlider = () => {
     return (
-        <div className="relative w-full h-[320px] sm:h-[400px] md:h-[480px] lg:h-[550px] xl:h-[600px] 2xl:h-[650px] overflow-hidden"> {/* Reduced height and added responsive heights */}
+        <section className="relative mt-10 w-full h-screen md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden text-white bg-gray-950 dark:bg-black">
             <Swiper
                 modules={[EffectCreative, Autoplay, Pagination, Navigation]}
                 effect={"creative"}
@@ -336,15 +343,14 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
                 }}
                 speed={1200}
                 pagination={{ clickable: true }}
-                navigation={false}
+                navigation={true}
                 loop={true}
                 className="mySwiper w-full h-full"
             >
-                {/* Existing textual slides */}
                 {slides.map((slide) => (
                     <SwiperSlide key={slide.id}>
                         {({ isActive }) => (
-                            <Link to={slide.buttonLink} className="relative w-full h-full flex items-center justify-center text-center cursor-pointer">
+                            <div className="relative w-full h-full flex items-center justify-center text-center">
                                 {/* Layer 1: Contextual Background Image (Prominent but filtered) */}
                                 <div
                                     className="absolute inset-0 z-0 opacity-40"
@@ -357,6 +363,10 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
                                 ></div>
 
                                 {/* Layer 2: Gradient Overlay with Brand Colors (Dominant color layer) */}
+                                {/* The original component had `slide.bgColor` but no `bgColor` in the slide data.
+                                    Assuming it was intended to use a dynamic class based on the slide.
+                                    For now, I'll add a placeholder gradient if `slide.bgColor` isn't defined.
+                                */}
                                 <div className={`absolute inset-0 z-10 bg-gradient-to-br ${slide.bgColor || 'from-gray-800/70 to-black/70'}`}></div>
 
                                 {/* Layer 3: Dynamic & Thematic Background Elements */}
@@ -371,13 +381,14 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
 
                                 {/* Layer 4: Content Area with Enhanced Animations */}
                                 <motion.div
-className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-10 lg:pb-10 lg:pt-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto text-white perspective-1000"                                    variants={contentContainerVariants}
+                                    className="relative z-30 p-4 sm:p-6 md:p-10 lg:p-16 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto text-white perspective-1000" // Responsive padding and max-width
+                                    variants={contentContainerVariants}
                                     initial="hidden"
                                     animate={isActive ? "visible" : "hidden"}
                                 >
                                     {/* PreTitle with icon */}
                                     <motion.h2
-                                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-wider opacity-90 mb-2 sm:mb-3 flex items-center justify-center" 
+                                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-wider opacity-90 mb-3 sm:mb-4 flex items-center justify-center" // Responsive text size, reduced margin
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.preTitle || { opacity: 0, y: -20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -389,7 +400,7 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
 
                                     {/* Main Title */}
                                     <motion.h1
-                                        className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tighter drop-shadow-3xl mb-2 sm:mb-4 text-shadow-lg" 
+                                        className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-extrabold leading-tight tracking-tighter drop-shadow-3xl mb-6 sm:mb-8 text-shadow-lg" // Responsive text size, reduced margin
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.title}
                                         animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, skewY: 0, filter: 'blur(0px)' }}
@@ -403,15 +414,34 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
                                     </motion.h1>
 
                                     {/* Subtitle */}
-                                    {/* <motion.p
-                                        className="text-base sm:text-lg md:text-xl lg:text-xl font-light leading-relaxed mb-6 sm:mb-8 opacity-95 drop-shadow-xl max-w-2xl mx-auto"
+                                    <motion.p
+                                        className="text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed mb-8 sm:mb-10 opacity-95 drop-shadow-xl max-w-3xl mx-auto" // Responsive text size, reduced margin, max-width
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.subtitle}
                                         animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, skewY: 0, filter: 'blur(0px)' }}
                                         transition={{ ...slideItemVariants.visible.transition, delay: 0.5 }}
                                     >
                                         {slide.subtitle}
-                                    </motion.p> */}
+                                    </motion.p>
+
+                                    {/* Call to Action Button */}
+                                    <motion.div
+                                        variants={slideItemVariants}
+                                        initial={slide.uniqueAnimationProps.button}
+                                        animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotateZ: 0 }}
+                                        transition={{ ...slideItemVariants.visible.transition, delay: 0.7 }}
+                                    >
+                                        <Link
+                                            to={slide.buttonLink}
+                                            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 px-6 sm:py-4 sm:px-10 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center group text-lg sm:text-xl relative overflow-hidden z-10 mx-auto border-2 border-white/30" // Responsive padding, text size
+                                            style={{ maxWidth: 'fit-content' }}
+                                        >
+                                            {slide.buttonIcon}
+                                            {slide.buttonText}
+                                            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300" /> {/* Responsive icon size, reduced margin */}
+                                            <span className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.3)_0%,_transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer"></span>
+                                        </Link>
+                                    </motion.div>
 
                                     {/* Additional Icons / Micro-infographics */}
                                     {slide.additionalIcons && (
@@ -426,13 +456,12 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
                                         </motion.div>
                                     )}
                                 </motion.div>
-
-                            </Link>
+                            </div>
                         )}
                     </SwiperSlide>
                 ))}
             </Swiper>
-        </div>
+        </section>
     );
 };
 

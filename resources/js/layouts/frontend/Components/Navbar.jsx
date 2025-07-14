@@ -11,9 +11,7 @@ import {
     LogOut,
     KeySquare,
     ShoppingBag,
-    Sun, // For dark mode toggle
-    Moon // For dark mode toggle
-} from 'lucide-react';
+    Truck, MessageSquare, HelpCircle} from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Load from './Load';
@@ -52,8 +50,7 @@ const Navbar = () => {
     const { totalCartItems, toggleCart } = useCart();
 
     const handleNavigation = (path) => {
-        setIsMobileMenuOpen(false); // Always close mobile menu on navigation
-        // Also clear search results if navigating
+        // REMOVED: setIsMobileMenuOpen(false); // This is now handled by the useEffect listening to location.pathname
         setSearchResults([]);
         setSearchTerm('');
         navigate(path);
@@ -69,6 +66,7 @@ const Navbar = () => {
     }, []);
 
     // Effect to close mobile menu automatically when location changes
+    // This is the primary mechanism for closing the menu on navigation
     useEffect(() => {
         if (isMobileMenuOpen) {
             setIsMobileMenuOpen(false);
@@ -88,12 +86,11 @@ const Navbar = () => {
                     }));
                     setCategory(formattedCategories);
                 } else {
-                    toast.error("Unable to fetch categories for Navbar.");
+                    console.error("Unable to fetch categories for Navbar.");
                 }
             })
             .catch(err => {
                 console.error("Network or server error fetching categories:", err);
-                toast.error("Error fetching categories for Navbar.");
             });
     }, []);
 
@@ -137,24 +134,24 @@ const Navbar = () => {
     // Auth & Admin Links
     const AuthLink = localStorage.getItem('auth_token') ? (
         <>
-            <Link to="/user/orders" onClick={() => handleNavigation('/user/orders')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800" title="My Orders">
+            <Link to="/user/orders" onClick={() => handleNavigation('/user/orders')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950" title="My Orders">
                 <ShoppingBag className="w-5 h-5 mr-1" />
                 <span className="hidden lg:inline">My Orders</span>
             </Link>
-            <button onClick={logout} className="flex items-center text-red-400 hover:text-red-500 transition-colors py-2 px-3 rounded-full hover:bg-gray-800" title="Log Out">
+            <button onClick={logout} className="flex items-center text-red-400 hover:text-red-500 transition-colors py-2 px-3 rounded-full hover:bg-gray-950" title="Log Out">
                 <LogOut className="w-5 h-5 mr-1" />
                 <span className="hidden lg:inline">Logout</span>
             </button>
         </>
     ) : (
-        <Link to="/login" onClick={() => handleNavigation('/login')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800" title="Log In">
+        <Link to="/login" onClick={() => handleNavigation('/login')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950" title="Log In">
             <User className="w-5 h-5 mr-1" />
             <span className="hidden lg:inline">Login</span>
         </Link>
     );
 
     const AdminLink = localStorage.getItem('role') === 'admin' && (
-        <Link to="/admin/dashboard" onClick={() => handleNavigation('/admin/dashboard')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800" title="Admin Dashboard">
+        <Link to="/admin/dashboard" onClick={() => handleNavigation('/admin/dashboard')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950" title="Admin Dashboard">
             <KeySquare className="w-5 h-5 mr-1" />
             <span className="hidden lg:inline">Admin</span>
         </Link>
@@ -213,34 +210,34 @@ const Navbar = () => {
     // FIX: Close mobile menu when clicking outside of it
     useEffect(() => {
         const handleClickOutsideMobileMenu = (event) => {
-            // Check if the click occurred outside the mobile menu AND not on the toggle button itself
-            // The toggle button's click should *open* the menu, not immediately close it via click-outside.
-            const menuToggleButton = document.querySelector('[aria-label="Toggle Menu"]'); // Select by aria-label for robustness
+            const menuToggleButton = document.querySelector('[aria-label="Toggle Menu"]');
 
             if (
                 isMobileMenuOpen &&
                 mobileMenuRef.current &&
                 !mobileMenuRef.current.contains(event.target) &&
-                (!menuToggleButton || !menuToggleButton.contains(event.target)) // Ensure click wasn't on the toggle button
+                (!menuToggleButton || !menuToggleButton.contains(event.target))
             ) {
                 setIsMobileMenuOpen(false);
             }
         };
 
-        // Attach listener only when the menu is open to avoid unnecessary checks
         if (isMobileMenuOpen) {
             document.addEventListener('mousedown', handleClickOutsideMobileMenu);
         } else {
             document.removeEventListener('mousedown', handleClickOutsideMobileMenu);
         }
 
-        // Cleanup listener on component unmount or when menu closes
         return () => {
             document.removeEventListener('mousedown', handleClickOutsideMobileMenu);
         };
-    }, [isMobileMenuOpen]); // Dependency on isMobileMenuOpen is crucial
+    }, [isMobileMenuOpen]);
 
-
+    const helpMenuItems = [
+        { name: 'Track Order', link: '/track-order', icon: Truck },
+        { name: 'Contact', link: '/contact', icon: MessageSquare },
+        { name: 'FAQ', link: 'support/faq', icon: HelpCircle },
+    ];
     return (
         <nav
             className={`fixed top-0 z-50 w-full transition-all duration-300 ease-in-out
@@ -252,7 +249,7 @@ const Navbar = () => {
             <div className="container mx-auto px-4 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" onClick={() => handleNavigation('/')} className="flex-shrink-0">
-                    <img src={fdcLogo} alt="First Digit Communications" className="h-10 sm:h-12 filter brightness-150" />
+                    <img src={fdcLogo} alt="First Digit Communications" className="h-10 w-15 sm:h-12 sm:w-15 filter brightness-150" />
                 </Link>
 
                 {/* Desktop Menu - Centralized */}
@@ -277,6 +274,12 @@ const Navbar = () => {
                         handleNavigation={handleNavigation} // Pass handleNavigation to dropdown
                         isMobile={false} // Explicitly set for desktop
                     />
+                    <NewDropdownMenu
+                        title="Help"
+                        items={helpMenuItems}
+                        handleNavigation={handleNavigation} // Reuse your existing navigation handler
+                        isMobile={false} // Explicitly set for desktop
+                    />
                 </ul>
 
                 {/* Desktop Icons & Search */}
@@ -287,7 +290,7 @@ const Navbar = () => {
                             value={searchTerm}
                             onChange={handleSearch}
                             placeholder="Search products..."
-                            className="p-2 pl-10 rounded-full bg-gray-800 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 w-52 transition-all duration-300 ease-in-out text-sm placeholder-gray-400"
+                            className="p-2 pl-10 rounded-full bg-gray-950 border border-gray-900 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 w-52 transition-all duration-300 ease-in-out text-sm placeholder-gray-400"
                         />
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                         {isLoading && (
@@ -303,11 +306,11 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute top-full left-0 right-0 mt-2 bg-gray-800 shadow-lg rounded-lg border border-gray-700 max-h-60 overflow-y-auto z-10"
+                                    className="absolute top-full left-0 right-0 mt-2 bg-gray-950 shadow-lg rounded-lg border border-gray-900 max-h-60 overflow-y-auto z-10"
                                 >
                                     <ul>
                                         {searchResults.map((item) => (
-                                            <li key={item.id} className="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0">
+                                            <li key={item.id} className="p-3 hover:bg-gray-900 cursor-pointer border-b border-gray-900 last:border-b-0">
                                                 <Link
                                                     to={`/collections/${item.category?.link || 'default-category'}/${item.link}`}
                                                     className="block text-gray-200 text-sm"
@@ -326,7 +329,7 @@ const Navbar = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute top-full left-0 right-0 mt-2 bg-gray-800 shadow-lg rounded-lg border border-gray-700 p-3 text-center text-gray-500 text-sm z-10"
+                                    className="absolute top-full left-0 right-0 mt-2 bg-gray-950 shadow-lg rounded-lg border border-gray-900 p-3 text-center text-gray-500 text-sm z-10"
                                 >
                                     No products found.
                                 </motion.div>
@@ -334,7 +337,7 @@ const Navbar = () => {
                         </AnimatePresence>
                     </div>
                     {/* Updated Shopping Cart Button */}
-                    <button onClick={toggleCart} className="relative text-gray-300 hover:text-lime-400 transition-colors p-2 rounded-full hover:bg-gray-800" title="Shopping Cart">
+                    <button onClick={toggleCart} className="relative text-gray-300 hover:text-lime-400 transition-colors p-2 rounded-full hover:bg-gray-950" title="Shopping Cart">
                         <ShoppingCart className="w-6 h-6" />
                         {totalCartItems > 0 && (
                             <AnimatePresence> {/* Use AnimatePresence for exit animations */}
@@ -415,6 +418,12 @@ const Navbar = () => {
                                     handleNavigation={handleNavigation}
                                     isMobile={true}
                                 />
+                                <NewDropdownMenu
+                                    title="Help"
+                                    items={helpMenuItems}
+                                    handleNavigation={handleNavigation} // Reuse your existing navigation handler
+                                    isMobile={true} // Explicitly set for desktop
+                                />
                                 {/* Mobile Search Bar */}
                                 <li className="relative w-full mt-6">
                                     <input
@@ -422,7 +431,7 @@ const Navbar = () => {
                                         value={searchTerm}
                                         onChange={handleSearch}
                                         placeholder="Search products..."
-                                        className="w-full p-3 pl-12 border border-gray-700 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-800 text-gray-200 placeholder-gray-400"
+                                        className="w-full p-3 pl-12 border border-gray-900 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-950 text-gray-200 placeholder-gray-400"
                                         aria-label="Mobile Search Input"
                                     />
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-500" />
@@ -439,10 +448,10 @@ const Navbar = () => {
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -10 }}
                                                 transition={{ duration: 0.2 }}
-                                                className="mt-2 bg-gray-800 rounded-md shadow-lg p-1 max-h-40 overflow-y-auto"
+                                                className="mt-2 bg-gray-950 rounded-md shadow-lg p-1 max-h-40 overflow-y-auto"
                                             >
                                                 {searchResults.map((product) => (
-                                                    <div key={product.id} className="border-b border-gray-700 py-2 last:border-b-0">
+                                                    <div key={product.id} className="border-b border-gray-900 py-2 last:border-b-0">
                                                         <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} onClick={() => { setSearchResults([]); setSearchTerm(''); handleNavigation(`/collections/${product.category?.link || 'default-category'}/${product.link}`); }}>
                                                             <span className="block text-gray-200 text-sm hover:text-cyan-400">{product.name}</span>
                                                         </Link>
@@ -463,27 +472,27 @@ const Navbar = () => {
                                 </li>
                             </ul>
                             {/* Auth and Admin Links for Mobile */}
-                            <div className="mt-auto border-t border-gray-700 pt-2 flex flex-col space-y-3">
+                            <div className="mt-auto border-t border-gray-900 pt-2 flex flex-col space-y-3">
                                 {localStorage.getItem('auth_token') ? (
                                     <>
-                                        <Link to="/user/orders" onClick={() => handleNavigation('/user/orders')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800 text-xl font-semibold w-fit">
+                                        <Link to="/user/orders" onClick={() => handleNavigation('/user/orders')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950 text-xl font-semibold w-fit">
                                             <ShoppingBag className="w-6 h-6 mr-2" />
                                             <span>My Orders</span>
                                         </Link>
 
-                                        <button onClick={logout} className="flex items-center text-red-400 hover:text-red-500 transition-colors py-2 px-3 rounded-full hover:bg-gray-800 text-xl font-semibold w-fit">
+                                        <button onClick={logout} className="flex items-center text-red-400 hover:text-red-500 transition-colors py-2 px-3 rounded-full hover:bg-gray-950 text-xl font-semibold w-fit">
                                             <LogOut className="w-6 h-6 mr-2" />
                                             <span>Logout</span>
                                         </button>
                                     </>
                                 ) : (
-                                    <Link to="/login" onClick={() => handleNavigation('/login')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800 text-xl font-semibold w-fit">
+                                    <Link to="/login" onClick={() => handleNavigation('/login')} className="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950 text-xl font-semibold w-fit">
                                         <User className="w-6 h-6 mr-2" />
                                         <span>Login</span>
                                     </Link>
                                 )}
                                 {localStorage.getItem('role') === 'admin' && (
-                                    <Link to="/admin/dashboard" onClick={() => handleNavigation('/admin/dashboard')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-800 text-xl font-semibold w-fit">
+                                    <Link to="/admin/dashboard" onClick={() => handleNavigation('/admin/dashboard')} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors py-2 px-3 rounded-full hover:bg-gray-950 text-xl font-semibold w-fit">
                                         <KeySquare className="w-6 h-6 mr-2" />
                                         <span>Admin</span>
                                     </Link>

@@ -30,6 +30,7 @@ Route::post('/analytics/track', [AnalyticsController::class, 'trackVisitor']);
 // Route for placing an order
 Route::post('/orders/place', [OrderController::class, 'placeOrder']);
 Route::post('/orders/update-status/{identifier}', [OrderController::class, 'updateStatus']);
+Route::get('/track-order/{orderNumber}', [OrderController::class, 'trackOrder']);
 
 Route::post('/paystack-webhook', [OrderController::class, 'handleWebhook']);
 Route::get('/allOrders', [OrderController::class, 'viewOrders']);
