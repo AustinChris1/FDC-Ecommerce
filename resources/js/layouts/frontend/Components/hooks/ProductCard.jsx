@@ -21,9 +21,9 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
 
     return (
         <motion.div
-        className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-gray-900 rounded-xl overflow-hidden shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-transparent hover:border-lime-600 flex flex-col"
-        // Adjusted max-width and height for smaller cards
-            style={{ maxWidth: '280px', maxHeight: '400px' }} 
+            className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg dark:shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-gray-200 dark:border-transparent hover:border-blue-400 dark:hover:border-lime-600 flex flex-col"
+            // Adjusted max-width and height for smaller cards
+            style={{ maxWidth: '280px', maxHeight: '400px' }}
             variants={{
                 hidden: { opacity: 0, scale: 0.9, y: 30 }, // Slightly smaller initial scale
                 visible: (i) => ({
@@ -43,12 +43,12 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                 <div className="relative pt-[70%] overflow-hidden">
                     {/* Primary Image */}
                     <motion.img
-                        src={product.image || `https://placehold.co/300x210/374151/9CA3AF?text=${product.name.substring(0, 15)}`}
+                        src={product.image || `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, 15)}`}
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-500 ease-out"
                         initial={false} // Prevent initial animation on render
                         animate={{ opacity: isHovered && product.image2 ? 0 : 1 }} // Fade out primary image on hover if image2 exists
-                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/300x210/374151/9CA3AF?text=${product.name.substring(0, 15)}`; }}
+                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, 15)}`; }}
                     />
 
                     {/* Secondary Image with slide-up animation */}
@@ -67,47 +67,47 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                     </AnimatePresence>
 
                     {discountPercentage > 0 && (
-                        <span className="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-lg">
+                        <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-green-600 dark:shadow-lg">
                             -{discountPercentage}%
                         </span>
                     )}
                     {outOfStock ? (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-lg">
+                        <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-red-600 dark:shadow-lg">
                             Out of Stock
                         </span>
                     ) : limitedStock && (
-                        <span className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-lg">
+                        <span className="absolute top-3 left-3 bg-orange-400 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-orange-500 dark:shadow-lg">
                             Limited Stock ({product.qty})
                         </span>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/50"></div>
                 </div>
             </Link>
 
             <div className="p-3 flex flex-col flex-grow">
                 <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} className="block">
-                    <h3 className="text-sm font-bold mb-1 text-white group-hover:text-lime-400 transition-colors duration-300 line-clamp-2">
+                    <h3 className="text-sm font-bold mb-1 text-gray-800 group-hover:text-blue-600 dark:text-white dark:group-hover:text-lime-400 transition-colors duration-300 line-clamp-2">
                         {product.name}
                     </h3>
-                    <p className="text-gray-400 mb-2 text-xs line-clamp-2 min-h-[2rem]">
+                    <p className="text-gray-500 mb-2 text-xs line-clamp-2 min-h-[2rem] dark:text-gray-400">
                         {product.description || 'No description available.'}
                     </p>
                     {product.rating !== undefined && product.num_reviews !== undefined && (
                         <div className="mb-2 flex items-center">
                             <StarRating rating={parseFloat(product.rating)} iconSize={14} /> {/* Slightly reduced icon size */}
-                            <span className="text-gray-400 text-xs ml-1">({product.num_reviews})</span>
+                            <span className="text-gray-500 text-xs ml-1 dark:text-gray-400">({product.num_reviews})</span>
                         </div>
                     )}
                 </Link>
 
-                <div className="mt-auto pt-2 border-t border-gray-700 flex items-center justify-between">
+                <div className="mt-auto pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div>
                         {discountPercentage > 0 && (
-                            <p className="text-xs text-gray-500 line-through">
+                            <p className="text-xs text-gray-400 line-through dark:text-gray-500">
                                 {formatCurrency(product.original_price)}
                             </p>
                         )}
-                        <p className={`text-base font-bold ${limitedStock ? 'text-red-400' : 'text-cyan-400'}`}> {/* Adjusted text size */}
+                        <p className={`text-base font-bold ${limitedStock ? 'text-red-500 dark:text-red-400' : 'text-blue-600 dark:text-cyan-400'}`}> {/* Adjusted text size */}
                             {formatCurrency(product.selling_price)}
                         </p>
                     </div>
@@ -116,8 +116,8 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                         onClick={(e) => { e.preventDefault(); handleAddToCart(product); }}
                         className={`p-2 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center text-sm
                             ${outOfStock
-                                ? 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-70'
-                                : 'bg-lime-600 text-white hover:bg-lime-700 active:scale-95 shadow-md'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-70 dark:bg-gray-700 dark:text-gray-400'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-md dark:bg-lime-600 dark:hover:bg-lime-700'
                             }`}
                         disabled={outOfStock}
                         aria-label={`Add ${product.name} to cart`}
@@ -125,7 +125,7 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                         <ShoppingBag className="w-4 h-4" />
                     </button>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-lime-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none dark:from-lime-500/10">
                 </div>
             </div>
         </motion.div>

@@ -16,6 +16,12 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\API\WishlistController;
+use App\Http\Controllers\LocationController; // Import LocationController
+use App\Http\Controllers\ProductLocationController;
+
+// NEW: Public Location Routes (e.g., for "Find a Store" page)
+Route::get('locations', [LocationController::class, 'index']); // Get all active locations
+
 
 Route::middleware('auth:sanctum')->group(function () {
     // Wishlist Routes
@@ -45,6 +51,7 @@ Route::get('/products/{productId}/reviews', [ReviewController::class, 'getReview
 // Auth Routes
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('auth/google', [AuthController::class, 'googleAuth']);
 
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 
@@ -63,6 +70,7 @@ Route::get('getProducts', [FrontendController::class, 'products']);
 Route::get('fetchProducts/{categoryLink}/{productLink}', [FrontendController::class, 'fetchProducts']);
 Route::get('/search', [FrontendController::class, 'search']);
 Route::get('/team/view', [TeamController::class, 'index']);
+Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
 
 // Admin Routes (Protected by Sanctum and Role Middleware)
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
@@ -74,8 +82,24 @@ Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
         ]);
     });
 
+    // NEW: Location Management Routes (Admin Only)
+    Route::get('admin/locations', [LocationController::class, 'allLocationsForAdmin']); // Get all locations including inactive
+    Route::post('admin/locations', [LocationController::class, 'store']);
+    Route::get('admin/locations/{id}', [LocationController::class, 'show']);
+    Route::put('admin/locations/{id}', [LocationController::class, 'update']);
+    Route::delete('admin/locations/{id}', [LocationController::class, 'destroy']);
+
+    // NEW: Product-Location (Inventory) Management Routes (Admin Only)
+    // Get stock for a specific product across all locations
+    Route::get('admin/products/{product_id}/locations', [ProductLocationController::class, 'getProductLocations']);
+    // Attach or update stock for a product at a specific location
+    Route::post('admin/products/{product_id}/locations', [ProductLocationController::class, 'attachOrUpdateProductLocation']);
+    // Detach product from a specific location
+    Route::delete('admin/products/{product_id}/locations/{location_id}', [ProductLocationController::class, 'detachProductLocation']);
+    // Get all products at a specific location with their quantities
+    Route::get('admin/locations/{location_id}/products', [ProductLocationController::class, 'getLocationProducts']);
+
     // Settings
-    Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
     Route::post('/settings/update', [AdminSettingsController::class, 'updateSettings']);
 
     // Category Management

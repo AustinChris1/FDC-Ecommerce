@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str; // Import the Str helper for slug generation
 use Carbon\Carbon; // Import Carbon for date/time handling
-
+use Illuminate\Support\Facades\Log; // Import Log facade for logging
 class ProductController extends Controller
 {
     /**
@@ -25,10 +25,10 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric',
             'original_price' => 'required|numeric',
             'qty' => 'required|integer',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:4096',
-            'image2' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
-            'image3' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
-            'image4' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'image' => 'required|image|mimes:jpg,jpeg,png',
+            'image2' => 'nullable|image|mimes:jpg,jpeg,png',
+            'image3' => 'nullable|image|mimes:jpg,jpeg,png',
+            'image4' => 'nullable|image|mimes:jpg,jpeg,png',
             'brand' => 'required|string|max:255', // Added max length
             'description' => 'nullable|string',
             'meta_description' => 'nullable|string|max:1000', // Added max length
@@ -206,20 +206,37 @@ class ProductController extends Controller
     /**
      * Update an existing product.
      */
-    public function update(Request $request, $id)
+ public function update(Request $request, $id)
     {
+        // --- LOGGING START ---
+        Log::info('Product update request received.', ['product_id' => $id, 'request_data' => $request->all()]);
+
+        // Log files specifically
+        foreach ($request->allFiles() as $key => $file) {
+            if ($file->isValid()) {
+                Log::info("File received: $key", [
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            } else {
+                Log::warning("Invalid file received for field: $key");
+            }
+        }
+        // --- LOGGING END ---
+
         $validator = Validator::make($request->all(), [
             'category_id' => 'required|integer|exists:categories,id',
             'meta_title' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
-            'link' => 'required|string|max:255|unique:products,link,' . $id, // Unique check, excluding current product
+            'link' => 'required|string|max:255|unique:products,link,' . $id,
             'selling_price' => 'required|numeric',
             'original_price' => 'required|numeric',
             'qty' => 'required|integer',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:4096', // Changed to nullable for update
-            'image2' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
-            'image3' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
-            'image4' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png',
+            'image2' => 'nullable|image|mimes:jpg,jpeg,png',
+            'image3' => 'nullable|image|mimes:jpg,jpeg,png',
+            'image4' => 'nullable|image|mimes:jpg,jpeg,png',
             'brand' => 'required|string|max:255',
             'description' => 'nullable|string',
             'meta_description' => 'nullable|string|max:1000',
@@ -234,6 +251,9 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
+            // --- LOGGING START ---
+            Log::error('Product update validation failed.', ['errors' => $validator->errors()->toArray()]);
+            // --- LOGGING END ---
             return response()->json([
                 'status' => 422,
                 'errors' => $validator->messages(),
@@ -243,6 +263,9 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if (!$product) {
+            // --- LOGGING START ---
+            Log::warning('Product not found for update.', ['product_id' => $id]);
+            // --- LOGGING END ---
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found',
@@ -299,8 +322,11 @@ class ProductController extends Controller
         // Refactored image update logic to be more generic and cleaner
         $baseDestinationPath = 'uploads/products';
         $updateImage = function ($file, $oldPath, $subfolder) use ($baseDestinationPath) {
+            // Log for image processing
+            Log::info("Attempting to update image for subfolder: $subfolder");
             if ($oldPath && File::exists(public_path($oldPath))) {
                 File::delete(public_path($oldPath));
+                Log::info("Deleted old image: $oldPath");
             }
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '_' . Str::random(10) . '.' . $extension;
@@ -308,19 +334,23 @@ class ProductController extends Controller
 
             if (!File::isDirectory($destinationPath)) {
                 File::makeDirectory($destinationPath, 0777, true, true);
+                Log::info("Created directory: $destinationPath");
             }
 
             $file->move($destinationPath, $filename);
-            return $baseDestinationPath . '/' . $subfolder . '/' . $filename;
+            $newPath = $baseDestinationPath . '/' . $subfolder . '/' . $filename;
+            Log::info("New image saved: $newPath");
+            return $newPath;
         };
 
+        // --- Important: Only process file if it actually exists in the request ---
         if ($request->hasFile('image')) {
             $product->image = $updateImage($request->file('image'), $product->image, 'main');
         }
         if ($request->hasFile('image2')) {
             $product->image2 = $updateImage($request->file('image2'), $product->image2, 'secondary');
         }
-        if ($request->hasFile('image3')) {
+        if ($request->hasFile('image3')) { // This is the specific one you asked about
             $product->image3 = $updateImage($request->file('image3'), $product->image3, 'third');
         }
         if ($request->hasFile('image4')) {
@@ -329,12 +359,15 @@ class ProductController extends Controller
 
         $product->save();
 
+        // --- LOGGING START ---
+        Log::info('Product updated successfully.', ['product_id' => $product->id]);
+        // --- LOGGING END ---
+
         return response()->json([
             'status' => 200,
             'message' => 'Product updated successfully',
         ]);
     }
-
     /**
      * Delete a product.
      */

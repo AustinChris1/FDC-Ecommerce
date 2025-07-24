@@ -9,7 +9,6 @@ import LoadingSpinner from './layouts/frontend/Components/Loader';
 import AboutUs from './layouts/frontend/Outer/AboutUs';
 import ContactUs from './layouts/frontend/Outer/ContactUs';
 import FAQ from './layouts/frontend/Outer/FAQ';
-import Team from './layouts/frontend/Outer/Team';
 import Collections from './layouts/frontend/Outer/Collections';
 import ResendEmail from './layouts/frontend/auth/Verification';
 import VerifyEmail from './layouts/frontend/auth/Verify';
@@ -31,6 +30,8 @@ import TrackOrder from './layouts/frontend/Components/TrackOrder';
 import FlashSale from './layouts/frontend/Outer/FlashSale';
 import ScrollToTopButton from './layouts/frontend/Components/hooks/ScrollToTopButton';
 import ChatSupportButton from './layouts/frontend/Components/ChatSupportButton';
+import SiteNotification from './layouts/frontend/Components/SiteNotification';
+import SubNavbar from './layouts/frontend/Components/SubNavbar';
 
 
 const Master = lazy(() => import('./layouts/admin/Master'));
@@ -91,6 +92,8 @@ function Layout() {
     return (
         <>
             {!isAdminRoute && <Navbar />}
+            {!isAdminRoute && <SubNavbar />}
+            {!isAdminRoute && <SiteNotification />}
             <CartSidebar />
             <Routes>
                 <Route
@@ -113,7 +116,6 @@ function Layout() {
                 <Route path="/trending" element={<TrendingProducts />} />
                 <Route path='/wishlist' element={<Wishlist />} />
                 <Route path="/about" element={<AboutUs />} />
-                <Route path="/company/team" element={<Team />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/support/warranty" element={<Warranty />} />
                 <Route path="/support/faq" element={<FAQ />} />

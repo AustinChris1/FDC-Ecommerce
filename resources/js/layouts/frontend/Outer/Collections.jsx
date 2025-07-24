@@ -3,14 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import Load from '../Components/Load'; 
-import LoadingSpinner from '../Components/Loader'; 
+import Load from '../Components/Load';
+import LoadingSpinner from '../Components/Loader';
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { useCart } from '../Components/CartContext';
 
 const Collections = () => {
     const { categoryLink } = useParams();
-    const [categories, setCategories] = useState([]); 
+    const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [selectedCategoryName, setSelectedCategoryName] = useState('Products');
@@ -78,7 +78,7 @@ const Collections = () => {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
     const paginate = (pageNumber) => {
-        if (pageNumber < 1 || pageNumber > totalPages) return; 
+        if (pageNumber < 1 || pageNumber > totalPages) return;
         setCurrentPage(pageNumber);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -111,7 +111,7 @@ const Collections = () => {
     const cardHoverVariants = {
         hover: {
             scale: 1.04,
-            boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.4)",
+            boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.2)", // Softer shadow for light mode
             transition: {
                 duration: 0.3,
                 ease: "easeInOut",
@@ -134,7 +134,7 @@ const Collections = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex justify-center items-center bg-zinc-950">
+            <div className="min-h-screen flex justify-center items-center bg-gray-50 dark:bg-zinc-950">
                 <LoadingSpinner />
             </div>
         );
@@ -142,8 +142,8 @@ const Collections = () => {
 
     return (
         <motion.div
-            className="w-full min-h-screen p-6 text-gray-200"
-            style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }}
+            className="w-full min-h-screen p-6 text-gray-800 bg-gradient-to-br from-gray-100 to-gray-200
+                       dark:text-gray-200 dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-950"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -152,27 +152,27 @@ const Collections = () => {
 
             {/* Breadcrumb - Always visible */}
             <motion.nav
-                className="text-gray-400 text-sm mb-5"
+                className="text-gray-500 text-sm mb-5 dark:text-gray-400"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
             >
                 <ul className="flex space-x-2">
                     <li>
-                        <Link to="/" className="text-blue-400 hover:underline">Home</Link>
+                        <Link to="/" className="text-blue-600 hover:underline dark:text-blue-400">Home</Link>
                     </li>
                     <li>/</li>
                     <li>
-                        <Link to="/shop" className="text-blue-400 hover:underline">Shop</Link>
+                        <Link to="/shop" className="text-blue-600 hover:underline dark:text-blue-400">Shop</Link>
                     </li>
                     <li>/</li>
-                    <li className="text-gray-100">{categoryLink || 'Category'}</li>
+                    <li className="text-gray-800 dark:text-gray-100">{categoryLink || 'Category'}</li>
                 </ul>
             </motion.nav>
 
             {/* Page Title - Always visible */}
             <motion.h1
-                className="text-3xl font-bold text-center mb-8 mt-8 text-blue-400"
+                className="text-3xl font-bold text-center mb-8 mt-8 text-blue-700 dark:text-blue-400"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
@@ -182,12 +182,12 @@ const Collections = () => {
 
             {error ? (
                 <div className="text-center py-20">
-                    <h2 className="text-3xl font-bold text-red-500 mb-4">Error</h2>
-                    <p className="text-xl text-gray-400">{error}</p>
+                    <h2 className="text-3xl font-bold text-red-600 mb-4 dark:text-red-500">Error</h2>
+                    <p className="text-xl text-gray-600 dark:text-gray-400">{error}</p>
                 </div>
             ) : filteredProducts.length === 0 ? (
                 <motion.p
-                    className="text-center text-xl text-gray-500"
+                    className="text-center text-xl text-gray-600 dark:text-gray-500"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
@@ -200,8 +200,8 @@ const Collections = () => {
                         <AnimatePresence>
                             {currentProducts.map((product) => {
                                 const handleAddToCart = (e) => {
-                                    e.preventDefault(); 
-                                    e.stopPropagation(); 
+                                    e.preventDefault();
+                                    e.stopPropagation();
 
                                     // Check product availability
                                     if (product.status !== 0 || product.qty <= 0) {
@@ -215,7 +215,9 @@ const Collections = () => {
                                 return (
                                     <motion.div
                                         key={product.id}
-                                        className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-105 bg-gray-800 border-gray-700"
+                                        className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-105
+                                                   bg-white border-gray-200
+                                                   dark:bg-gray-800 dark:border-gray-700"
                                         variants={itemVariants}
                                         whileHover="hover"
                                         whileTap="tap"
@@ -229,20 +231,21 @@ const Collections = () => {
                                                 initial={false}
                                                 whileHover="hover"
                                             />
-                                            <div className="p-4 bg-gray-900">
-                                                <h3 className="text-lg font-semibold text-blue-400">{product.name}</h3>
-                                                <p className="text-sm text-gray-300 mt-2">
+                                            <div className="p-4 bg-gray-50 dark:bg-gray-900">
+                                                <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400">{product.name}</h3>
+                                                <p className="text-sm text-gray-600 mt-2 dark:text-gray-300">
                                                     {product.description.length > 100
                                                         ? `${product.description.slice(0, 100)}...`
                                                         : product.description}
                                                 </p>
                                                 <div className="flex justify-between items-center mt-4">
-                                                    <span className="text-lime-400 font-extrabold text-xl">
+                                                    <span className="text-green-600 font-extrabold text-xl dark:text-lime-400">
                                                         ₦{product.selling_price.toLocaleString()}
                                                     </span>
                                                     <button
-                                                        onClick={handleAddToCart} 
-                                                        className="inline-flex items-center bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105"
+                                                        onClick={handleAddToCart}
+                                                        className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105
+                                                                   dark:bg-blue-700 dark:hover:bg-blue-600"
                                                     >
                                                         <ShoppingCart className="w-5 h-5 mr-2" />
                                                     </button>
@@ -263,8 +266,8 @@ const Collections = () => {
                                 disabled={currentPage === 1}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                                     currentPage === 1
-                                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                        : 'bg-blue-700 hover:bg-blue-600 text-white'
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600'
                                 }`}
                                 whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
                                 whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
@@ -277,8 +280,8 @@ const Collections = () => {
                                     onClick={() => paginate(number)}
                                     className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                                         currentPage === number
-                                            ? 'bg-blue-500 text-white'
-                                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                                            ? 'bg-blue-500 text-white dark:bg-blue-500'
+                                            : 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300'
                                     }`}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
@@ -291,8 +294,8 @@ const Collections = () => {
                                 disabled={currentPage === totalPages}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                                     currentPage === totalPages
-                                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                        : 'bg-blue-700 hover:bg-blue-600 text-white'
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600'
                                 }`}
                                 whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
                                 whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}

@@ -62,7 +62,6 @@ const ProductShowcase = () => {
                     // Prepend "All" category
                     setCategories([{ id: "All", name: "All", link: "all" }, ...categoryRes.data.category]);
                 } else {
-                    toast.error("Unable to fetch categories.");
                     console.error("Backend error fetching categories:", categoryRes.data.message);
                 }
 
@@ -98,7 +97,7 @@ const ProductShowcase = () => {
                         // A product is on flash sale if is_flash_sale is true AND
                         // the current time is between flash_sale_starts_at and flash_sale_ends_at
                         const isCurrentlyFlashSale = product.is_flash_sale && flashSaleStartsAt && flashSaleEndsAt &&
-                                                    now >= flashSaleStartsAt && now <= flashSaleEndsAt;
+                            now >= flashSaleStartsAt && now <= flashSaleEndsAt;
 
                         return {
                             ...product,
@@ -121,12 +120,10 @@ const ProductShowcase = () => {
                     setProducts(productsWithReviews);
 
                 } else {
-                    toast.error("Unable to fetch products.");
                     console.error("Backend error fetching products:", productsRes.data.message);
                 }
             } catch (error) {
                 console.error("Network or server error during data fetch:", error);
-                toast.error("Failed to load data. Please try again.");
             } finally {
                 setLoading(false);
             }
@@ -154,8 +151,8 @@ const ProductShowcase = () => {
     );
 
     const popularProducts = useMemo(() =>
-        products.filter(p => p.popular === 1 && p.qty > 0) 
-            .sort((a, b) => b.sales_count - a.sales_count) 
+        products.filter(p => p.popular === 1 && p.qty > 0)
+            .sort((a, b) => b.sales_count - a.sales_count)
             .slice(0, 8),
         [products]
     );
@@ -203,7 +200,7 @@ const ProductShowcase = () => {
     const handleAddToCart = (product) => {
         const quantity = 1;
 
-        if (product.status == 1 || product.qty <= 0) { 
+        if (product.status == 1 || product.qty <= 0) {
             toast.error(`${product.name} is currently out of stock or unavailable.`);
             return;
         }
@@ -224,22 +221,22 @@ const ProductShowcase = () => {
 
     return (
         <section
-            className="py-16 md:py-24 bg-gray-950 text-white relative overflow-hidden"
+            className="py-16 md:py-24 dark:bg-gray-950 bg-gray-50 dark:text-white text-gray-900 relative overflow-hidden"
             style={{
                 backgroundImage: `radial-gradient(at 20% 0%, rgba(20,20,50,0.4) 0%, transparent 50%),
                                   radial-gradient(at 80% 100%, rgba(50,20,20,0.4) 0%, transparent 50%)`,
                 backgroundBlendMode: 'overlay',
             }}
         >
-            {/* Subtle background abstract shapes/glows */}
+            {/* Subtle background abstract shapes/glows - colors adjusted for light mode too */}
             <motion.div
                 className="absolute inset-0 pointer-events-none z-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: (categoriesInView || flashSaleInView || newArrivalsInView || popularProductsInView || featuredProductsInView || limitedStockInView || allProductsInView) ? 1 : 0 }}
                 transition={{ duration: 1.5, delay: 0.5 }}
             >
-                <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl opacity-30"></div>
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute -top-20 -left-20 w-64 h-64 dark:bg-blue-500/10 bg-blue-200/20 rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute -bottom-20 -right-20 w-64 h-64 dark:bg-purple-500/10 bg-purple-200/20 rounded-full blur-3xl opacity-30"></div>
             </motion.div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -253,11 +250,11 @@ const ProductShowcase = () => {
                             initial="hidden"
                             animate={flashSaleInView ? "visible" : "hidden"}
                         >
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight text-purple-400">
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-purple-400 text-purple-700">
                                 <Timer className="inline-block mr-3 w-10 h-10 align-middle" />
                                 Flash Sales! Don't Miss Out!
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 Incredible deals available for a limited time.
                             </p>
                             {/* Use dynamic target date from the earliest ending flash sale product */}
@@ -270,8 +267,8 @@ const ProductShowcase = () => {
 
                         {loading ? (
                             <div className="text-center py-20 flex flex-col items-center justify-center">
-                                <Loader2 className="w-12 h-12 animate-spin text-purple-400 mb-4" />
-                                <p className="text-xl text-gray-400">Loading flash deals...</p>
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-purple-400 text-purple-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Loading flash deals...</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-20">
@@ -290,7 +287,7 @@ const ProductShowcase = () => {
                                 ))}
                             </div>
                         )}
-                        <hr className="my-16 border-gray-800" />
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
                     </>
                 )}
 
@@ -304,18 +301,18 @@ const ProductShowcase = () => {
                             initial="hidden"
                             animate={limitedStockInView ? "visible" : "hidden"}
                         >
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight text-red-500">
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-red-500 text-red-700">
                                 Hurry Now! Limited Stock!
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 These popular items are flying off the shelves. Grab them before they're gone!
                             </p>
                         </motion.div>
 
                         {loading ? (
                             <div className="text-center py-20 flex flex-col items-center justify-center">
-                                <Loader2 className="w-12 h-12 animate-spin text-red-400 mb-4" />
-                                <p className="text-xl text-gray-400">Finding hot deals...</p>
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-red-400 text-red-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Finding hot deals...</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-20">
@@ -333,7 +330,7 @@ const ProductShowcase = () => {
                                 ))}
                             </div>
                         )}
-                        <hr className="my-16 border-gray-800" />
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
                     </>
                 )}
 
@@ -347,18 +344,18 @@ const ProductShowcase = () => {
                             initial="hidden"
                             animate={popularProductsInView ? "visible" : "hidden"}
                         >
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight text-orange-400">
-                                <span className="text-white">Customer Favorites:</span> Popular Products
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-orange-400 text-orange-700">
+                                <span className="dark:text-white text-gray-900">Customer Favorites:</span> Popular Products
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 See what everyone else is loving right now.
                             </p>
                         </motion.div>
 
                         {loading ? (
                             <div className="text-center py-20 flex flex-col items-center justify-center">
-                                <Loader2 className="w-12 h-12 animate-spin text-orange-400 mb-4" />
-                                <p className="text-xl text-gray-400">Finding popular items...</p>
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-orange-400 text-orange-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Finding popular items...</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-20">
@@ -376,7 +373,7 @@ const ProductShowcase = () => {
                                 ))}
                             </div>
                         )}
-                        <hr className="my-16 border-gray-800" />
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
                     </>
                 )}
 
@@ -390,18 +387,18 @@ const ProductShowcase = () => {
                             initial="hidden"
                             animate={featuredProductsInView ? "visible" : "hidden"}
                         >
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight text-pink-400">
-                                Specially <span className="text-white">Featured</span> For You
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-pink-400 text-pink-700">
+                                Specially <span className="dark:text-white text-gray-900">Featured</span> For You
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 Handpicked items our experts recommend.
                             </p>
                         </motion.div>
 
                         {loading ? (
                             <div className="text-center py-20 flex flex-col items-center justify-center">
-                                <Loader2 className="w-12 h-12 animate-spin text-pink-400 mb-4" />
-                                <p className="text-xl text-gray-400">Curating top picks...</p>
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-pink-400 text-pink-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Curating top picks...</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-20">
@@ -419,7 +416,7 @@ const ProductShowcase = () => {
                                 ))}
                             </div>
                         )}
-                        <hr className="my-16 border-gray-800" />
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
                     </>
                 )}
 
@@ -433,18 +430,18 @@ const ProductShowcase = () => {
                             initial="hidden"
                             animate={newArrivalsInView ? "visible" : "hidden"}
                         >
-                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight text-teal-400">
-                                Fresh Off The Truck! <span className="text-white">New Arrivals</span>
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-teal-400 text-teal-700">
+                                Fresh Off The Truck! <span className="dark:text-white text-gray-900">New Arrivals</span>
                             </h2>
-                            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 Discover the latest and greatest tech products just added to our inventory.
                             </p>
                         </motion.div>
 
                         {loading ? (
                             <div className="text-center py-20 flex flex-col items-center justify-center">
-                                <Loader2 className="w-12 h-12 animate-spin text-teal-400 mb-4" />
-                                <p className="text-xl text-gray-400">Discovering new items...</p>
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-teal-400 text-teal-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Discovering new items...</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-20">
@@ -462,7 +459,7 @@ const ProductShowcase = () => {
                                 ))}
                             </div>
                         )}
-                        <hr className="my-16 border-gray-800" />
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
                     </>
                 )}
 
@@ -475,24 +472,24 @@ const ProductShowcase = () => {
                     animate={categoriesInView ? "visible" : "hidden"}
                 >
                     <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight">
-                        Explore Our <span className="text-cyan-400">Top Categories</span>
+                        Explore Our <span className="dark:text-cyan-400 text-cyan-700">Top Categories</span>
                     </h2>
-                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                    <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                         Find the perfect tech for your needs from our expertly curated selections.
                     </p>
                 </motion.div>
 
                 {loading ? (
                     <div className="text-center py-20 flex flex-col items-center justify-center">
-                        <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mb-4" />
-                        <p className="text-xl text-gray-400">Loading categories...</p>
+                        <Loader2 className="w-12 h-12 animate-spin dark:text-cyan-400 text-cyan-700 mb-4" />
+                        <p className="text-xl dark:text-gray-400 text-gray-600">Loading categories...</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-20">
                         {categories.filter(cat => cat.id !== "All").slice(0, 6).map((category, i) => (
                             <motion.div
                                 key={category.id}
-                                className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl group relative cursor-pointer transform hover:scale-105 transition-transform duration-300 ease-out border border-transparent hover:border-blue-600 aspect-square flex flex-col justify-end"
+                                className="dark:bg-gray-800 bg-gray-100 rounded-xl overflow-hidden shadow-2xl group relative cursor-pointer transform hover:scale-105 transition-transform duration-300 ease-out border border-transparent dark:hover:border-blue-600 hover:border-blue-400 aspect-square flex flex-col justify-end"
                                 variants={sectionTitleVariants} // Re-using for simpler animation, or you can create a new one
                                 initial="hidden"
                                 animate={categoriesInView ? "visible" : "hidden"}
@@ -504,25 +501,25 @@ const ProductShowcase = () => {
                                         alt={category.name}
                                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out opacity-80 group-hover:opacity-100"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                    <div className="absolute inset-0 dark:bg-gradient-to-t dark:from-black/70 from-black/50 to-transparent"></div>
                                     <div className="p-4 text-left absolute bottom-0 left-0 right-0">
-                                        <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1">
+                                        <h3 className="text-lg font-bold dark:text-white text-gray-900 dark:group-hover:text-cyan-400 group-hover:text-cyan-700 transition-colors duration-300 line-clamp-1">
                                             {category.name}
                                         </h3>
                                         <div
-                                            className="inline-flex items-center text-blue-400 hover:text-blue-200 transition-colors duration-300 font-semibold text-sm mt-1"
+                                            className="inline-flex items-center dark:text-blue-400 text-blue-700 dark:hover:text-blue-200 hover:text-blue-500 transition-colors duration-300 font-semibold text-sm mt-1"
                                         >
                                             Shop Now
                                             <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform duration-300" />
                                         </div>
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br dark:from-blue-500/10 from-blue-200/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                                 </Link>
                             </motion.div>
                         ))}
                     </div>
                 )}
-                <hr className="my-16 border-gray-800" />
+                <hr className="my-16 dark:border-gray-800 border-gray-200" />
 
                 {/* --- Section: Main Product Listing with Filtering and Pagination --- */}
                 <div id="product-grid-section" className="mt-20">
@@ -534,9 +531,9 @@ const ProductShowcase = () => {
                         animate={allProductsInView ? "visible" : "hidden"}
                     >
                         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight">
-                            All Our <span className="text-lime-400">Products</span>
+                            All Our <span className="dark:text-lime-400 text-lime-700">Products</span>
                         </h2>
-                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+                        <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                             Browse our extensive catalog of cutting-edge technology.
                         </p>
                     </motion.div>
@@ -556,9 +553,9 @@ const ProductShowcase = () => {
                                 key={cat.id}
                                 onClick={() => { setSelectedCategory(cat.id); setCurrentPage(1); }}
                                 className={`px-5 py-2 text-sm rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-md
-                                    ${selectedCategory === cat.id
-                                        ? 'bg-blue-600 text-white shadow-blue-500/50'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                ${selectedCategory === cat.id
+                                        ? 'dark:bg-blue-600 dark:text-white dark:shadow-blue-500/50 bg-blue-500 text-white shadow-blue-300/50'
+                                        : 'dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                                 variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
                             >
@@ -570,14 +567,14 @@ const ProductShowcase = () => {
                     {/* Product Grid */}
                     {loading ? (
                         <div className="text-center py-20 flex flex-col items-center justify-center">
-                            <Loader2 className="w-12 h-12 animate-spin text-lime-400 mb-4" />
-                            <p className="text-xl text-gray-400">Fetching products...</p>
+                            <Loader2 className="w-12 h-12 animate-spin dark:text-lime-400 text-lime-700 mb-4" />
+                            <p className="text-xl dark:text-gray-400 text-gray-600">Fetching products...</p>
                         </div>
                     ) : (
                         <>
                             {currentProducts.length > 0 ? (
                                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                                {currentProducts.map((product, i) => (
+                                    {currentProducts.map((product, i) => (
                                         <ProductCard
                                             key={product.id}
                                             product={product}
@@ -591,18 +588,18 @@ const ProductShowcase = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-20">
-                                    <p className="text-lg text-gray-400">No products found for this category.</p>
+                                <div className="text-center py-20 dark:text-gray-400 text-gray-600 text-xl">
+                                    No products found for the selected category.
                                 </div>
                             )}
 
                             {/* Pagination Controls */}
                             {totalPages > 1 && (
-                                <div className="flex justify-center items-center mt-12 space-x-2">
+                                <div className="flex justify-center items-center space-x-2 mt-12">
                                     <button
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
-                                        className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="px-4 py-2 rounded-lg dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:dark:bg-gray-600 hover:bg-gray-300 transition-colors"
                                     >
                                         Previous
                                     </button>
@@ -611,9 +608,9 @@ const ProductShowcase = () => {
                                             key={index + 1}
                                             onClick={() => handlePageChange(index + 1)}
                                             className={`px-4 py-2 rounded-lg font-semibold transition-colors
-                                                ${currentPage === index + 1
-                                                    ? 'bg-blue-600 text-white'
-                                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            ${currentPage === index + 1
+                                                    ? 'dark:bg-lime-600 bg-lime-500 dark:text-white text-white'
+                                                    : 'dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 hover:dark:bg-gray-600 hover:bg-gray-300'
                                                 }`}
                                         >
                                             {index + 1}
@@ -622,7 +619,7 @@ const ProductShowcase = () => {
                                     <button
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}
-                                        className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="px-4 py-2 rounded-lg dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:dark:bg-gray-600 hover:bg-gray-300 transition-colors"
                                     >
                                         Next
                                     </button>

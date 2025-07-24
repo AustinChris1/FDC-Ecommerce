@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Setting; // Import the Setting model
-use Illuminate\Support\Facades\File; // IMPORTANT: Changed from Storage to File facade
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule; // For conditional validation rules
-use Illuminate\Validation\Rules\File as FileRule; // Alias File rule to avoid conflict with File facade
-use Illuminate\Support\Facades\Log; // For logging errors/information
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File as FileRule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon; // Import Carbon for timestamps
 
 class AdminSettingsController extends Controller
 {
@@ -27,8 +28,11 @@ class AdminSettingsController extends Controller
                 'facebook_url' => $settings['facebook_url'] ?? '',
                 'twitter_url' => $settings['twitter_url'] ?? '',
                 'instagram_url' => $settings['instagram_url'] ?? '',
-                'site_logo_path' => $settings['site_logo_path'] ?? '', // Path to the current logo
-                'shipping_fee' => $settings['shipping_fee'] ?? 0, // New: Default to 0
+                'site_logo_path' => $settings['site_logo_path'] ?? '',
+                'shipping_fee' => $settings['shipping_fee'] ?? 0,
+                // NEW: Notification settings
+                'site_notification_message' => $settings['site_notification_message'] ?? '',
+                'site_notification_active' => filter_var($settings['site_notification_active'] ?? false, FILTER_VALIDATE_BOOLEAN), // Convert to boolean
             ];
 
             return response()->json([
@@ -57,17 +61,19 @@ class AdminSettingsController extends Controller
             'facebook_url' => 'nullable|url|max:255',
             'twitter_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
-            'shipping_fee' => 'required|numeric|min:0|max:1000000', // Numeric validation for shipping fee
+            'shipping_fee' => 'required|numeric|min:0|max:1000000',
             'site_logo' => [
-                'nullable', // Allows the field to be empty or not present
-                // Conditionally apply rules based on whether a file is present or a string 'REMOVE_LOGO' is sent
+                'nullable',
                 Rule::when($request->hasFile('site_logo'), [
-                    FileRule::image()->max(2048), // Correct usage of aliased FileRule
+                    FileRule::image()->max(2048),
                 ]),
                 Rule::when($request->input('site_logo') === 'REMOVE_LOGO', [
-                    Rule::in(['REMOVE_LOGO']), // Ensures it's explicitly the 'REMOVE_LOGO' string
+                    Rule::in(['REMOVE_LOGO']),
                 ]),
             ],
+            // NEW: Notification settings validation
+            'site_notification_message' => 'nullable|string|max:1000',
+            'site_notification_active' => 'required|boolean', // Expects true/false or 0/1
         ];
 
         // Custom error messages for clarity
@@ -81,6 +87,8 @@ class AdminSettingsController extends Controller
             'shipping_fee.numeric' => 'The shipping fee must be a number.',
             'shipping_fee.min' => 'The shipping fee must be at least 0.',
             'shipping_fee.max' => 'The shipping fee cannot exceed 1,000,000.',
+            'site_notification_active.required' => 'The notification active status is required.',
+            'site_notification_active.boolean' => 'The notification active status must be true or false.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -95,35 +103,31 @@ class AdminSettingsController extends Controller
 
         try {
             $validatedData = $validator->validated();
-            $newLogoPath = null; // To store the path of the new logo if uploaded
+            $newLogoPath = null;
             
-            // Get current logo path from settings table
             $oldLogoPath = Setting::where('key', 'site_logo_path')->value('value'); 
 
             // Handle site_logo upload or removal
             if ($request->hasFile('site_logo')) {
-                // A new file was uploaded, delete old one if it exists
                 if ($oldLogoPath && File::exists(public_path($oldLogoPath))) {
-                    File::delete(public_path($oldLogoPath)); // Use File facade with public_path()
+                    File::delete(public_path($oldLogoPath));
                     Log::info('Old logo deleted: ' . public_path($oldLogoPath));
                 }
                 
                 $logo = $request->file('site_logo');
                 $fileName = time() . '.' . $logo->getClientOriginalExtension();
-                $destinationPath = '/uploads/settings'; // Directory within public/
-                $logo->move(public_path($destinationPath), $fileName); // Move to public directory
-                $newLogoPath = $destinationPath . "/" . $fileName; // Store the relative path in DB
+                $destinationPath = '/uploads/settings';
+                $logo->move(public_path($destinationPath), $fileName);
+                $newLogoPath = $destinationPath . "/" . $fileName;
 
                 Log::info('New logo uploaded: ' . $newLogoPath);
             } elseif ($request->input('site_logo') === 'REMOVE_LOGO') {
-                // Signal to remove the current logo
                 if ($oldLogoPath && File::exists(public_path($oldLogoPath))) {
-                    File::delete(public_path($oldLogoPath)); // Use File facade with public_path()
+                    File::delete(public_path($oldLogoPath));
                     Log::info('Existing logo removed via REMOVE_LOGO signal: ' . public_path($oldLogoPath));
                 }
-                $newLogoPath = ''; // Set path to empty to indicate no logo
+                $newLogoPath = '';
             } else {
-                // No new logo uploaded and not signaled for removal, retain old path
                 $newLogoPath = $oldLogoPath;
             }
 
@@ -136,15 +140,20 @@ class AdminSettingsController extends Controller
                 'facebook_url' => $validatedData['facebook_url'],
                 'twitter_url' => $validatedData['twitter_url'],
                 'instagram_url' => $validatedData['instagram_url'],
-                'site_logo_path' => $newLogoPath, // Store the determined logo path
-                'shipping_fee' => $validatedData['shipping_fee'], // Shipping Fee
+                'site_logo_path' => $newLogoPath,
+                'shipping_fee' => $validatedData['shipping_fee'],
+                // NEW: Notification settings
+                'site_notification_message' => $validatedData['site_notification_message'] ?? '', // Use ?? '' for nullable
+                'site_notification_active' => $validatedData['site_notification_active'], // Boolean value (true/false)
             ];
 
             // Update or create each setting
             foreach ($settingsToUpdate as $key => $value) {
+                // Ensure boolean values are stored as '1' or '0' in the database if your 'value' column is string
+                $dbValue = is_bool($value) ? ($value ? '1' : '0') : $value;
                 Setting::updateOrCreate(
                     ['key' => $key],
-                    ['value' => $value]
+                    ['value' => $dbValue]
                 );
             }
 

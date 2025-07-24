@@ -2,23 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from 'react-toastify';
-import { motion } from 'framer-motion'; // Import motion for animations
-import { MailCheck } from 'lucide-react'; // Icon for email verification
+import { motion } from 'framer-motion';
+import { MailCheck } from 'lucide-react';
 
 const ResendEmail = () => {
-    document.title = "Verify Your Email - First Digit"; // Updated title for clarity
+    document.title = "Verify Your Email - First Digit";
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Redirect to home after 1.5 minutes
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!loading) { // Only redirect if not actively sending
+            if (!loading) {
                 navigate("/");
             }
-        }, 1.5 * 60 * 1000); // 1.5 minutes in milliseconds
+        }, 1.5 * 60 * 1000);
 
-        return () => clearTimeout(timer); // Cleanup on unmount
+        return () => clearTimeout(timer);
     }, [navigate, loading]);
 
     const handleResendEmail = (e) => {
@@ -53,7 +52,6 @@ const ResendEmail = () => {
             });
     };
 
-    // Framer Motion Variants (consistent with Login/Register)
     const pageVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -71,39 +69,50 @@ const ResendEmail = () => {
 
     return (
         <motion.div
-            className="flex items-center justify-center min-h-screen p-5 relative overflow-hidden"
-            style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }} // Darker background
+            className="flex items-center justify-center min-h-screen p-5 pt-24 relative overflow-hidden
+                       bg-gradient-to-br from-white to-gray-100
+                       dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
             variants={pageVariants}
             initial="hidden"
             animate="visible"
         >
-            {/* Subtle background glow/design elements (consistent positioning) */}
-            <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl opacity-30"></div>
-            <div className="absolute bottom-[15%] right-[10%] w-80 h-80 bg-purple-500/10 rounded-full blur-3xl opacity-30"></div>
+            {/* Subtle background glow/design elements for Dark Mode */}
+            <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl opacity-30 dark:block hidden"></div>
+            <div className="absolute bottom-[15%] right-[10%] w-80 h-80 bg-purple-500/10 rounded-full blur-3xl opacity-30 dark:block hidden"></div>
+
+            {/* Subtle background glow/design elements for Light Mode */}
+            <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-rose-200/50 rounded-full blur-3xl opacity-50 dark:hidden block"></div>
+            <div className="absolute bottom-[15%] right-[10%] w-80 h-80 bg-sky-200/50 rounded-full blur-3xl opacity-50 dark:hidden block"></div>
 
             <motion.div
-                className="bg-gray-900 p-8 md:p-10 rounded-xl shadow-2xl border border-gray-700 w-full max-w-md relative z-10 text-center"
+                className="p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-md relative z-10 text-center
+                           bg-white border border-gray-200
+                           dark:bg-gray-900 dark:border-gray-700 dark:shadow-2xl"
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
             >
-                <MailCheck className="w-20 h-20 mx-auto text-lime-400 mb-6 drop-shadow-md" /> {/* Prominent icon */}
-                <h1 className="text-4xl font-extrabold text-lime-400 mb-4 drop-shadow-md">
+                <MailCheck className="w-20 h-20 mx-auto mb-6 drop-shadow-md
+                                     text-indigo-600 dark:text-lime-400" />
+                <h1 className="text-4xl font-extrabold mb-4 drop-shadow-md
+                           text-indigo-600 dark:text-lime-400">
                     Verify Your Email
                 </h1>
-                <p className="text-lg text-gray-400 mb-8 leading-relaxed">
+                <p className="text-lg mb-8 leading-relaxed
+                          text-gray-600 dark:text-gray-400">
                     A verification link has been sent to your email address. Please check your inbox (and spam folder!) to complete your registration.
                 </p>
-                <p className="text-md text-gray-500 mb-6">
+                <p className="text-md mb-6
+                          text-gray-500 dark:text-gray-500">
                     Didn't receive the email?
                 </p>
                 <form onSubmit={handleResendEmail}>
                     <motion.button
                         type="submit"
-                        className={`w-full flex items-center justify-center font-bold py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-98 shadow-lg ${
+                        className={`w-full flex items-center justify-center font-bold py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 active:scale-98 shadow-lg ${
                             loading
-                                ? "bg-blue-800 text-gray-400 cursor-not-allowed" // Darker disabled state
-                                : "bg-blue-600 hover:bg-blue-700 text-white"
+                                ? "bg-gray-400 text-gray-700 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400"
+                                : "bg-teal-600 hover:bg-teal-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-500"
                         }`}
                         disabled={loading}
                         variants={buttonVariants}
@@ -117,8 +126,9 @@ const ResendEmail = () => {
                         )}
                     </motion.button>
                 </form>
-                <p className="text-center mt-6 text-gray-500 text-sm">
-                    You will be redirected to the homepage in 1.5 minutes if you do not resend.
+                <p className="text-center mt-6 text-sm
+                             text-gray-500 dark:text-gray-500">
+                    You'll be redirected to the homepage in 1.5 minutes if you don't resend.
                 </p>
             </motion.div>
         </motion.div>

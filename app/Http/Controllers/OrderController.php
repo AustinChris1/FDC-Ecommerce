@@ -352,7 +352,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateOrder($orderNumber, Request $request)
+   public function updateOrder($orderNumber, Request $request)
     {
         // 1. Find the order
         $order = Order::where('order_number', $orderNumber)->first();
@@ -364,7 +364,7 @@ class OrderController extends Controller
             ], 404);
         }
 
-        // 2. Define validation rules. Add 'status' to the rules.
+        // 2. Define validation rules.
         $rules = [
             'user_info.fullName' => 'required|string|max:255',
             'user_info.email' => 'required|email|max:255',
@@ -379,11 +379,13 @@ class OrderController extends Controller
             'items.*.name' => 'required|string',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
-            'grand_total' => 'required|numeric|min:0',
+            'total_price' => 'required|numeric|min:0', // Ensure this matches your frontend payload
             'shipping_cost' => 'required|numeric|min:0',
-            // grand_total is repeated in your original rules, removed the duplicate
+            'grand_total' => 'required|numeric|min:0',
             'payment_method' => 'required|string|in:paystack,bank_transfer,credit_card,cash_on_delivery',
-            'status' => 'required|string|in:pending_payment,processing_paystack_payment,processing_bank_transfer_payment,pending_confirmation,processing,shipped,pending_delivery,completed,cancelled,payment_canceled,payment_failed', // Add status validation
+            'status' => 'required|string|in:pending_payment,processing_paystack_payment,processing_bank_transfer_payment,pending_confirmation,processing,shipped,pending_delivery,completed,cancelled,payment_canceled,payment_failed',
+            'subtotal' => 'nullable|numeric|min:0', // Added as nullable for consistency with placeOrder if needed
+            'discount_amount' => 'nullable|numeric|min:0', // Added as nullable
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -397,21 +399,14 @@ class OrderController extends Controller
             ], 400);
         }
 
-        // 3. Check if order status allows updates (optional, depending on your workflow)
-        // You might want to allow status changes even for 'completed' etc., if an admin needs to correct something.
-        // If an admin is using this, they might need to override status restrictions.
-        // For now, let's allow all updates, but specifically handle status changes.
-        // If you want to keep the restriction for other fields, then keep the below logic,
-        // but for status updates, admins typically need full control.
-        /*
-        $unmodifiableStatuses = ['completed', 'shipped', 'cancelled'];
-        if (in_array($order->status, $unmodifiableStatuses) && $request->input('status') === $order->status) {
-             return response()->json([
-                 'status' => 403,
-                 'message' => "Order with status '{$order->status}' cannot be modified."
-             ], 403);
+        // 3. Check if order status allows updates
+        $finalizedStatuses = ['completed', 'shipped', 'cancelled', 'payment_canceled', 'payment_failed'];
+        if (in_array($order->status, $finalizedStatuses) && $request->input('status') !== $order->status) {
+            return response()->json([
+                'status' => 403,
+                'message' => "Order with status '{$order->status}' cannot be modified by a user in checkout."
+            ], 403);
         }
-        */
 
         try {
             $oldPaymentMethod = $order->payment_method;
@@ -432,8 +427,8 @@ class OrderController extends Controller
 
             // Order Totals and Method
             $order->items_json = json_encode($request->input('items')); // Store items as JSON string
-            $order->subtotal = $request->input('subtotal', $order->subtotal); // Add subtotal if it's part of your update payload
-            $order->discount_amount = $request->input('discount_amount', $order->discount_amount); // Add discount
+            $order->subtotal = $request->input('total_price', $order->subtotal); // Assuming total_price from frontend is subtotal
+            $order->discount_amount = $request->input('discount_amount', $order->discount_amount ?? 0); // Default to 0 if not set
             $order->shipping_cost = $request->input('shipping_cost');
             $order->grand_total = $request->input('grand_total');
             $order->payment_method = $request->input('payment_method');
@@ -442,46 +437,52 @@ class OrderController extends Controller
             if ($oldPaymentMethod === 'paystack' && $request->input('payment_method') === 'bank_transfer') {
                 $order->paystack_reference = null; // Clear if switching from Paystack to bank transfer
             } elseif ($oldPaymentMethod === 'bank_transfer' && $request->input('payment_method') === 'paystack') {
-                // If switching from bank transfer to Paystack, re-use existing order number as reference
-                // or generate a new one if you need unique references for each Paystack attempt
-                $order->paystack_reference = $order->order_number; // Or generate a new one if necessary
+                if (is_null($order->paystack_reference)) {
+                    // This creates a new reference if one isn't present when switching to Paystack
+                    $order->paystack_reference = 'FDC-' . time() . '-' . rand(1000, 9999);
+                }
             }
 
-            // --- IMPORTANT: Handle Status Changes and Set Timestamps ---
             $newStatus = $request->input('status');
             if ($newStatus !== $oldStatus) {
                 $order->status = $newStatus; // Update the status
 
                 switch ($newStatus) {
                     case 'shipped':
-                        if (is_null($order->shipped_at)) { // Only set if not already set
-                            $order->shipped_at = now();
-                        }
+                        // Only set if not already set, or if explicitly changed to this status
+                        $order->shipped_at = $order->shipped_at ?? Carbon::now();
+                        $order->out_for_delivery_at = null;
+                        $order->delivered_at = null;
+                        $order->cancelled_at = null;
                         break;
-                    case 'pending_delivery': // Assuming this means 'out for delivery'
-                        if (is_null($order->out_for_delivery_at)) {
-                            $order->out_for_delivery_at = now();
-                        }
+                    case 'pending_delivery':
+                        $order->out_for_delivery_at = $order->out_for_delivery_at ?? Carbon::now();
+                        $order->shipped_at = $order->shipped_at ?? Carbon::now();
+                        $order->delivered_at = null;
+                        $order->cancelled_at = null;
                         break;
                     case 'completed':
-                        if (is_null($order->delivered_at)) {
-                            $order->delivered_at = now();
-                        }
-                        // Optionally, if an order is completed, clear other pending timestamps
-                        $order->shipped_at = $order->shipped_at ?? now();
-                        $order->out_for_delivery_at = $order->out_for_delivery_at ?? now();
+                        $order->delivered_at = $order->delivered_at ?? Carbon::now();
+                        // Ensure all preceding successful timestamps are set
+                        $order->shipped_at = $order->shipped_at ?? Carbon::now();
+                        $order->out_for_delivery_at = $order->out_for_delivery_at ?? Carbon::now();
+                        $order->cancelled_at = null;
                         break;
                     case 'cancelled':
                     case 'payment_canceled':
-                        if (is_null($order->cancelled_at)) {
-                            $order->cancelled_at = now();
-                        }
+                    case 'payment_failed':
+                        $order->cancelled_at = $order->cancelled_at ?? Carbon::now();
+                        // Clear successful progression timestamps
+                        $order->shipped_at = null;
+                        $order->out_for_delivery_at = null;
+                        $order->delivered_at = null;
                         break;
-                    // For other statuses, clear relevant timestamps if the order goes back
-                    // For example, if it goes from shipped back to processing, clear shipped_at
-                    case 'processing':
+                    // For statuses that are 'earlier' in the flow, clear later timestamps
                     case 'pending_payment':
+                    case 'processing_paystack_payment':
+                    case 'processing_bank_transfer_payment':
                     case 'pending_confirmation':
+                    case 'processing':
                         $order->shipped_at = null;
                         $order->out_for_delivery_at = null;
                         $order->delivered_at = null;
@@ -504,6 +505,7 @@ class OrderController extends Controller
                 'delivered_at' => $order->delivered_at,
                 'cancelled_at' => $order->cancelled_at,
             ], 200);
+
         } catch (\Exception $e) {
             Log::error("Order Update Error for {$orderNumber}: " . $e->getMessage() . " on line " . $e->getLine() . " in " . $e->getFile());
             return response()->json([
@@ -512,7 +514,6 @@ class OrderController extends Controller
             ], 500);
         }
     }
-
     //Add paystack webhook endpoint
     public function handleWebhook(Request $request)
     {

@@ -54,7 +54,7 @@ const slides = [
         buttonText: "Ignite Savings",
         buttonLink: "/flash-sales",
         buttonIcon: <Flame className="w-5 h-5 mr-2" />,
-        icon: <Zap className="w-8 h-8 mr-3 text-yellow-300 transform rotate-[-10deg]" />,
+        icon: <Zap className="w-8 h-8 mr-3 dark:text-yellow-300 text-yellow-600 transform rotate-[-10deg]" />,
         backgroundImage: 'https://plus.unsplash.com/premium_photo-1661682801696-e499fa39ac0e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aGFwcHklMjBibGFjayUyMHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D',
         uniqueAnimationProps: {
             preTitle: { y: -50, opacity: 0, scale: 0.8 },
@@ -65,19 +65,19 @@ const slides = [
         backgroundElements: (
             <>
                 <motion.div
-                    className="absolute top-[5%] left-[10%] w-[180px] h-[180px] sm:w-[280px] sm:h-[280px] bg-red-600/25 rounded-full"
+                    className="absolute top-[5%] left-[10%] w-[180px] h-[180px] sm:w-[280px] sm:h-[280px] dark:bg-red-600/25 bg-red-300/30 rounded-full"
                     style={{ filter: 'blur(120px)' }}
                     animate={{ scale: [0.9, 1.3, 0.9], opacity: [0.5, 0.9, 0.5], rotate: [0, 360] }}
                     transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                    className="absolute bottom-[3%] right-[15%] w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] bg-orange-500/25 rounded-full"
+                    className="absolute bottom-[3%] right-[15%] w-[120px] h-[120px] sm:w-[220px] sm:h-[220px] dark:bg-orange-500/25 bg-orange-200/30 rounded-full"
                     style={{ filter: 'blur(110px)' }}
                     animate={{ scale: [1.3, 0.9, 1.3], opacity: [0.9, 0.5, 0.9], rotate: [360, 0] }}
                     transition={{ duration: 9, repeat: Infinity, ease: "linear", delay: 0.5 }}
                 />
                 <motion.div
-                    className="absolute top-[20%] left-[45%] text-red-400/70"
+                    className="absolute top-[20%] left-[45%] dark:text-red-400/70 text-red-600/70"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: [0, 1, 0], y: [-20, 0, 20] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.2, ease: "easeInOut" }}
@@ -85,7 +85,7 @@ const slides = [
                     <Percent className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
-                    className="absolute bottom-[25%] left-[20%] text-yellow-400/70"
+                    className="absolute bottom-[25%] left-[20%] dark:text-yellow-400/70 text-yellow-600/70"
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5], rotate: [0, 180] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
@@ -93,7 +93,7 @@ const slides = [
                     <Tag className="w-10 h-10 sm:w-12 sm:h-12" />
                 </motion.div>
                 <motion.div
-                    className="absolute top-[35%] right-[5%] text-orange-400/70"
+                    className="absolute top-[35%] right-[5%] dark:text-orange-400/70 text-orange-600/70"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: [0, 1, 0], x: [20, 0, -20] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 0.8, ease: "easeInOut" }}
@@ -101,7 +101,7 @@ const slides = [
                     <Star className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
-                    className="absolute top-[5%] right-[25%] text-red-500/60"
+                    className="absolute top-[5%] right-[25%] dark:text-red-500/60 text-red-700/60"
                     initial={{ opacity: 0, scale: 0.7 }}
                     animate={{ opacity: [0, 0.8, 0], scale: [0.7, 1.1, 0.7], rotate: [0, 90, 180] }}
                     transition={{ duration: 2.5, repeat: Infinity, delay: 0.3, ease: "easeInOut" }}
@@ -109,7 +109,7 @@ const slides = [
                     <Zap className="w-6 h-6 sm:w-8 sm:h-8" />
                 </motion.div>
                 <motion.div
-                    className="absolute bottom-[10%] left-[40%] text-yellow-500/60"
+                    className="absolute bottom-[10%] left-[40%] dark:text-yellow-500/60 text-yellow-700/60"
                     initial={{ opacity: 0, y: -30 }}
                     animate={{ opacity: [0, 0.8, 0], y: [-30, 0, 30] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.6, ease: "easeInOut" }}
@@ -120,10 +120,10 @@ const slides = [
         ),
         additionalIcons: (
             <>
-                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white/80 animate-pulse" />
-                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-white/80 animate-bounce-slow" />
-                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-white/80 animate-slide-right" />
-                <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80 animate-pulse" />
+                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80 animate-bounce-slow" />
+                <Truck className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80 animate-slide-right" />
+                <Wallet className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
             </>
         ),
     },
@@ -135,7 +135,7 @@ const slides = [
         buttonText: "Claim Awoof",
         buttonLink: "/",
         buttonIcon: <Gift className="w-5 h-5 mr-2" />,
-        icon: <Sparkles className="w-8 h-8 mr-3 text-lime-400 transform scale-125" />,
+        icon: <Sparkles className="w-8 h-8 mr-3 dark:text-lime-400 text-lime-600 transform scale-125" />,
         backgroundImage: 'https://images.unsplash.com/photo-1655720362153-1bbfa72c2d13?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGFwcHklMjBibGFjayUyMHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D',
         uniqueAnimationProps: {
             preTitle: { opacity: 0, y: -40 },
@@ -146,19 +146,19 @@ const slides = [
         backgroundElements: (
             <>
                 <motion.div
-                    className="absolute top-[15%] left-[20%] w-[100px] h-[100px] sm:w-[180px] sm:h-[180px] bg-green-500/20 rounded-xl rotate-45"
+                    className="absolute top-[15%] left-[20%] w-[100px] h-[100px] sm:w-[180px] sm:h-[180px] dark:bg-green-500/20 bg-green-300/30 rounded-xl rotate-45"
                     style={{ filter: 'blur(80px)' }}
                     animate={{ y: ["-10%", "10%", "-10%"], x: ["-5%", "5%", "-5%"], rotate: [45, 90, 45] }}
                     transition={{ duration: 12, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute bottom-[10%] right-[25%] w-[80px] h-[80px] sm:w-[150px] sm:h-[150px] bg-blue-400/20 rounded-full"
+                    className="absolute bottom-[10%] right-[25%] w-[80px] h-[80px] sm:w-[150px] sm:h-[150px] dark:bg-blue-400/20 bg-blue-200/30 rounded-full"
                     style={{ filter: 'blur(70px)' }}
                     animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
                 />
                 <motion.div
-                    className="absolute top-[40%] right-[10%] text-green-300/70"
+                    className="absolute top-[40%] right-[10%] dark:text-green-300/70 text-green-600/70"
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5], rotate: [0, -180] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 0.7, ease: "easeInOut" }}
@@ -166,7 +166,7 @@ const slides = [
                     <Gift className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
-                    className="absolute bottom-[30%] left-[5%] text-teal-300/70"
+                    className="absolute bottom-[30%] left-[5%] dark:text-teal-300/70 text-teal-600/70"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: [0, 1, 0], x: [-20, 0, 20] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.4, ease: "easeInOut" }}
@@ -177,10 +177,10 @@ const slides = [
         ),
         additionalIcons: (
             <>
-                <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-white/80 animate-bounce" />
-                <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <Star className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+                <Gift className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80 animate-bounce" />
+                <Tag className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <Wallet className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
             </>
         ),
     },
@@ -192,7 +192,7 @@ const slides = [
         buttonText: "Track Your Order",
         buttonLink: "/track-order",
         buttonIcon: <Truck className="w-5 h-5 mr-2" />,
-        icon: <Package className="w-8 h-8 mr-3 text-sky-400 animate-pulse" />,
+        icon: <Package className="w-8 h-8 mr-3 dark:text-sky-400 text-sky-600 animate-pulse" />,
         backgroundImage: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhhcHB5JTIwYmxhY2slMjBwZXJzb258ZW58MHx8MHx8fDA%3D',
         uniqueAnimationProps: {
             preTitle: { opacity: 0, y: -30 },
@@ -203,25 +203,25 @@ const slides = [
         backgroundElements: (
             <>
                 <motion.div
-                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] bg-cyan-400/15"
+                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] dark:bg-cyan-400/15 bg-cyan-200/20"
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["-100%", "100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] bg-indigo-400/15"
+                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] dark:bg-indigo-400/15 bg-indigo-200/20"
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["100%", "-100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear", delay: 1 }}
                 />
                 <motion.div
-                    className="absolute inset-0 [mask-image:radial-gradient(transparent,black)] [background-size:20px_20px] sm:[background-size:40px_40px] [background-image:linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] opacity-20"
+                    className="absolute inset-0 [mask-image:radial-gradient(transparent,black)] [background-size:20px_20px] sm:[background-size:40px_40px] dark:[background-image:linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-image:linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:opacity-20 opacity-30"
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1, opacity: [0.1, 0.25, 0.1] }}
                     transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 ></motion.div>
                 <motion.div
-                    className="absolute top-[25%] left-[15%] text-white/50"
+                    className="absolute top-[25%] left-[15%] dark:text-white/50 text-gray-700/50"
                     initial={{ opacity: 0, y: -30 }}
                     animate={{ opacity: [0, 1, 0], y: [-30, 0, 30] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.2, ease: "easeInOut" }}
@@ -229,7 +229,7 @@ const slides = [
                     <Cloud className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
-                    className="absolute bottom-[20%] right-[10%] text-white/50"
+                    className="absolute bottom-[20%] right-[10%] dark:text-white/50 text-gray-700/50"
                     initial={{ opacity: 0, scale: 0.6 }}
                     animate={{ opacity: [0, 1, 0], scale: [0.6, 1.1, 0.6], rotate: [0, 360] }}
                     transition={{ duration: 4.5, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
@@ -240,10 +240,10 @@ const slides = [
         ),
         additionalIcons: (
             <>
-                <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-white/80 animate-pulse" />
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <Cloud className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+                <Truck className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80 animate-pulse" />
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <Cloud className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
             </>
         ),
     },
@@ -255,7 +255,7 @@ const slides = [
         buttonText: "Shop All Essentials",
         buttonLink: "/trending",
         buttonIcon: <ShoppingCart className="w-5 h-5 mr-2" />,
-        icon: <ShoppingBag className="w-8 h-8 mr-3 text-purple-400 transform scale-110" />,
+        icon: <ShoppingBag className="w-8 h-8 mr-3 dark:text-purple-400 text-purple-600 transform scale-110" />,
         backgroundImage: 'https://images.unsplash.com/photo-1542849887-f70517865241?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         uniqueAnimationProps: {
             preTitle: { opacity: 0, y: 20 },
@@ -266,19 +266,19 @@ const slides = [
         backgroundElements: (
             <>
                 <motion.div
-                    className="absolute top-[10%] left-[10%] w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] bg-purple-500/20 rounded-full"
+                    className="absolute top-[10%] left-[10%] w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] dark:bg-purple-500/20 bg-purple-300/30 rounded-full"
                     style={{ filter: 'blur(150px)', transform: 'translate(-50%, -50%)' }}
                     animate={{ opacity: [0.3, 0.8, 0.3], scale: [1, 1.05, 1] }}
                     transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute bottom-[10%] right-[10%] w-[150px] h-[150px] sm:w-[250px] sm:h-[250px] bg-fuchsia-400/20 rounded-full"
+                    className="absolute bottom-[10%] right-[10%] w-[150px] h-[150px] sm:w-[250px] sm:h-[250px] dark:bg-fuchsia-400/20 bg-fuchsia-200/30 rounded-full"
                     style={{ filter: 'blur(100px)' }}
                     animate={{ y: ["-15%", "15%"], x: ["-15%", "15%"] }}
                     transition={{ duration: 11, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute top-[20%] left-[25%] text-purple-300/60"
+                    className="absolute top-[20%] left-[25%] dark:text-purple-300/60 text-purple-600/60"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: [0, 1, 0], scale: [0.8, 1.2, 0.8], rotate: [0, 360] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.3, ease: "easeInOut" }}
@@ -286,7 +286,7 @@ const slides = [
                     <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12" />
                 </motion.div>
                 <motion.div
-                    className="absolute bottom-[20%] left-[30%] text-pink-300/60"
+                    className="absolute bottom-[20%] left-[30%] dark:text-pink-300/60 text-pink-600/60"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: [0, 1, 0], x: [-20, 0, 20] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 0.6, ease: "easeInOut" }}
@@ -294,7 +294,7 @@ const slides = [
                     <Star className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
-                    className="absolute top-[40%] right-[20%] text-fuchsia-300/60"
+                    className="absolute top-[40%] right-[20%] dark:text-fuchsia-300/60 text-fuchsia-600/60"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: [0, 1, 0], y: [20, 0, -20] }}
                     transition={{ duration: 4.2, repeat: Infinity, delay: 0.9, ease: "easeInOut" }}
@@ -305,10 +305,10 @@ const slides = [
         ),
         additionalIcons: (
             <>
-                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <Star className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
-                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <Tag className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
+                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 dark:text-white/80 text-gray-700/80" />
             </>
         ),
     }
@@ -347,7 +347,7 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
                             <Link to={slide.buttonLink} className="relative w-full h-full flex items-center justify-center text-center cursor-pointer">
                                 {/* Layer 1: Contextual Background Image (Prominent but filtered) */}
                                 <div
-                                    className="absolute inset-0 z-0 opacity-40"
+                                    className="absolute inset-0 z-0 dark:opacity-40 opacity-60"
                                     style={{
                                         backgroundImage: `url(${slide.backgroundImage})`,
                                         backgroundSize: 'cover',
@@ -357,7 +357,7 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
                                 ></div>
 
                                 {/* Layer 2: Gradient Overlay with Brand Colors (Dominant color layer) */}
-                                <div className={`absolute inset-0 z-10 bg-gradient-to-br ${slide.bgColor || 'from-gray-800/70 to-black/70'}`}></div>
+                                <div className={`absolute inset-0 z-10 bg-gradient-to-br ${slide.bgColor || 'dark:from-gray-800/70 dark:to-black/70 from-white/70 to-gray-200/70'}`}></div>
 
                                 {/* Layer 3: Dynamic & Thematic Background Elements */}
                                 <motion.div
@@ -371,13 +371,14 @@ const HeroSlider = ({ products = [], handleAddToCart }) => {
 
                                 {/* Layer 4: Content Area with Enhanced Animations */}
                                 <motion.div
-className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-10 lg:pb-10 lg:pt-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto text-white perspective-1000"                                    variants={contentContainerVariants}
+                                    className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 md:pt-6 lg:px-10 lg:pb-10 lg:pt-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto dark:text-white text-gray-900 perspective-1000"
+                                    variants={contentContainerVariants}
                                     initial="hidden"
                                     animate={isActive ? "visible" : "hidden"}
                                 >
                                     {/* PreTitle with icon */}
                                     <motion.h2
-                                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-wider opacity-90 mb-2 sm:mb-3 flex items-center justify-center" 
+                                        className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-wider dark:opacity-90 opacity-80 mb-2 sm:mb-3 flex items-center justify-center"
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.preTitle || { opacity: 0, y: -20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -389,14 +390,14 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
 
                                     {/* Main Title */}
                                     <motion.h1
-                                        className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tighter drop-shadow-3xl mb-2 sm:mb-4 text-shadow-lg" 
+                                        className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tighter dark:drop-shadow-3xl drop-shadow-lg mb-2 sm:mb-4 dark:text-shadow-lg text-shadow-sm-light"
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.title}
                                         animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, skewY: 0, filter: 'blur(0px)' }}
                                         transition={{ ...slideItemVariants.visible.transition, delay: 0.3 }}
                                     >
                                         {slide.title.split(' ').map((word, index) => (
-                                            <span key={index} className={word.includes(':') || word.includes('!') || word.includes('💥') ? 'text-yellow-400 animate-pulse-fast' : ''}>
+                                            <span key={index} className={word.includes(':') || word.includes('!') || word.includes('💥') ? 'dark:text-yellow-400 text-yellow-700 animate-pulse-fast' : ''}>
                                                 {word}{' '}
                                             </span>
                                         ))}
@@ -404,7 +405,7 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
 
                                     {/* Subtitle */}
                                     {/* <motion.p
-                                        className="text-base sm:text-lg md:text-xl lg:text-xl font-light leading-relaxed mb-6 sm:mb-8 opacity-95 drop-shadow-xl max-w-2xl mx-auto"
+                                        className="text-base sm:text-lg md:text-xl lg:text-xl font-light leading-relaxed mb-6 sm:mb-8 dark:opacity-95 opacity-90 dark:drop-shadow-xl drop-shadow-md max-w-2xl mx-auto"
                                         variants={slideItemVariants}
                                         initial={slide.uniqueAnimationProps.subtitle}
                                         animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, skewY: 0, filter: 'blur(0px)' }}
@@ -416,7 +417,7 @@ className="relative z-30 px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 md:pb-8 
                                     {/* Additional Icons / Micro-infographics */}
                                     {slide.additionalIcons && (
                                         <motion.div
-                                            className="flex justify-center items-center mt-6 sm:mt-8 space-x-4 sm:space-x-6 opacity-80" // Responsive margin-top and space-x
+                                            className="flex justify-center items-center mt-6 sm:mt-8 space-x-4 sm:space-x-6 dark:opacity-80 opacity-70"
                                             variants={slideItemVariants}
                                             initial={{ opacity: 0, y: 40, scale: 0.9 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}

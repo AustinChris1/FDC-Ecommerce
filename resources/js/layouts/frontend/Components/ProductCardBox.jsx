@@ -20,16 +20,19 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
 
     return (
         <motion.div
-            className="bg-black p-4 rounded-lg shadow-2xl flex flex-col justify-between text-gray-50 border border-gray-700 hover:border-lime-500 transition-colors duration-300 relative overflow-hidden
+            className="dark:bg-black bg-white p-4 rounded-lg shadow-2xl flex flex-col justify-between
+                       dark:text-gray-50 text-gray-800
+                       dark:border-gray-700 border-gray-200
+                       hover:border-lime-500 transition-colors duration-300 relative overflow-hidden
                        h-[320px] sm:h-[350px] md:h-[380px] lg:h-[400px]" // Adjusted responsive fixed heights
             variants={itemVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
         >
-            {/* Gradient Overlay for subtle effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-lime-950/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            {/* Gradient Overlay for subtle effect - adjusted for dual mode */}
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent dark:to-lime-950/10 to-gray-200/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-            <h3 className="text-xl font-bold mb-4 text-left text-white tracking-wide">
+            <h3 className="text-xl font-bold mb-4 text-left dark:text-white text-gray-900 tracking-wide">
                 {title}
             </h3>
 
@@ -39,10 +42,12 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
                     <Link
                         to={`/collections/${product.category?.link || 'default-category'}/${product.link}`}
                         key={product.id || index}
-                        className="group block relative overflow-hidden rounded-md border border-gray-700 hover:border-lime-600 transition-colors duration-300"
+                        className="group block relative overflow-hidden rounded-md
+                                   dark:border-gray-700 border-gray-200
+                                   hover:border-lime-600 transition-colors duration-300"
                     >
                         {/* Removed aspect-w/h and used flexbox for image sizing within its container */}
-                        <div className="w-full h-full flex items-center justify-center bg-gray-950"> {/* Added bg-gray-800 for placeholders */}
+                        <div className="w-full h-full flex items-center justify-center dark:bg-gray-950 bg-gray-50"> {/* Added bg-gray-800 for placeholders */}
                             <img
                                 src={product.image || `https://placehold.co/150x150/2d3748/cbd5e0?text=${product.name.substring(0, Math.min(product.name.length, 10))}`} // Adjusted placeholder text length
                                 alt={product.name}
@@ -50,7 +55,7 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
                                 onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/150x150/2d3748/cbd5e0?text=${product.name.substring(0, Math.min(product.name.length, 10))}`; }}
                             />
                         </div>
-                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1">
+                        <div className="absolute inset-0 dark:bg-black dark:bg-opacity-40 bg-gray-900 bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1">
                             <span className="text-white text-xs text-center line-clamp-2">{product.name}</span>
                         </div>
                     </Link>
@@ -60,7 +65,9 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
             <div className="mt-4 text-left"> {/* Slightly reduced margin-top */}
                 <Link
                     to={linkHref}
-                    className="text-lime-400 hover:text-lime-300 hover:underline text-sm font-semibold flex items-center group"
+                    className="dark:text-lime-400 text-lime-700
+                               dark:hover:text-lime-300 hover:text-lime-600
+                               hover:underline text-sm font-semibold flex items-center group"
                 >
                     {linkText}
                     <motion.span

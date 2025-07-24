@@ -90,9 +90,6 @@ const Top = () => {
         fetchData();
     }, []);
 
-    // REMOVED: The incorrect `discountPercentage` calculation outside the useEffect.
-    // That variable was not scoped correctly for individual products.
-
     // Memoized product subsets for the boxes
     const everydayPricesProducts = useMemo(() =>
         products.filter(p => p.qty > 0).sort(() => 0.5 - Math.random()).slice(0, 4),
@@ -123,19 +120,14 @@ const Top = () => {
         [products]
     );
 
-
     // This is the main container for your homepage content
     return (
-        <div className="relative w-full overflow-hidden bg-gray-950 mt-10 min-h-screen">
-            {/* Hero Section - The Slider */}
-            {/* Kept original height values as per your request not to change styling */}
+        <div className="relative w-full overflow-hidden dark:bg-gray-950 bg-white mt-10 min-h-screen">
             <div ref={heroSectionRef} className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden">
                 <HeroSlider products={products} handleAddToCart={addToCart} />
             </div>
 
-            {/* Overlaying Product Showcase Boxes */}
-            {/* Kept original margin-top values as per your request not to change styling */}
-            <div className="relative z-40 px-4 md:px-8 -mt-40 md:-mt-60 lg:-mt-80 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-10">
+            <div className="relative z-30 px-4 md:px-8 -mt-40 md:-mt-60 lg:-mt-80 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-10">
                 {loading ? (
                     <div className="col-span-full flex justify-center items-center h-[300px]">
                         <Load />

@@ -135,36 +135,36 @@ const UserOrderDetail = () => {
         clonedElement.style.top = '-9999px';
 
         // Override specific Tailwind-like classes for light theme
-        clonedElement.querySelectorAll('.bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF'); // Main background
-        clonedElement.querySelectorAll('.bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8'); // Card backgrounds
-        clonedElement.querySelectorAll('.bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2'); // Alternating table rows
-        clonedElement.querySelectorAll('.bg-gray-800').forEach(el => el.style.backgroundColor = '#E9E9E9'); // Table header/other backgrounds
+        clonedElement.querySelectorAll('.dark\\:bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF'); // Main background
+        clonedElement.querySelectorAll('.dark\\:bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8'); // Card backgrounds
+        clonedElement.querySelectorAll('.dark\\:bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2'); // Alternating table rows
+        clonedElement.querySelectorAll('.dark\\:bg-gray-800').forEach(el => el.style.backgroundColor = '#E9E9E9'); // Table header/other backgrounds
 
-        clonedElement.querySelectorAll('.text-gray-200').forEach(el => el.style.color = '#333333');
-        clonedElement.querySelectorAll('.text-gray-300').forEach(el => el.style.color = '#555555');
-        clonedElement.querySelectorAll('.text-gray-400').forEach(el => el.style.color = '#777777');
-        clonedElement.querySelectorAll('.text-white').forEach(el => el.style.color = '#333333'); // Text that was originally white
+        clonedElement.querySelectorAll('.dark\\:text-gray-200').forEach(el => el.style.color = '#333333');
+        clonedElement.querySelectorAll('.dark\\:text-gray-300').forEach(el => el.style.color = '#555555');
+        clonedElement.querySelectorAll('.dark\\:text-gray-400').forEach(el => el.style.color = '#777777');
+        clonedElement.querySelectorAll('.dark\\:text-white').forEach(el => el.style.color = '#333333'); // Text that was originally white
 
         // Adjust specific accent colors for better contrast on light background
-        clonedElement.querySelectorAll('.text-blue-400').forEach(el => el.style.color = '#0066CC'); // Darker blue
-        clonedElement.querySelectorAll('.text-yellow-300').forEach(el => el.style.color = '#CC9900'); // Darker yellow/gold
-        clonedElement.querySelectorAll('.text-emerald-400').forEach(el => el.style.color = '#008000'); // Darker green for grand total
-        clonedElement.querySelectorAll('.text-purple-400').forEach(el => el.style.color = '#800080'); // Darker purple
-        clonedElement.querySelectorAll('.text-orange-400').forEach(el => el.style.color = '#FF8C00'); // Darker orange
+        clonedElement.querySelectorAll('.dark\\:text-blue-400').forEach(el => el.style.color = '#0066CC'); // Darker blue
+        clonedElement.querySelectorAll('.dark\\:text-yellow-300').forEach(el => el.style.color = '#CC9900'); // Darker yellow/gold
+        clonedElement.querySelectorAll('.dark\\:text-emerald-400').forEach(el => el.style.color = '#008000'); // Darker green for grand total
+        clonedElement.querySelectorAll('.dark\\:text-purple-400').forEach(el => el.style.color = '#800080'); // Darker purple
+        clonedElement.querySelectorAll('.dark\\:text-orange-400').forEach(el => el.style.color = '#FF8C00'); // Darker orange
 
         // Status pill backgrounds and text
-        clonedElement.querySelectorAll('.bg-green-600').forEach(el => { el.style.backgroundColor = '#D4EDDA'; el.style.color = '#155724'; });
-        clonedElement.querySelectorAll('.bg-orange-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
-        clonedElement.querySelectorAll('.bg-yellow-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
-        clonedElement.querySelectorAll('.bg-indigo-500').forEach(el => { el.style.backgroundColor = '#CCE5FF'; el.style.color = '#004085'; });
-        clonedElement.querySelectorAll('.bg-red-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
-        clonedElement.querySelectorAll('.bg-pink-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
-        clonedElement.querySelectorAll('.bg-purple-600').forEach(el => { el.style.backgroundColor = '#E2BBEB'; el.style.color = '#4A005B'; });
-        clonedElement.querySelectorAll('.bg-gray-600').forEach(el => { el.style.backgroundColor = '#E2E6EA'; el.style.color = '#495057'; });
+        clonedElement.querySelectorAll('.dark\\:bg-green-600').forEach(el => { el.style.backgroundColor = '#D4EDDA'; el.style.color = '#155724'; });
+        clonedElement.querySelectorAll('.dark\\:bg-orange-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
+        clonedElement.querySelectorAll('.dark\\:bg-yellow-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
+        clonedElement.querySelectorAll('.dark\\:bg-indigo-500').forEach(el => { el.style.backgroundColor = '#CCE5FF'; el.style.color = '#004085'; });
+        clonedElement.querySelectorAll('.dark\\:bg-red-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
+        clonedElement.querySelectorAll('.dark\\:bg-pink-600').forEach(el => { el.style.backgroundColor = '#F8D7DA'; el.style.color = '#721C24'; });
+        clonedElement.querySelectorAll('.dark\\:bg-purple-600').forEach(el => { el.style.backgroundColor = '#E2BBEB'; el.style.color = '#4A005B'; });
+        clonedElement.querySelectorAll('.dark\\:bg-gray-600').forEach(el => { el.style.backgroundColor = '#E2E6EA'; el.style.color = '#495057'; });
 
 
-        clonedElement.querySelectorAll('.border-gray-800').forEach(el => el.style.borderColor = '#DDDDDD');
-        clonedElement.querySelectorAll('.divide-gray-700').forEach(el => el.style.borderColor = '#EEEEEE');
+        clonedElement.querySelectorAll('.dark\\:border-gray-800').forEach(el => el.style.borderColor = '#DDDDDD');
+        clonedElement.querySelectorAll('.dark\\:divide-gray-700').forEach(el => el.style.borderColor = '#EEEEEE');
 
 
         // Make the PDF header visible
@@ -232,19 +232,19 @@ const UserOrderDetail = () => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'completed': return 'bg-green-600';
-            case 'pending_delivery': return 'bg-orange-500';
-            case 'pending_payment': return 'bg-yellow-500';
+            case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-600 dark:text-white';
+            case 'pending_delivery': return 'bg-orange-100 text-orange-800 dark:bg-orange-500 dark:text-white';
+            case 'pending_payment': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500 dark:text-white';
             case 'processing_paystack_payment':
             case 'processing_bank_transfer_payment':
             case 'pending_confirmation':
             case 'processing_mock_payment':
-            case 'processing': return 'bg-indigo-500';
+            case 'processing': return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500 dark:text-white';
             case 'cancelled':
-            case 'payment_canceled': return 'bg-red-600';
-            case 'payment_failed': return 'bg-pink-600';
-            case 'shipped': return 'bg-purple-600';
-            default: return 'bg-gray-600';
+            case 'payment_canceled': return 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-white';
+            case 'payment_failed': return 'bg-pink-100 text-pink-800 dark:bg-pink-600 dark:text-white';
+            case 'shipped': return 'bg-purple-100 text-purple-800 dark:bg-purple-600 dark:text-white';
+            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white';
         }
     };
 
@@ -269,7 +269,7 @@ const UserOrderDetail = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+            <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
                 <Load />
             </div>
         );
@@ -278,16 +278,16 @@ const UserOrderDetail = () => {
     if (error || !order) {
         return (
             <motion.div
-                className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-950 text-gray-200 flex items-center justify-center"
+                className="min-h-screen p-4 sm:p-6 lg:p-8 bg-white text-gray-800 dark:bg-gray-950 dark:text-gray-200 flex items-center justify-center"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
-                <div className="bg-gray-900 rounded-xl shadow-lg p-8 text-center border border-gray-800">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-red-500 mb-4 leading-tight">
+                <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-red-600 dark:text-red-500 mb-4 leading-tight">
                         Order Details Not Found
                     </h1>
-                    <p className="text-gray-300 text-lg mb-6">
+                    <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
                         {error || `We couldn't load the details for order number "${orderNumber}". It might be invalid, or an error occurred.`}
                     </p>
                     <Link
@@ -312,7 +312,7 @@ const UserOrderDetail = () => {
 
     return (
         <motion.div
-            className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-950 text-gray-200 pt-24"
+            className="min-h-screen p-4 sm:p-6 lg:p-8 bg-white text-gray-800 dark:bg-gray-950 dark:text-gray-200 pt-24"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -323,9 +323,9 @@ const UserOrderDetail = () => {
             </Helmet>
 
             {/* Header section with title and Back/Download buttons */}
-            <header className="flex mt-20 flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-gray-900 rounded-xl shadow-md p-6 border border-gray-800">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-0">
-                    Order Details: <span className="text-blue-400">#{order.order_number}</span>
+            <header className="flex mt-20 flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white rounded-xl shadow-md p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-0">
+                    Order Details: <span className="text-blue-700 dark:text-blue-400">#{order.order_number}</span>
                 </h1>
                 <div className="flex space-x-3 mt-4 sm:mt-0">
                     <button
@@ -338,7 +338,8 @@ const UserOrderDetail = () => {
                     </button>
                     <Link
                         to="/user/orders"
-                        className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center"
+                        className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 flex items-center
+                        dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200"
                     >
                         <ArrowLeft className="w-5 h-5 mr-2" /> Back to My Orders
                     </Link>
@@ -357,48 +358,48 @@ const UserOrderDetail = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Order Summary Card */}
                     <motion.div
-                        className="lg:col-span-2 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                        className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
                         variants={cardVariants}
                         initial="hidden"
                         animate="visible"
                     >
-                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                            <ShoppingCart className="w-6 h-6 mr-3 text-blue-400" />
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <ShoppingCart className="w-6 h-6 mr-3 text-blue-700 dark:text-blue-400" />
                             Order Summary
                         </h2>
-                        <div className="space-y-3 text-gray-300">
+                        <div className="space-y-3 text-gray-700 dark:text-gray-300">
                             <p className="flex items-center">
-                                <span className="font-semibold w-36 text-gray-400">Order Number:</span>
-                                <span className="ml-2 text-yellow-300">#{order.order_number}</span>
+                                <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Order Number:</span>
+                                <span className="ml-2 text-yellow-700 dark:text-yellow-300">#{order.order_number}</span>
                             </p>
                             <p className="flex items-center">
-                                <span className="font-semibold w-36 text-gray-400">Status:</span>
-                                <span className={`ml-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full text-white ${getStatusColor(order.status)} flex items-center`}>
+                                <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Status:</span>
+                                <span className={`ml-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusColor(order.status)} flex items-center`}>
                                     {getStatusIcon(order.status)}
                                     {order.status.replace(/_/g, ' ')}
                                 </span>
                             </p>
                             <p className="flex items-center">
-                                <span className="font-semibold w-36 text-gray-400">Payment Method:</span>
+                                <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Payment Method:</span>
                                 <span className="ml-2 flex items-center">
-                                    <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
+                                    <CreditCard className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
                                     {order.payment_method.replace(/_/g, ' ')}
                                 </span>
                             </p>
                             {order.paystack_reference && (
                                 <p className="flex items-center">
-                                    <span className="font-semibold w-36 text-gray-400">Paystack Ref:</span>
-                                    <span className="ml-2 text-blue-400 font-medium">{order.paystack_reference}</span>
+                                    <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Paystack Ref:</span>
+                                    <span className="ml-2 text-blue-700 dark:text-blue-400 font-medium">{order.paystack_reference}</span>
                                 </p>
                             )}
                             <p className="flex items-center">
-                                <span className="font-semibold w-36 text-gray-400">Order Date:</span>
+                                <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Order Date:</span>
                                 <span className="ml-2 flex items-center">
-                                    <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                                    <Calendar className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
                                     {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
                                 </span>
                             </p>
-                            <p className="flex items-center text-xl font-bold text-emerald-400 pt-2">
+                            <p className="flex items-center text-xl font-bold text-emerald-700 dark:text-emerald-400 pt-2">
                                 <span className="font-semibold w-36">Grand Total:</span>
                                 <span className="ml-2 flex items-center">
                                     ₦{order.grand_total.toLocaleString()}
@@ -409,40 +410,40 @@ const UserOrderDetail = () => {
 
                     {/* Customer & Shipping Info Card */}
                     <motion.div
-                        className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                        className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
                         variants={cardVariants}
                         initial="hidden"
                         animate="visible"
                         transition={{ delay: 0.1 }}
                     >
-                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                            <User className="w-6 h-6 mr-3 text-purple-400" />
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <User className="w-6 h-6 mr-3 text-purple-700 dark:text-purple-400" />
                             Customer & Shipping
                         </h2>
-                        <div className="space-y-3 text-gray-300">
+                        <div className="space-y-3 text-gray-700 dark:text-gray-300">
                             <p className="flex items-center">
-                                <span className="font-semibold w-24 text-gray-400">Name:</span>
+                                <span className="font-semibold w-24 text-gray-600 dark:text-gray-400">Name:</span>
                                 <span className="ml-2">{order.full_name || 'N/A'}</span>
                             </p>
                             <p className="flex items-center">
-                                <span className="font-semibold w-24 text-gray-400">Email:</span>
+                                <span className="font-semibold w-24 text-gray-600 dark:text-gray-400">Email:</span>
                                 <span className="ml-2 flex items-center break-all">
-                                    <Mail className="w-4 h-4 mr-2 text-gray-500" />
+                                    <Mail className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
                                     {order.email || 'N/A'}
                                 </span>
                             </p>
                             <p className="flex items-center">
-                                <span className="font-semibold w-24 text-gray-400">Phone:</span>
+                                <span className="font-semibold w-24 text-gray-600 dark:text-gray-400">Phone:</span>
                                 <span className="ml-2 flex items-center">
-                                    <Phone className="w-4 h-4 mr-2 text-gray-500" />
+                                    <Phone className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
                                     {order.phone || 'N/A'}
                                 </span>
                             </p>
                             {order.shipping_address1 && (
                                 <p className="flex items-start">
-                                    <span className="font-semibold w-24 pt-1 text-gray-400">Address:</span>
+                                    <span className="font-semibold w-24 pt-1 text-gray-600 dark:text-gray-400">Address:</span>
                                     <span className="ml-2 flex items-start flex-grow">
-                                        <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 flex-shrink-0" />
+                                        <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 dark:text-gray-500 flex-shrink-0" />
                                         <span>
                                             {order.shipping_address1}, {order.shipping_address2 && `${order.shipping_address2}, `}
                                             {order.city}, {order.state}, {order.zip_code}
@@ -451,7 +452,7 @@ const UserOrderDetail = () => {
                                 </p>
                             )}
                             {!order.shipping_address1 && order.is_pos_sale && (
-                                <p className="text-gray-500 text-sm mt-4 italic">
+                                <p className="text-gray-500 dark:text-gray-500 text-sm mt-4 italic">
                                     This was a POS sale (no shipping address recorded).
                                 </p>
                             )}
@@ -461,41 +462,41 @@ const UserOrderDetail = () => {
 
                 {/* Ordered Items Card */}
                 <motion.div
-                    className="mt-6 bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800"
+                    className="mt-6 bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
                     variants={cardVariants}
                     initial="hidden"
                     animate="visible"
                     transition={{ delay: 0.2 }}
                 >
-                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                        <Package className="w-6 h-6 mr-3 text-orange-400" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <Package className="w-6 h-6 mr-3 text-orange-700 dark:text-orange-400" />
                         Ordered Items
                     </h2>
                     {orderItems.length > 0 ? (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-700">
-                                <thead className="bg-gray-800">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gray-100 dark:bg-gray-800">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price (per item)</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Subtotal</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Product Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Quantity</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Price (per item)</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-700">
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {orderItems.map((item, index) => (
-                                        <tr key={index} className="even:bg-gray-850 odd:bg-gray-900">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">{item.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{item.qty || item.quantity}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">₦{item.price.toLocaleString()}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-400">₦{(item.qty * item.price).toLocaleString()}</td>
+                                        <tr key={index} className="even:bg-gray-50 odd:bg-white dark:even:bg-gray-850 dark:odd:bg-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">{item.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.qty || item.quantity}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">₦{item.price.toLocaleString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-700 dark:text-emerald-400">₦{(item.qty * item.price).toLocaleString()}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                     ) : (
-                        <p className="text-gray-400">No items found for this order.</p>
+                        <p className="text-gray-600 dark:text-gray-400">No items found for this order.</p>
                     )}
                 </motion.div>
             </div>

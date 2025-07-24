@@ -103,7 +103,8 @@ const ContactUs = () => {
 
     return (
         <motion.div
-            className="min-h-screen bg-gray-950 text-gray-200 pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center"
+            className="min-h-screen bg-gray-50 text-gray-900 pt-28 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center
+                       dark:bg-gray-950 dark:text-gray-200"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -114,21 +115,23 @@ const ContactUs = () => {
             </Helmet>
 
             <motion.div
-                className="w-full max-w-2xl bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800"
+                className="w-full max-w-2xl bg-white rounded-xl shadow-xl p-6 sm:p-8 lg:p-10 border border-gray-200
+                           dark:bg-gray-900 dark:rounded-xl dark:shadow-2xl dark:p-6 dark:sm:p-8 dark:lg:p-10 dark:border dark:border-gray-800"
                 variants={itemVariants}
             >
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 text-white bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 leading-tight">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 text-gray-800 bg-clip-text
+                           dark:text-white dark:bg-clip-text dark:text-transparent dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-600 leading-tight">
                     Get in Touch
                 </h1>
-                <p className="text-center text-lg text-gray-400 mb-8 max-w-md mx-auto">
+                <p className="text-center text-lg text-gray-600 mb-8 max-w-md mx-auto dark:text-gray-400">
                     We'd love to hear from you! Please fill out the form below.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Name Input */}
                     <motion.div variants={itemVariants}>
-                        <label htmlFor="name" className="block text-gray-400 text-sm font-medium mb-2">
-                            <User className="inline-block w-4 h-4 mr-2 text-indigo-400" /> Your Name
+                        <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2 dark:text-gray-400">
+                            <User className="inline-block w-4 h-4 mr-2 text-indigo-600 dark:text-indigo-400" /> Your Name
                         </label>
                         <input
                             type="text"
@@ -136,18 +139,20 @@ const ContactUs = () => {
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className={`w-full p-3 bg-gray-800 border rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors
-                                ${errors.name ? 'border-red-500' : 'border-gray-700'}`}
+                            className={`w-full p-3 bg-gray-100 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${errors.name ? 'border-red-500' : 'border-gray-300'}
+                                dark:bg-gray-800 dark:border dark:rounded-lg dark:text-gray-200 dark:placeholder-gray-500 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-600 dark:transition-colors
+                                dark:${errors.name ? 'border-red-500' : 'border-gray-700'}`}
                             placeholder="Enter your name"
                             required
                         />
-                        {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name[0]}</p>}
+                        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name[0]}</p>}
                     </motion.div>
 
                     {/* Email Input */}
                     <motion.div variants={itemVariants}>
-                        <label htmlFor="email" className="block text-gray-400 text-sm font-medium mb-2">
-                            <Mail className="inline-block w-4 h-4 mr-2 text-green-400" /> Your Email
+                        <label htmlFor="email" className="block text-gray-700 text-sm font-medium mb-2 dark:text-gray-400">
+                            <Mail className="inline-block w-4 h-4 mr-2 text-green-600 dark:text-green-400" /> Your Email
                         </label>
                         <input
                             type="email"
@@ -155,18 +160,20 @@ const ContactUs = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={`w-full p-3 bg-gray-800 border rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors
-                                ${errors.email ? 'border-red-500' : 'border-gray-700'}`}
+                            className={`w-full p-3 bg-gray-100 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${errors.email ? 'border-red-500' : 'border-gray-300'}
+                                dark:bg-gray-800 dark:border dark:rounded-lg dark:text-gray-200 dark:placeholder-gray-500 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-600 dark:transition-colors
+                                dark:${errors.email ? 'border-red-500' : 'border-gray-700'}`}
                             placeholder="your.email@example.com"
                             required
                         />
-                        {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email[0]}</p>}
+                        {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email[0]}</p>}
                     </motion.div>
 
                     {/* Subject Input */}
                     <motion.div variants={itemVariants}>
-                        <label htmlFor="subject" className="block text-gray-400 text-sm font-medium mb-2">
-                            <Type className="inline-block w-4 h-4 mr-2 text-yellow-400" /> Subject
+                        <label htmlFor="subject" className="block text-gray-700 text-sm font-medium mb-2 dark:text-gray-400">
+                            <Type className="inline-block w-4 h-4 mr-2 text-yellow-600 dark:text-yellow-400" /> Subject
                         </label>
                         <input
                             type="text"
@@ -174,18 +181,20 @@ const ContactUs = () => {
                             name="subject"
                             value={formData.subject}
                             onChange={handleInputChange}
-                            className={`w-full p-3 bg-gray-800 border rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors
-                                ${errors.subject ? 'border-red-500' : 'border-gray-700'}`}
+                            className={`w-full p-3 bg-gray-100 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${errors.subject ? 'border-red-500' : 'border-gray-300'}
+                                dark:bg-gray-800 dark:border dark:rounded-lg dark:text-gray-200 dark:placeholder-gray-500 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-600 dark:transition-colors
+                                dark:${errors.subject ? 'border-red-500' : 'border-gray-700'}`}
                             placeholder="Reason for your message"
                             required
                         />
-                        {errors.subject && <p className="mt-1 text-sm text-red-400">{errors.subject[0]}</p>}
+                        {errors.subject && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.subject[0]}</p>}
                     </motion.div>
 
                     {/* Message Textarea */}
                     <motion.div variants={itemVariants}>
-                        <label htmlFor="message" className="block text-gray-400 text-sm font-medium mb-2">
-                            <MessageSquare className="inline-block w-4 h-4 mr-2 text-cyan-400" /> Your Message
+                        <label htmlFor="message" className="block text-gray-700 text-sm font-medium mb-2 dark:text-gray-400">
+                            <MessageSquare className="inline-block w-4 h-4 mr-2 text-cyan-600 dark:text-cyan-400" /> Your Message
                         </label>
                         <textarea
                             id="message"
@@ -193,19 +202,22 @@ const ContactUs = () => {
                             value={formData.message}
                             onChange={handleInputChange}
                             rows="5"
-                            className={`w-full p-3 bg-gray-800 border rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors resize-y
-                                ${errors.message ? 'border-red-500' : 'border-gray-700'}`}
+                            className={`w-full p-3 bg-gray-100 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-y
+                                ${errors.message ? 'border-red-500' : 'border-gray-300'}
+                                dark:bg-gray-800 dark:border dark:rounded-lg dark:text-gray-200 dark:placeholder-gray-500 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-blue-600 dark:transition-colors dark:resize-y
+                                dark:${errors.message ? 'border-red-500' : 'border-gray-700'}`}
                             placeholder="Write your message here..."
                             required
                         ></textarea>
-                        {errors.message && <p className="mt-1 text-sm text-red-400">{errors.message[0]}</p>}
+                        {errors.message && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.message[0]}</p>}
                     </motion.div>
 
                     {/* Submit Button */}
                     <motion.button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+                                   dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white dark:font-semibold dark:rounded-lg dark:shadow-md dark:transition-all dark:duration-300 dark:transform dark:hover:scale-105 dark:disabled:opacity-50 dark:disabled:cursor-not-allowed"
                         variants={itemVariants}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}

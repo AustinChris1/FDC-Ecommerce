@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react'; // Icons for accordion toggle
+import { Helmet } from 'react-helmet-async'; // Import Helmet
 
 const faqData = [
     {
@@ -36,7 +37,8 @@ const faqData = [
 ];
 
 const FAQ = () => {
-  document.title = `FAQ - First Digits`;
+    // Replaced document.title with Helmet for better React SEO practices
+    // document.title = `FAQ - First Digits`;
 
     const [openQuestion, setOpenQuestion] = useState(null);
 
@@ -69,17 +71,24 @@ const FAQ = () => {
 
     return (
         <motion.div
-            className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 text-gray-200"
-            style={{ backgroundImage: 'linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a)' }}
+            className="min-h-screen py-20 px-4 sm:px-6 lg:px-8
+                       bg-gray-50 text-gray-900
+                       dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 dark:text-gray-200"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
+            <Helmet>
+                <title>FAQ - First Digit Communications</title>
+                <meta name="description" content="Find answers to frequently asked questions about First Digit Communications products, orders, shipping, and more." />
+            </Helmet>
+
             <div className="container mx-auto max-w-4xl pt-10"> {/* Added pt-10 for spacing below Navbar */}
-                <motion.h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-6 leading-tight drop-shadow-lg" variants={itemVariants}>
-                    Frequently Asked <span className="text-lime-400">Questions</span>
+                <motion.h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-6 leading-tight drop-shadow-lg
+                                   text-gray-800 dark:text-white" variants={itemVariants}>
+                    Frequently Asked <span className="text-lime-500 dark:text-lime-400">Questions</span>
                 </motion.h1>
-                <motion.p className="text-lg md:text-xl text-gray-400 text-center mb-12 max-w-2xl mx-auto" variants={itemVariants}>
+                <motion.p className="text-lg md:text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto dark:text-gray-400" variants={itemVariants}>
                     Find quick answers to our most common questions about products, orders, shipping, and more.
                 </motion.p>
 
@@ -87,11 +96,13 @@ const FAQ = () => {
                     {faqData.map((faq) => (
                         <motion.div
                             key={faq.id}
-                            className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden"
+                            className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden
+                                       dark:bg-gray-800 dark:shadow-lg dark:border-gray-700"
                             variants={itemVariants}
                         >
                             <button
-                                className="w-full text-left p-6 flex justify-between items-center text-white font-semibold text-lg hover:bg-gray-700 transition-colors duration-200 focus:outline-none"
+                                className="w-full text-left p-6 flex justify-between items-center text-gray-800 font-semibold text-lg hover:bg-gray-50 transition-colors duration-200 focus:outline-none
+                                           dark:text-white dark:hover:bg-gray-700"
                                 onClick={() => toggleQuestion(faq.id)}
                                 aria-expanded={openQuestion === faq.id}
                                 aria-controls={`faq-answer-${faq.id}`}
@@ -101,14 +112,18 @@ const FAQ = () => {
                                     animate={{ rotate: openQuestion === faq.id ? 180 : 0 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    {openQuestion === faq.id ? <ChevronUp className="w-6 h-6 text-cyan-400" /> : <ChevronDown className="w-6 h-6 text-gray-400" />}
+                                    {openQuestion === faq.id ? (
+                                        <ChevronUp className="w-6 h-6 text-blue-500 dark:text-cyan-400" />
+                                    ) : (
+                                        <ChevronDown className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                                    )}
                                 </motion.div>
                             </button>
                             <AnimatePresence>
                                 {openQuestion === faq.id && (
                                     <motion.div
                                         id={`faq-answer-${faq.id}`}
-                                        className="px-6 pb-6 text-gray-300 text-base leading-relaxed"
+                                        className="px-6 pb-6 text-gray-700 text-base leading-relaxed dark:text-gray-300"
                                         variants={answerVariants}
                                         initial="hidden"
                                         animate="visible"

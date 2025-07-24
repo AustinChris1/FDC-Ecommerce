@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../LoadingSpinner';
 
 const EditProducts = () => {
-    const { id } = useParams(); // Get product ID from URL parameters
-    const navigate = useNavigate(); // For navigation
-    const [loading, setLoading] = useState(true); // Manages full-page loading for fetching product data
-    const [editLoading, setEditLoading] = useState(false); // Manages loading state for the submit button
-    const [category, setCategory] = useState([]); // Stores fetched categories for the dropdown
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [editLoading, setEditLoading] = useState(false);
+    const [category, setCategory] = useState([]);
 
     const [productsInput, setProductsInput] = useState({
         category_id: '',
@@ -27,82 +27,50 @@ const EditProducts = () => {
         featured: false,
         popular: false,
         status: false,
-        // NEW: Add states for new fields
         is_new_arrival: false,
         is_flash_sale: false,
         flash_sale_price: '',
         flash_sale_starts_at: '',
         flash_sale_ends_at: ''
     });
-    // States for image files and their previews
-    const [picture, setPicture] = useState(null); // File object for image 1 (new upload)
-    const [picture2, setPicture2] = useState(null); // File object for image 2 (new upload)
-    const [picture3, setPicture3] = useState(null); // NEW: File object for image 3
-    const [picture4, setPicture4] = useState(null); // NEW: File object for image 4
 
-    const [imagePreview, setImagePreview] = useState(null); // URL for image 1 preview
-    const [image2Preview, setImage2Preview] = useState(null); // URL for image 2 preview
-    const [image3Preview, setImage3Preview] = useState(null); // NEW: URL for image 3 preview
-    const [image4Preview, setImage4Preview] = useState(null); // NEW: URL for image 4 preview
+    // States for image files (for new uploads)
+    const [picture, setPicture] = useState(null);
+    const [picture2, setPicture2] = useState(null);
+    const [picture3, setPicture3] = useState(null);
+    const [picture4, setPicture4] = useState(null);
 
-    const [currentImage1Path, setCurrentImage1Path] = useState(''); // Store original image 1 path
-    const [currentImage2Path, setCurrentImage2Path] = useState(''); // Store original image 2 path
-    const [currentImage3Path, setCurrentImage3Path] = useState(''); // NEW: Store original image 3 path
-    const [currentImage4Path, setCurrentImage4Path] = useState(''); // NEW: Store original image 4 path
+    // States for image previews (can be new file or existing URL)
+    const [imagePreview, setImagePreview] = useState(null);
+    const [image2Preview, setImage2Preview] = useState(null);
+    const [image3Preview, setImage3Preview] = useState(null);
+    const [image4Preview, setImage4Preview] = useState(null);
 
-    const [specifications, setSpecifications] = useState([{ feature: '', value: '' }]); // NEW: State for specifications
-    const [feature, setFeature] = useState([{ feature: '' }]); // NEW: State for feature
+    // No longer need currentImagePath states if preview handles existing images.
+    // Instead, the fetch logic will set the initial preview from existing paths.
 
-    const [error, setError] = useState({}); // Stores validation errors from backend
-    const [activeTab, setActiveTab] = useState('home'); // State to manage active tab
+    const [specifications, setSpecifications] = useState([{ feature: '', value: '' }]);
+    const [feature, setFeature] = useState([{ feature: '' }]);
+
+    const [error, setError] = useState({});
+    const [activeTab, setActiveTab] = useState('home');
 
     // Handlers for image file inputs
-    const handleImage = (e) => {
-        const { name, files } = e.target;
-        const file = files[0];
-
-        if (name === 'image') {
-            setPicture(file);
-            setImagePreview(file ? URL.createObjectURL(file) : null);
-            setCurrentImage1Path(''); // Clear old path if new image selected
-            setError(prev => ({ ...prev, image: '' })); // Clear specific error
-        } else if (name === 'image2') {
-            setPicture2(file);
-            setImage2Preview(file ? URL.createObjectURL(file) : null);
-            setCurrentImage2Path(''); // Clear old path if new image selected
-            setError(prev => ({ ...prev, image2: '' })); // Clear specific error
-        } else if (name === 'image3') { // NEW: Handle image 3
-            setPicture3(file);
-            setImage3Preview(file ? URL.createObjectURL(file) : null);
-            setCurrentImage3Path('');
-            setError(prev => ({ ...prev, image3: '' }));
-        } else if (name === 'image4') { // NEW: Handle image 4
-            setPicture4(file);
-            setImage4Preview(file ? URL.createObjectURL(file) : null);
-            setCurrentImage4Path('');
-            setError(prev => ({ ...prev, image4: '' }));
-        }
+    const handleImage = (e, setImageFile, setImagePrev) => {
+        const file = e.target.files[0];
+        setImageFile(file);
+        setImagePrev(file ? URL.createObjectURL(file) : null);
+        // Clear specific error for this image field
+        setError(prev => ({ ...prev, [e.target.name]: '' }));
     };
 
-    // Function to remove image preview and file
-    const removeImage = (imageNumber) => {
-        if (imageNumber === 1) {
-            setPicture(null);
-            setImagePreview(null);
-            setCurrentImage1Path(''); // Signal to backend to remove this image
-        } else if (imageNumber === 2) {
-            setPicture2(null);
-            setImage2Preview(null);
-            setCurrentImage2Path(''); // Signal to backend to remove this image
-        } else if (imageNumber === 3) { // NEW: Remove image 3
-            setPicture3(null);
-            setImage3Preview(null);
-            setCurrentImage3Path('');
-        } else if (imageNumber === 4) { // NEW: Remove image 4
-            setPicture4(null);
-            setImage4Preview(null);
-            setCurrentImage4Path('');
-        }
+    // Function to remove image preview and associated file
+    const removeImage = (setImageFile, setImagePrev, inputName) => {
+        setImageFile(null); // Clear the file
+        setImagePrev(null); // Clear the preview
+        // Optionally, clear the file input value visually
+        const fileInput = document.querySelector(`input[name=${inputName}]`);
+        if (fileInput) fileInput.value = '';
     };
 
     // Handler for text, select, and checkbox inputs
@@ -114,12 +82,10 @@ const EditProducts = () => {
                 [name]: type === 'checkbox' ? checked : value
             };
 
-            // If is_flash_sale is unchecked, clear flash sale related fields
             if (name === 'is_flash_sale' && !checked) {
                 newState.flash_sale_price = '';
                 newState.flash_sale_starts_at = '';
                 newState.flash_sale_ends_at = '';
-                // Also clear errors for these fields if they exist
                 setError(prevErrors => {
                     const newErrors = { ...prevErrors };
                     delete newErrors.flash_sale_price;
@@ -132,7 +98,7 @@ const EditProducts = () => {
         });
     };
 
-    // NEW: Handlers for specifications
+    // Handlers for specifications
     const handleSpecificationChange = (index, event) => {
         const { name, value } = event.target;
         const newSpecifications = [...specifications];
@@ -149,7 +115,7 @@ const EditProducts = () => {
         setSpecifications(newSpecifications);
     };
 
-    // NEW: Handlers for feature
+    // Handlers for feature
     const handleFeatureChange = (index, event) => {
         const { name, value } = event.target;
         const newfeature = [...feature];
@@ -170,7 +136,6 @@ const EditProducts = () => {
     useEffect(() => {
         document.title = "Edit Product";
 
-        // Fetch all categories for the dropdown
         axios.get('/api/allCategory')
             .then(res => {
                 if (res.status === 200 && res.data.category) {
@@ -184,7 +149,6 @@ const EditProducts = () => {
                 toast.error('Network error or server issue. Could not load categories.');
             });
 
-        // Fetch product data for editing
         axios.get(`/api/products/edit/${id}`)
             .then(res => {
                 if (res.status === 200 && res.data.Product) {
@@ -204,26 +168,19 @@ const EditProducts = () => {
                         featured: productData.featured === 1 ? true : false,
                         popular: productData.popular === 1 ? true : false,
                         status: productData.status === 1 ? true : false,
-                        // NEW: Populate new fields
                         is_new_arrival: productData.is_new_arrival === 1 ? true : false,
                         is_flash_sale: productData.is_flash_sale === 1 ? true : false,
                         flash_sale_price: productData.flash_sale_price || '',
-                        // Format dates for input[type="date"]
                         flash_sale_starts_at: productData.flash_sale_starts_at ? new Date(productData.flash_sale_starts_at).toISOString().split('T')[0] : '',
                         flash_sale_ends_at: productData.flash_sale_ends_at ? new Date(productData.flash_sale_ends_at).toISOString().split('T')[0] : ''
                     });
-                    // Set current image paths and initial previews
-                    setCurrentImage1Path(productData.image || '');
-                    setImagePreview(productData.image ? `/${productData.image}` : null); // Prepend '/' if needed for public path
-                    setCurrentImage2Path(productData.image2 || '');
-                    setImage2Preview(productData.image2 ? `/${productData.image2}` : null); // Prepend '/' if needed for public path
-                    // NEW: Set current image paths and initial previews for image3 and image4
-                    setCurrentImage3Path(productData.image3 || '');
+
+                    // Set initial image previews from existing product data paths
+                    setImagePreview(productData.image ? `/${productData.image}` : null);
+                    setImage2Preview(productData.image2 ? `/${productData.image2}` : null);
                     setImage3Preview(productData.image3 ? `/${productData.image3}` : null);
-                    setCurrentImage4Path(productData.image4 || '');
                     setImage4Preview(productData.image4 ? `/${productData.image4}` : null);
 
-                    // NEW: Set specifications if available
                     if (productData.specifications) {
                         try {
                             const parsedSpecs = JSON.parse(productData.specifications);
@@ -236,7 +193,6 @@ const EditProducts = () => {
                         setSpecifications([{ feature: '', value: '' }]);
                     }
 
-                    // NEW: Set Feature if available
                     if (productData.features) {
                         try {
                             const parsedFeatures = typeof productData.features === 'string'
@@ -254,7 +210,7 @@ const EditProducts = () => {
 
                 } else if (res.status === 404) {
                     toast.error(res.data.message);
-                    navigate('/admin/products/view'); // Redirect if product not found
+                    navigate('/admin/products/view');
                 } else {
                     toast.error(res.data.message || 'Failed to fetch product details.');
                 }
@@ -262,127 +218,98 @@ const EditProducts = () => {
             .catch(err => {
                 console.error('Error fetching product details:', err);
                 toast.error('Failed to fetch product details. Please check network/server.');
-                navigate('/admin/products/view'); // Redirect on network error
+                navigate('/admin/products/view');
             })
             .finally(() => {
-                setLoading(false); // Stop full-page loading spinner
+                setLoading(false);
             });
-    }, [id, navigate]); // Dependencies for useEffect
+    }, [id, navigate]);
 
     // Function to handle product update
     const editProducts = async (e) => {
         e.preventDefault();
-        setEditLoading(true); // Show spinner on submit button
+        setEditLoading(true);
 
         const formData = new FormData();
         formData.append('_method', 'POST'); // Important for Laravel's PUT/PATCH method spoofing
 
-        // Append all product data
-        formData.append('category_id', productsInput.category_id || '');
-        formData.append('name', productsInput.name || '');
-        formData.append('link', productsInput.link || '');
-        formData.append('description', productsInput.description || '');
-        formData.append('meta_title', productsInput.meta_title || '');
-        formData.append('meta_keywords', productsInput.meta_keywords || '');
-        formData.append('meta_description', productsInput.meta_description || '');
-        formData.append('selling_price', parseFloat(productsInput.selling_price) || 0);
-        formData.append('original_price', parseFloat(productsInput.original_price) || 0);
-        formData.append('qty', parseInt(productsInput.qty) || 0);
-        formData.append('brand', productsInput.brand || '');
-        formData.append('featured', productsInput.featured ? 1 : 0);
-        formData.append('popular', productsInput.popular ? 1 : 0);
-        formData.append('status', productsInput.status ? 1 : 0);
-
-        // NEW: Append new fields
-        formData.append('is_new_arrival', productsInput.is_new_arrival ? 1 : 0);
-        formData.append('is_flash_sale', productsInput.is_flash_sale ? 1 : 0);
-        
-        // Only append flash sale details if is_flash_sale is true
-        if (productsInput.is_flash_sale) {
-            formData.append('flash_sale_price', parseFloat(productsInput.flash_sale_price) || '');
-            formData.append('flash_sale_starts_at', productsInput.flash_sale_starts_at || '');
-            formData.append('flash_sale_ends_at', productsInput.flash_sale_ends_at || '');
-        } else {
-            // Explicitly send empty or null values if flash sale is unchecked,
-            // so backend can clear existing values.
-            formData.append('flash_sale_price', '');
-            formData.append('flash_sale_starts_at', '');
-            formData.append('flash_sale_ends_at', '');
+        // Append all productsInput fields
+        for (const key in productsInput) {
+            // Handle booleans: convert true/false to 1/0
+            if (typeof productsInput[key] === 'boolean') {
+                formData.append(key, productsInput[key] ? 1 : 0);
+            } else if (productsInput[key] !== null && productsInput[key] !== undefined) {
+                formData.append(key, productsInput[key]);
+            }
         }
 
-
-        // Handle image 1
+        // --- CORRECTED IMAGE HANDLING LOGIC ---
+        // Only append image files if a new file has been selected (picture state is not null)
         if (picture) {
             formData.append('image', picture);
-        } else if (currentImage1Path === '' && !picture) {
-            // If current path was cleared and no new picture, signal backend to delete old image
-            formData.append('image', 'REMOVE_IMAGE'); // Use a specific string to signal deletion
-        } else if (currentImage1Path) {
-            // If no new picture and old path exists, retain it (backend handles this if not explicitly changed)
-            // No need to append if backend keeps existing image by default when not provided
         }
-
-        // Handle image 2
         if (picture2) {
             formData.append('image2', picture2);
-        } else if (currentImage2Path === '' && !picture2) {
-            // If current path was cleared and no new picture, signal backend to delete old image
-            formData.append('image2', 'REMOVE_IMAGE'); // Use a specific string to signal deletion
-        } else if (currentImage2Path) {
-            // If no new picture and old path exists, retain it
-            // No need to append if backend keeps existing image by default when not provided
         }
-
-        // NEW: Handle image 3
         if (picture3) {
             formData.append('image3', picture3);
-        } else if (currentImage3Path === '' && !picture3) {
-            formData.append('image3', 'REMOVE_IMAGE');
         }
-
-        // NEW: Handle image 4
         if (picture4) {
             formData.append('image4', picture4);
-        } else if (currentImage4Path === '' && !picture4) {
-            formData.append('image4', 'REMOVE_IMAGE');
         }
+        // If picture state is null, it means no new file was selected for that slot.
+        // We do NOT append the field to FormData at all.
+        // Laravel's 'nullable' validation will then correctly treat it as "not present" and ignore it.
 
-        // NEW: Append specifications as a JSON string
+        // If you need explicit "remove image" functionality, you'd add a separate flag
+        // For example:
+        // if (!imagePreview && !picture) { // If both current and new are null/cleared
+        //     formData.append('remove_image1', 'true');
+        // }
+        // ... and then handle this `remove_image1` flag in your Laravel backend controller.
+        // For now, removing `REMOVE_IMAGE` string is the priority.
+
+
+        // Append specifications as a JSON string
         formData.append('specifications', JSON.stringify(specifications.filter(s => s.feature && s.value)));
 
-        // NEW: Append feature as a JSON string
+        // Append feature as a JSON string
         formData.append('features', JSON.stringify(feature.filter(s => s.feature)));
 
         try {
             const res = await axios.post(`/api/products/update/${id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data', // Axios handles this for FormData automatically
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
             if (res.data.status === 200) {
                 toast.success(res.data.message);
-                setError({}); // Clear errors on success
-                navigate('/admin/products/view'); // Navigate back to view products
+                setError({});
+                navigate('/admin/products/view');
             } else if (res.data.status === 422) {
-                setError(res.data.errors); // Validation errors from backend
-                toast.error('Please check the input fields for errors.');
+                setError(res.data.errors);
+                Object.values(res.data.errors).forEach(errArr => {
+                    errArr.forEach(err => toast.error(err));
+                });
             } else if (res.data.status === 404) {
                 toast.error(res.data.message);
-                navigate('/admin/products/view'); // Redirect if product not found on update
+                navigate('/admin/products/view');
             } else {
                 toast.error(res.data.message || 'An unexpected error occurred during update.');
             }
         } catch (err) {
             if (err.response && err.response.status === 422) {
                 setError(err.response.data.errors);
-                toast.error('Please check the input fields for errors.');
+                Object.values(err.response.data.errors).forEach(errArr => {
+                    errArr.forEach(err => toast.error(err));
+                });
             } else {
                 console.error("Update error:", err);
                 toast.error('Failed to update product, try again.');
             }
         } finally {
-            setEditLoading(false); // Hide submit button spinner
+            setEditLoading(false);
         }
     };
 
@@ -392,19 +319,17 @@ const EditProducts = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
     };
 
-    // Show full-page loading spinner while fetching product details
     if (loading) {
         return <LoadingSpinner />;
     }
 
     return (
         <motion.div
-            className='min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-100 text-gray-800' // Lighter background
+            className='min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-100 text-gray-800'
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            {/* Header section with title and Back button */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 md:mb-0">Edit Product</h1>
                 <Link
@@ -415,17 +340,15 @@ const EditProducts = () => {
                 </Link>
             </header>
 
-            {/* Form container */}
             <motion.form
                 onSubmit={editProducts}
-                encType='multipart/form-data' // Important for file uploads
+                encType='multipart/form-data'
                 id='productsForm'
-                className='bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8' // White background for form card
+                className='bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8'
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
             >
-                {/* Tab Navigation */}
                 <ul className="flex flex-wrap space-x-2 md:space-x-4 border-b border-gray-300 mb-6" role="tablist">
                     <li className="nav-item" role="presentation">
                         <button
@@ -463,7 +386,6 @@ const EditProducts = () => {
                             Other Details
                         </button>
                     </li>
-                    {/* NEW: Specifications Tab */}
                     <li className="nav-item" role="presentation">
                         <button
                             className={`px-5 py-3 text-lg font-semibold border-b-2 border-transparent transition-colors duration-300 ${activeTab === 'specifications' ? 'text-blue-600 border-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
@@ -478,10 +400,8 @@ const EditProducts = () => {
                     </li>
                 </ul>
 
-                {/* Tab Content */}
                 <div className="tab-content">
                     <AnimatePresence mode='wait'>
-                        {/* Home Tab Pane */}
                         {activeTab === 'home' && (
                             <motion.div
                                 key="homeTab"
@@ -564,143 +484,125 @@ const EditProducts = () => {
 
                                 {/* Images Upload and Preview */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                                    {/* Image 1 */}
                                     <div className="mb-5">
                                         <label htmlFor="image" className="block text-gray-700 text-sm font-medium mb-2">Image 1</label>
                                         <input
                                             type="file"
                                             id="image"
                                             name="image"
-                                            onChange={handleImage}
+                                            onChange={(e) => handleImage(e, setPicture, setImagePreview)}
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <small className="text-red-500 text-sm mt-1 block">{error.image ? error.image[0] : ''}</small>
-                                        {(imagePreview || currentImage1Path) && (
+                                        {(imagePreview) && ( // Display preview if available
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
                                                 <img
-                                                    src={imagePreview || (currentImage1Path ? `/${currentImage1Path}` : null)} // Prioritize new preview, then current path
+                                                    src={imagePreview}
                                                     alt="Image 1 Preview"
                                                     className="w-20 h-20 object-cover rounded-md"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/000000?text=No+Image"; }}
                                                 />
-                                                <div>
-                                                    <p className="text-gray-700 text-sm font-medium">
-                                                        {picture ? picture.name : (currentImage1Path ? 'Current Image 1' : 'No Image')}
-                                                    </p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(1)}
-                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
-                                                    >
-                                                        Remove Image 1
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(setPicture, setImagePreview, 'image')}
+                                                    className="text-red-500 hover:text-red-700 text-sm font-semibold"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Image 2 */}
                                     <div className="mb-5">
                                         <label htmlFor="image2" className="block text-gray-700 text-sm font-medium mb-2">Image 2</label>
                                         <input
                                             type="file"
                                             id="image2"
                                             name="image2"
-                                            onChange={handleImage}
+                                            onChange={(e) => handleImage(e, setPicture2, setImage2Preview)}
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <small className="text-red-500 text-sm mt-1 block">{error.image2 ? error.image2[0] : ''}</small>
-                                        {(image2Preview || currentImage2Path) && (
+                                        {(image2Preview) && (
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
                                                 <img
-                                                    src={image2Preview || (currentImage2Path ? `/${currentImage2Path}` : null)}
+                                                    src={image2Preview}
                                                     alt="Image 2 Preview"
                                                     className="w-20 h-20 object-cover rounded-md"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/000000?text=No+Image"; }}
                                                 />
-                                                <div>
-                                                    <p className="text-gray-700 text-sm font-medium">
-                                                        {picture2 ? picture2.name : (currentImage2Path ? 'Current Image 2' : 'No Image')}
-                                                    </p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(2)}
-                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
-                                                    >
-                                                        Remove Image 2
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(setPicture2, setImage2Preview, 'image2')}
+                                                    className="text-red-500 hover:text-red-700 text-sm font-semibold"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         )}
                                     </div>
-                                </div>
-
-                                {/* NEW: Image 3 and Image 4 Uploads */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                                    {/* Image 3 */}
                                     <div className="mb-5">
-                                        <label htmlFor="image3" className="block text-gray-700 text-sm font-medium mb-2">Image 3 (Optional)</label>
+                                        <label htmlFor="image3" className="block text-gray-700 text-sm font-medium mb-2">Image 3</label>
                                         <input
                                             type="file"
                                             id="image3"
                                             name="image3"
-                                            onChange={handleImage}
+                                            onChange={(e) => handleImage(e, setPicture3, setImage3Preview)}
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <small className="text-red-500 text-sm mt-1 block">{error.image3 ? error.image3[0] : ''}</small>
-                                        {(image3Preview || currentImage3Path) && (
+                                        {(image3Preview) && (
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
                                                 <img
-                                                    src={image3Preview || (currentImage3Path ? `/${currentImage3Path}` : null)}
+                                                    src={image3Preview}
                                                     alt="Image 3 Preview"
                                                     className="w-20 h-20 object-cover rounded-md"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/000000?text=No+Image"; }}
                                                 />
-                                                <div>
-                                                    <p className="text-gray-700 text-sm font-medium">
-                                                        {picture3 ? picture3.name : (currentImage3Path ? 'Current Image 3' : 'No Image')}
-                                                    </p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(3)}
-                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
-                                                    >
-                                                        Remove Image 3
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(setPicture3, setImage3Preview, 'image3')}
+                                                    className="text-red-500 hover:text-red-700 text-sm font-semibold"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         )}
                                     </div>
+                                    {/* Image 4 */}
                                     <div className="mb-5">
-                                        <label htmlFor="image4" className="block text-gray-700 text-sm font-medium mb-2">Image 4 (Optional)</label>
+                                        <label htmlFor="image4" className="block text-gray-700 text-sm font-medium mb-2">Image 4</label>
                                         <input
                                             type="file"
                                             id="image4"
                                             name="image4"
-                                            onChange={handleImage}
+                                            onChange={(e) => handleImage(e, setPicture4, setImage4Preview)}
                                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <small className="text-red-500 text-sm mt-1 block">{error.image4 ? error.image4[0] : ''}</small>
-                                        {(image4Preview || currentImage4Path) && (
+                                        {(image4Preview) && (
                                             <div className="mt-2 border border-gray-300 rounded-lg p-2 flex items-center space-x-4 bg-gray-50">
                                                 <img
-                                                    src={image4Preview || (currentImage4Path ? `/${currentImage4Path}` : null)}
+                                                    src={image4Preview}
                                                     alt="Image 4 Preview"
                                                     className="w-20 h-20 object-cover rounded-md"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/555555?text=No+Img"; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/e0e0e0/000000?text=No+Image"; }}
                                                 />
-                                                <div>
-                                                    <p className="text-gray-700 text-sm font-medium">
-                                                        {picture4 ? picture4.name : (currentImage4Path ? 'Current Image 4' : 'No Image')}
-                                                    </p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(4)}
-                                                        className="mt-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"
-                                                    >
-                                                        Remove Image 4
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(setPicture4, setImage4Preview, 'image4')}
+                                                    className="text-red-500 hover:text-red-700 text-sm font-semibold"
+                                                >
+                                                    Remove
+                                                </button>
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </div> {/* End of Image grid */}
+
                             </motion.div>
                         )}
 

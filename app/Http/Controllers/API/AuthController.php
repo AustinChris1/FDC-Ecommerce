@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth as Auth;
 // use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Google\Client as Google_Client;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -22,30 +24,30 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed', // password confirmation
         ]);
-    
+
         // Return validation errors if they exist
         if ($validator->fails()) {
             return response()->json([
                 'validation_errors' => $validator->messages(),
             ], 422);
         }
-    
+
         // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-    
+
         // Log the user in immediately
         Auth::login($user);
-    
+
         // Create a token for the user
         $token = $user->createToken($user->email . '_Token')->plainTextToken;
-    
+
         // Trigger the registration event (e.g., sending email verification)
         event(new Registered($user));
-    
+
         // Respond with success and the necessary data
         return response()->json([
             'status' => 200,
@@ -56,7 +58,84 @@ class AuthController extends Controller
             'message' => 'Check your email to verify your account.',
         ]);
     }
-    
+
+    public function googleAuth(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_token' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'validation_errors' => $validator->messages(),
+            ], 422);
+        }
+
+        $idToken = $request->input('id_token');
+
+        try {
+            $client = new Google_Client(['client_id' => env('VITE_GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($idToken);
+
+            if ($payload) {
+                $email = $payload['email'];
+                $name = $payload['name'];
+                $googleId = $payload['sub']; // Google User ID
+
+                // Find user by email
+                $user = User::where('email', $email)->first();
+
+                if ($user) {
+                    // User exists, log them in
+                    Auth::login($user);
+                    $message = 'Logged in with Google successfully!';
+                } else {
+                    // User does not exist, create a new account
+                    $user = User::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'password' => Hash::make(uniqid()),
+                        'google_id' => $googleId,
+                        'email_verified_at' => Carbon::now(), // Mark email as verified immediately
+                    ]);
+                    Auth::login($user);
+                    event(new Verified($user)); // Trigger the Verified event
+                    $message = 'Signed up with Google successfully! Email is verified.';
+                }
+
+                // Determine role and create Sanctum token
+                $role = 'user'; // Default role
+                $token = $user->createToken($user->email . '_Token', [''])->plainTextToken;
+
+                // If you have a role_as column and logic for admin, you can add it here
+                if (isset($user->role_as) && ($user->role_as == 1 || $user->role_as == 2)) {
+                    $role = 'admin';
+                    $token = $user->createToken($user->email . '_AdminToken', ['server:admin'])->plainTextToken;
+                }
+
+                return response()->json([
+                    'status' => 200,
+                    'username' => $user->name,
+                    'email' => $user->email,
+                    'token' => $token,
+                    'role' => $role,
+                    'message' => $message,
+                ]);
+            } else {
+                // Invalid ID Token
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'Invalid Google ID token.',
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Google authentication failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
     // Email Verification Notice Handler
     public function verifyEmailNotice()
     {

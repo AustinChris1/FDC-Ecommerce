@@ -68,4 +68,11 @@ class Product extends Model
     {
         return $this->hasMany(Wishlist::class);
     }
+
+     public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'product_location')
+                    ->withPivot('quantity_in_store') // Include the quantity column from the pivot table
+                    ->withTimestamps(); // If you want to use the timestamps on the pivot table
+    }
 }

@@ -24,8 +24,9 @@ import { useWishlist } from '../Components/WishlistContext';
 // Helper component for tab buttons
 const TabButton = ({ icon, label, isActive, onClick }) => (
     <motion.button
-        className={`flex items-center space-x-4 px-6 py-3 text-lg font-semibold rounded-t-lg transition-all duration-300
-                    ${isActive ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800 border-b-2 border-transparent'}`}
+        className={`flex items-center space-x-4 px-6 py-3 text-lg font-semibold rounded-t-lg transition-all duration-300 text-black
+                    dark:bg-gray-800 dark:text-cyan-400 
+                    ${isActive ? 'bg-gray-200 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-400 hover:text-gray-200 hover:bg-gray-300 border-b-2 border-transparent'}`}
         onClick={onClick}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -188,7 +189,7 @@ const ProductDetail = () => {
 
     const handleAddToWishlist = (e) => {
         e.preventDefault();
-        e.stopPropagation(); 
+        e.stopPropagation();
 
         if (!product) return;
 
@@ -197,7 +198,7 @@ const ProductDetail = () => {
         } else {
             addToWishlist(product);
         }
-    };    
+    };
     const inWishlist = product ? isProductInWishlist(product.id) : false;
 
     const handleQuantityChange = (type) => {
@@ -219,7 +220,7 @@ const ProductDetail = () => {
     }
 
     if (!product) {
-        return <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-200">Product not found.</div>;
+        return <div className="min-h-screen flex items-center justify-center dark:bg-gray-950 dark:text-gray-200 bg-gray-50 text-gray-800">Product not found.</div>;
     }
 
     // Calculate average rating
@@ -257,7 +258,7 @@ const ProductDetail = () => {
 
     return (
         <motion.div
-            className="w-full min-h-screen bg-gray-950 text-gray-200 pt-24 pb-12 px-4 sm:px-6 lg:px-8"
+            className="w-full min-h-screen dark:bg-gray-950 dark:text-gray-200 bg-gray-50 text-gray-800 pt-28 pb-12 px-4 sm:px-6 lg:px-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -273,27 +274,27 @@ const ProductDetail = () => {
             </Helmet>
 
             {/* Breadcrumb Navigation */}
-            <motion.nav className="text-gray-400 text-sm mb-8" variants={itemVariants}>
+            <motion.nav className="dark:text-gray-400 text-gray-600 text-sm mb-8" variants={itemVariants}>
                 <ul className="flex items-center space-x-2">
                     <li>
-                        <Link to="/" className="text-cyan-400 hover:text-cyan-300 transition-colors">Home</Link>
+                        <Link to="/" className="dark:text-cyan-400 dark:hover:text-cyan-300 text-blue-600 hover:text-blue-500 transition-colors">Home</Link>
                     </li>
-                    <li><ChevronRight className="w-4 h-4 text-gray-500" /></li>
+                    <li><ChevronRight className="w-4 h-4 dark:text-gray-500 text-gray-400" /></li>
                     <li>
-                        <Link to="/shop" className="text-cyan-400 hover:text-cyan-300 transition-colors">Shop</Link>
+                        <Link to="/shop" className="dark:text-cyan-400 dark:hover:text-cyan-300 text-blue-600 hover:text-blue-500 transition-colors">Shop</Link>
                     </li>
-                    <li><ChevronRight className="w-4 h-4 text-gray-500" /></li>
+                    <li><ChevronRight className="w-4 h-4 dark:text-gray-500 text-gray-400" /></li>
                     <li>
-                        <Link to={`/collections/${product.category?.link}`} className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                        <Link to={`/collections/${product.category?.link}`} className="dark:text-cyan-400 dark:hover:text-cyan-300 text-blue-600 hover:text-blue-500 transition-colors">
                             {product.category?.name || 'Category'}
                         </Link>
                     </li>
-                    <li><ChevronRight className="w-4 h-4 text-gray-500" /></li>
-                    <li className="text-gray-100">{product.name || 'Product'}</li>
+                    <li><ChevronRight className="w-4 h-4 dark:text-gray-500 text-gray-400" /></li>
+                    <li className="dark:text-gray-100 text-gray-800">{product.name || 'Product'}</li>
                 </ul>
             </motion.nav>
 
-            <div className="flex flex-col lg:flex-row justify-center items-start gap-12 bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800">
+            <div className="flex flex-col lg:flex-row justify-center items-start gap-12 dark:bg-gray-900 bg-white rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 dark:border dark:border-gray-800 border border-gray-200">
                 {/* Product Image Gallery */}
                 <motion.div className="w-full lg:w-1/2 flex flex-col items-center" variants={itemVariants}>
                     <Swiper
@@ -305,7 +306,7 @@ const ProductDetail = () => {
                         pagination={{ clickable: true, dynamicBullets: true }}
                         thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
                         modules={[FreeMode, Navigation, Thumbs, Pagination, Autoplay]}
-                        className="mySwiper2 w-full max-w-xl rounded-lg overflow-hidden shadow-lg border border-gray-700"
+                        className="mySwiper2 w-full max-w-xl rounded-lg overflow-hidden shadow-lg dark:border dark:border-gray-700 border border-gray-300"
                         autoplay={{ delay: 4000, disableOnInteraction: false }}
                         loop={true}
                     >
@@ -315,23 +316,23 @@ const ProductDetail = () => {
                                     <img
                                         src={`/${image}`}
                                         alt={`${product.name} Image ${index + 1}`}
-                                        className="w-full h-auto max-h-[550px] object-contain cursor-zoom-in bg-gray-800 p-4"
+                                        className="w-full h-auto max-h-[550px] object-contain cursor-zoom-in dark:bg-gray-800 bg-gray-100 p-4"
                                         onClick={() => openModal(image)}
                                     />
                                 </SwiperSlide>
                             ))
                         ) : (
                             <SwiperSlide>
-                                <div className="w-full h-[300px] sm:h-[400px] flex items-center justify-center bg-gray-800 rounded-lg text-gray-500">
+                                <div className="w-full h-[300px] sm:h-[400px] flex items-center justify-center dark:bg-gray-800 bg-gray-100 rounded-lg dark:text-gray-500 text-gray-400">
                                     No image available
                                 </div>
                             </SwiperSlide>
                         )}
                         {/* Custom Navigation Arrows */}
-                        <div className="swiper-button-prev-main absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 text-white cursor-pointer hover:bg-black/70 transition-colors">
+                        <div className="swiper-button-prev-main absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full dark:bg-black/50 dark:text-white bg-gray-800/50 text-white cursor-pointer dark:hover:bg-black/70 hover:bg-gray-800 transition-colors">
                             <ArrowLeft className="w-6 h-6" />
                         </div>
-                        <div className="swiper-button-next-main absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 text-white cursor-pointer hover:bg-black/70 transition-colors">
+                        <div className="swiper-button-next-main absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full dark:bg-black/50 dark:text-white bg-gray-800/50 text-white cursor-pointer dark:hover:bg-black/70 hover:bg-gray-800 transition-colors">
                             <ArrowRight className="w-6 h-6" />
                         </div>
                     </Swiper>
@@ -373,17 +374,17 @@ const ProductDetail = () => {
 
                 {/* Product Details */}
                 <motion.div className="w-full lg:w-1/2" variants={itemVariants}>
-                    <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 text-white bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 leading-tight">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 dark:text-white text-gray-900 bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-cyan-400 dark:to-blue-600 bg-gradient-to-r from-blue-600 to-indigo-800 leading-tight">
                         {product.name || 'Product Name'}
                     </h1>
-                    <p className="text-gray-400 text-base mb-2 flex items-center gap-2"><Tag className="w-4 h-4 text-gray-500" />{`Brand: ${product.brand || 'Unknown'}`}</p>
-                    <p className={`text-base font-semibold ${product.status === 0 && product.qty > 0 ? 'text-lime-400' : 'text-red-500'} mb-4 flex items-center gap-2`}>
+                    <p className="dark:text-gray-400 text-gray-600 text-base mb-2 flex items-center gap-2"><Tag className="w-4 h-4 dark:text-gray-500 text-gray-400" />{`Brand: ${product.brand || 'Unknown'}`}</p>
+                    <p className={`text-base font-semibold ${product.status === 0 && product.qty > 0 ? 'dark:text-lime-400 text-green-600' : 'dark:text-red-500 text-red-600'} mb-4 flex items-center gap-2`}>
                         <Package className="w-4 h-4" /> {product.status === 0 && product.qty > 0 ? 'In Stock' : 'Out of Stock'}
                     </p>
 
                     <div className="flex items-center mb-6">
                         <StarRating rating={averageRating} />
-                        <span className="ml-3 text-gray-400 text-sm">
+                        <span className="ml-3 dark:text-gray-400 text-gray-600 text-sm">
                             {reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'} (Average: {averageRating.toFixed(1)})
                         </span>
                     </div>
@@ -396,13 +397,13 @@ const ProductDetail = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.3, duration: 0.5 }}
                             >
-                                <p className="text-lime-400 text-5xl font-bold flex items-center">
+                                <p className="dark:text-lime-400 text-blue-600 text-5xl font-bold flex items-center">
                                     ₦{product.selling_price.toLocaleString()}
                                 </p>
 
                                 {product.original_price && product.original_price > product.selling_price && (
                                     <>
-                                        <p className="text-gray-400 text-xl line-through">
+                                        <p className="dark:text-gray-400 text-gray-500 text-xl line-through">
                                             ₦{product.original_price.toLocaleString()}
                                         </p>
 
@@ -421,20 +422,20 @@ const ProductDetail = () => {
 
                     {/* Quantity Selector */}
                     <div className="mb-6 flex items-center space-x-4">
-                        <span className="text-gray-300 text-lg font-medium">Quantity:</span>
-                        <div className="flex items-center bg-gray-800 rounded-lg border border-gray-700">
+                        <span className="dark:text-gray-300 text-gray-700 text-lg font-medium">Quantity:</span>
+                        <div className="flex items-center dark:bg-gray-800 bg-gray-100 rounded-lg dark:border dark:border-gray-700 border border-gray-300">
                             <motion.button
                                 onClick={() => handleQuantityChange('decrease')}
-                                className="p-3 rounded-l-lg text-gray-300 hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-3 rounded-l-lg dark:text-gray-300 text-gray-700 dark:hover:bg-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                                 disabled={quantity <= 1}
                             >
                                 <Minus className="w-5 h-5" />
                             </motion.button>
-                            <span className="px-4 text-gray-100 font-semibold text-lg">{quantity}</span>
+                            <span className="px-4 dark:text-gray-100 text-gray-900 font-semibold text-lg">{quantity}</span>
                             <motion.button
                                 onClick={() => handleQuantityChange('increase')}
-                                className="p-3 rounded-r-lg text-gray-300 hover:bg-gray-700 transition-colors"
+                                className="p-3 rounded-r-lg dark:text-gray-300 text-gray-700 dark:hover:bg-gray-700 hover:bg-gray-200 transition-colors"
                                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                                 disabled={product.qty && quantity >= product.qty}
                             >
@@ -447,7 +448,7 @@ const ProductDetail = () => {
                     <div className="flex flex-col sm:flex-row gap-4 mb-8">
                         <motion.button
                             onClick={handleAddToCart}
-                            className="flex-1 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-8 py-3 dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-800 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             variants={buttonVariants}
                             whileHover="hover"
                             whileTap="tap"
@@ -458,7 +459,7 @@ const ProductDetail = () => {
                         </motion.button>
                         <motion.button
                             onClick={handleAddToWishlist}
-                            className={`flex-1 px-8 py-3 bg-gray-800 text-gray-300 border border-gray-700 rounded-lg font-bold text-lg shadow-md hover:bg-gray-700 hover:text-red-400 transition-all duration-300 flex items-center justify-center space-x-2 ${inWishlist ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                            className={`flex-1 px-8 py-3 dark:bg-gray-800 dark:text-gray-300 dark:border dark:border-gray-700 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg font-bold text-lg shadow-md dark:hover:bg-gray-700 hover:bg-gray-300 hover:text-red-500 transition-all duration-300 flex items-center justify-center space-x-2 ${inWishlist ? 'dark:bg-red-500 dark:hover:bg-red-600 dark:text-white bg-red-500 hover:bg-red-600 text-white' : 'dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700'
                                 }`}
                             aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                             variants={buttonVariants}
@@ -470,8 +471,8 @@ const ProductDetail = () => {
                         </motion.button>
                     </div>
 
-                    <motion.div className="mt-8 pt-8 border-t border-gray-800" variants={itemVariants}>
-                        <h3 className="text-3xl font-bold mb-6 text-cyan-400">Share This Product</h3>
+                    <motion.div className="mt-8 pt-8 dark:border-t dark:border-gray-800 border-t border-gray-200" variants={itemVariants}>
+                        <h3 className="text-3xl font-bold mb-6 dark:text-cyan-400 text-blue-700">Share This Product</h3>
                         <div className="flex space-x-4">
                             <motion.a href={`https://www.facebook.com/sharer/sharer.php?u=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}`} target="_blank" rel="noopener noreferrer"
                                 className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-800 transition-colors"
@@ -480,7 +481,7 @@ const ProductDetail = () => {
                                 <img src={Facebook} className="w-6 h-6" alt="Facebook" />
                             </motion.a>
                             <motion.a href={`https://twitter.com/intent/tweet?url=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}&text=${encodeURIComponent(product.name)}`} target="_blank" rel="noopener noreferrer"
-                                className="bg-gray-200 text-white p-3 rounded-full hover:bg-blue-500 transition-colors"
+                                className="dark:bg-gray-200 bg-gray-700 text-white p-3 rounded-full hover:bg-blue-500 transition-colors"
                                 whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                             >
                                 <img src={Twitter} className="w-6 h-6" alt="Twitter" />
@@ -490,101 +491,122 @@ const ProductDetail = () => {
                 </motion.div>
             </div>
 
-            {/* Product Tabs Section */}
-            <motion.div className="mt-16 bg-gray-900 rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-800" variants={containerVariants}>
-                <div className="flex flex-wrap justify-center mb-8 border-b border-gray-700">
-                    <TabButton icon={<Info className="w-5 h-5" />} label="Description" isActive={activeTab === 'description'} onClick={() => setActiveTab('description')} />
-                    <TabButton icon={<Package className="w-5 h-5" />} label="Specifications" isActive={activeTab === 'specifications'} onClick={() => setActiveTab('specifications')} />
-                    <TabButton icon={<ListChecks className="w-5 h-5" />} label="Features" isActive={activeTab === 'features'} onClick={() => setActiveTab('features')} />
-                    <TabButton icon={<Lightbulb className="w-5 h-5" />} label={`Reviews (${totalReviews})`} isActive={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} />
-                </div>
+            {/* Product Tabs Section */ }
+    <motion.div className="mt-16 mb-6 dark:bg-gray-900 bg-white rounded-xl shadow-2xl p-3 sm:p-8 lg:p-5 dark:border dark:border-gray-800 border border-gray-200" variants={containerVariants}>
+        {/* Sticky and responsive tab buttons */}
+        <div
+            className="sticky z-40 top-[84px] dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 flex flex-wrap justify-center gap-1 px-1 py-1 sm:flex-nowrap sm:gap-4 sm:px-4 sm:py-3"
+        >
+            <TabButton
+                icon={<Info className="w-3 h-3 sm:w-5 sm:h-5" />}
+                label="Description"
+                isActive={activeTab === 'description'}
+                onClick={() => setActiveTab('description')}
+            />
+            <TabButton
+                icon={<Package className="w-3 h-3 sm:w-5 sm:h-5" />}
+                label="Specifications"
+                isActive={activeTab === 'specifications'}
+                onClick={() => setActiveTab('specifications')}
+            />
+            <TabButton
+                icon={<ListChecks className="w-3 h-3 sm:w-5 sm:h-5" />}
+                label="Features"
+                isActive={activeTab === 'features'}
+                onClick={() => setActiveTab('features')}
+            />
+            <TabButton
+                icon={<Lightbulb className="w-3 h-3 sm:w-5 sm:h-5" />}
+                label={`Reviews (${totalReviews})`}
+                isActive={activeTab === 'reviews'}
+                onClick={() => setActiveTab('reviews')}
+            />
+        </div>
+        <AnimatePresence mode='wait'>
+            <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+            >
+                {activeTab === 'description' && (
+                    <div className="pt-8">
+                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Info className="w-8 h-8" />Product Description</h3>
+                        <p className="dark:text-gray-300 text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                            {product.description || 'No detailed description is available for this product yet. Please check back later!'}
+                        </p>
+                    </div>
+                )}
 
-                <AnimatePresence mode='wait'>
+                {activeTab === 'specifications' && (
+                    <div className="pt-8">
+                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Package className="w-8 h-8" />Technical Specifications</h3>
+                        {productSpecifications.length > 0 ? (
+                            <div className="overflow-x-auto rounded-lg dark:border dark:border-gray-700 border border-gray-300">
+                                <table className="w-full text-left dark:text-gray-300 text-gray-700">
+                                    <thead className="text-xs dark:text-gray-400 text-gray-500 uppercase dark:bg-gray-800 bg-gray-100">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3">Specification</th>
+                                            <th scope="col" className="px-6 py-3">Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {productSpecifications.map((spec, index) => (
+                                            <tr key={index} className="dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 dark:hover:bg-gray-800 hover:bg-gray-50 transition-colors duration-200">
+                                                <td className="px-6 py-4 font-medium dark:text-white text-gray-800 whitespace-nowrap">{spec.feature}</td>
+                                                <td className="px-6 py-4">{spec.value}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p className="dark:text-gray-400 text-gray-600">No specifications available for this product.</p>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'features' && (
+                    <div className="pt-8">
+                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1">
+                            <ListChecks className="w-8 h-8" />
+                            Key Features
+                        </h3>
+
+                        {productFeatures.length > 0 ? (
+                            <ul className="list-disc list-inside space-y-3 dark:text-gray-300 text-gray-700 text-lg ml-4">
+                                {productFeatures.map((item, index) => (
+                                    <li key={index} className="flex items-start">
+                                        <ChevronRight className="w-5 h-5 mt-1 mr-2 flex-shrink-0 dark:text-cyan-400 text-blue-600" />
+                                        <span>{item.feature}</span> {/* ✅ Corrected here */}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="dark:text-gray-400 text-gray-600">No features listed for this product.</p>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'reviews' && (
                     <motion.div
-                        key={activeTab}
+                        id="reviews-section"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
+                        className="dark:bg-gray-900 bg-white rounded-xl pt-8"
                     >
-                        {activeTab === 'description' && (
-                            <div>
-                                <h3 className="text-3xl font-bold mb-6 text-cyan-400 flex items-center gap-3"><Info className="w-8 h-8" />Product Description</h3>
-                                <p className="text-gray-300 text-lg leading-relaxed whitespace-pre-line">
-                                    {product.description || 'No detailed description is available for this product yet. Please check back later!'}
-                                </p>
-                            </div>
-                        )}
+                        <h3 className="text-3xl font-bold mb-8 dark:text-cyan-400 text-blue-700">Customer Reviews ({totalReviews})</h3>
 
-                        {activeTab === 'specifications' && (
-                            <div>
-                                <h3 className="text-3xl font-bold mb-6 text-cyan-400 flex items-center gap-3"><Package className="w-8 h-8" />Technical Specifications</h3>
-                                {productSpecifications.length > 0 ? (
-                                    <div className="overflow-x-auto rounded-lg border border-gray-700">
-                                        <table className="w-full text-left text-gray-300">
-                                            <thead className="text-xs text-gray-400 uppercase bg-gray-800">
-                                                <tr>
-                                                    <th scope="col" className="px-6 py-3">Specification</th>
-                                                    <th scope="col" className="px-6 py-3">Detail</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {productSpecifications.map((spec, index) => (
-                                                    <tr key={index} className="bg-gray-900 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-200">
-                                                        <td className="px-6 py-4 font-medium text-white whitespace-nowrap">{spec.feature}</td>
-                                                        <td className="px-6 py-4">{spec.value}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <p className="text-gray-400">No specifications available for this product.</p>
-                                )}
-                            </div>
-                        )}
-
-
-                        {activeTab === 'features' && (
-                            <div>
-                                <h3 className="text-3xl font-bold mb-6 text-cyan-400 flex items-center gap-3">
-                                    <ListChecks className="w-8 h-8" />
-                                    Key Features
-                                </h3>
-
-                                {productFeatures.length > 0 ? (
-                                    <ul className="list-disc list-inside space-y-3 text-gray-300 text-lg ml-4">
-                                        {productFeatures.map((item, index) => (
-                                            <li key={index} className="flex items-start">
-                                                <ChevronRight className="w-5 h-5 mt-1 mr-2 flex-shrink-0 text-cyan-400" />
-                                                <span>{item.feature}</span> {/* ✅ Corrected here */}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="text-gray-400">No features listed for this product.</p>
-                                )}
-                            </div>
-                        )}
-
-                        {activeTab === 'reviews' && (
-                            <motion.div
-                                id="reviews-section"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.3 }}
-                                className="bg-gray-900 rounded-xl"
-                            >
-                                <h3 className="text-3xl font-bold mb-8 text-cyan-400">Customer Reviews ({totalReviews})</h3>
-
-                                {/* Review Form */}
-                                {localStorage.getItem('auth_token') ? (
+                        {/* Review Form */}
+                                                        {localStorage.getItem('auth_token') ? (
                                     <motion.form
                                         onSubmit={handleReviewSubmit}
-                                        className="mb-12 p-6 bg-gray-800 rounded-lg shadow-inner border border-gray-700"
+                                        className="mb-12 p-6 dark:bg-gray-800 bg-gray-100 rounded-lg shadow-inner dark:border dark:border-gray-700 border border-gray-300"
                                     >
-                                        <h4 className="text-xl font-semibold mb-4 text-white">Leave a Review</h4>
+                                        <h4 className="text-xl font-semibold mb-4 dark:text-white text-gray-800">Leave a Review</h4>
                                         <div className="flex items-center mb-5">
                                             <StarRating rating={rating} totalStars={5} onClick={setRating} isClickable={true} />
                                             <span className="ml-3 text-gray-400 text-sm">
@@ -596,7 +618,7 @@ const ProductDetail = () => {
                                             value={reviewText}
                                             onChange={(e) => setReviewText(e.target.value)}
                                             rows="5"
-                                            className="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 resize-y"
+                                            className="w-full p-4 dark:bg-gray-700 bg-white dark:text-gray-200 text-gray-800 rounded-lg border dark:border-gray-600 border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y min-h-[100px]"
                                         ></textarea>
                                         <motion.button
                                             type="submit"
@@ -615,101 +637,115 @@ const ProductDetail = () => {
                                     </p>
                                 )}
 
-                                {/* Review List */}
-                                {reviews.length > 0 ? (
-                                    <>
-                                        <div className="mt-10 space-y-8">
-                                            {currentReviews.map((review) => (
-                                                <motion.div
-                                                    key={review.id}
-                                                    className="p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700"
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ duration: 0.4 }}
-                                                >
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <div className="flex items-center space-x-3">
-                                                            <div className="w-10 h-10 bg-cyan-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                                                                {review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'U'}
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-white font-semibold">{review.user?.name || 'Anonymous User'}</p>
-                                                                <StarRating rating={review.rating} />
-                                                            </div>
-                                                        </div>
-                                                        <span className="text-gray-400 text-sm">{formatDate(review.created_at)}</span>
-                                                    </div>
-                                                    <p className="text-gray-300 text-base leading-relaxed mt-3">{review.review}</p>
-                                                </motion.div>
-                                            ))}
-                                        </div>
 
-                                        {/* Pagination */}
-                                        {totalPagesReviews > 1 && (
-                                            <div className="flex justify-center items-center space-x-4 mt-10">
-                                                <motion.button
-                                                    onClick={() => changeReviewsPage(currentPage - 1)}
-                                                    disabled={currentPage === 1}
-                                                    className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    Previous
-                                                </motion.button>
-                                                <span className="text-lg font-semibold text-gray-100">
-                                                    Page {currentPage} of {totalPagesReviews}
-                                                </span>
-                                                <motion.button
-                                                    onClick={() => changeReviewsPage(currentPage + 1)}
-                                                    disabled={currentPage === totalPagesReviews}
-                                                    className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    Next
-                                                </motion.button>
+                        {/* Display Reviews */}
+                        {reviews.length > 0 ? (
+                            <div className="space-y-8">
+                                {currentReviews.map((review) => (
+                                    <motion.div
+                                        key={review.id}
+                                        className="p-6 dark:bg-gray-800 bg-gray-100 rounded-lg shadow-md dark:border dark:border-gray-700 border border-gray-300"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <div className="flex items-center mb-3">
+                                            <div className="dark:bg-gray-700 bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-lg mr-4">
+                                                {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
                                             </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <p className="text-gray-400 mt-8 text-center p-4 bg-gray-800 rounded-lg border border-gray-700">
-                                        Be the first to leave a review for this product!
-                                    </p>
+                                            <div>
+                                                <p className="font-semibold dark:text-white text-gray-800">{review.user_name || 'Anonymous User'}</p>
+                                                <StarRating rating={review.rating} />
+                                            </div>
+                                        </div>
+                                        <p className="dark:text-gray-300 text-gray-700 text-sm mb-4">{formatDate(review.created_at)}</p>
+                                        <p className="dark:text-gray-200 text-gray-900 leading-relaxed whitespace-pre-line">{review.review}</p>
+                                    </motion.div>
+                                ))}
+                                {/* Pagination for Reviews */}
+                                {totalPagesReviews > 1 && (
+                                    <div className="flex justify-center items-center space-x-2 mt-8">
+                                        <motion.button
+                                            onClick={() => changeReviewsPage(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <ArrowLeft className="w-5 h-5" />
+                                        </motion.button>
+                                        {[...Array(totalPagesReviews)].map((_, index) => (
+                                            <motion.button
+                                                key={index}
+                                                onClick={() => changeReviewsPage(index + 1)}
+                                                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${currentPage === index + 1
+                                                        ? 'dark:bg-cyan-600 bg-blue-600 text-white'
+                                                        : 'dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300'
+                                                    }`}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                {index + 1}
+                                            </motion.button>
+                                        ))}
+                                        <motion.button
+                                            onClick={() => changeReviewsPage(currentPage + 1)}
+                                            disabled={currentPage === totalPagesReviews}
+                                            className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <ArrowRight className="w-5 h-5" />
+                                        </motion.button>
+                                    </div>
                                 )}
-                            </motion.div>
+                            </div>
+                        ) : (
+                            <div className="text-center p-8 dark:bg-gray-800 bg-gray-100 rounded-lg dark:text-gray-400 text-gray-600 border dark:border-gray-700 border-gray-300">
+                                <p className="text-lg font-medium mb-4">No reviews yet for this product.</p>
+                                <p>Be the first to share your thoughts!</p>
+                            </div>
                         )}
                     </motion.div>
-                </AnimatePresence>
-            </motion.div>
-
-            {/* Image Modal */}
-            <AnimatePresence>
-                {isModalOpen && (
-                    <motion.div
-                        className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={closeModal}
-                    >
-                        <motion.img
-                            src={`/${modalImage}`}
-                            alt="Zoomed Product Image"
-                            className="max-w-full max-h-full object-contain"
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.8 }}
-                            transition={{ duration: 0.3 }}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                        <motion.button
-                            className="absolute top-4 right-4 p-3 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-                            onClick={closeModal}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                        >
-                            <X className="w-8 h-8" />
-                        </motion.button>
-                    </motion.div>
                 )}
-            </AnimatePresence>
-        </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    </motion.div>
+
+    {/* Image Modal */ }
+    <AnimatePresence>
+        {isModalOpen && (
+            <motion.div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={closeModal}
+            >
+                <motion.div
+                    className="relative max-w-5xl max-h-[90vh] w-full"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking on image
+                >
+                    <button
+                        onClick={closeModal}
+                        className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black/50 rounded-full p-2"
+                        aria-label="Close image modal"
+                    >
+                        <X className="w-8 h-8" />
+                    </button>
+                    <img
+                        src={`/${modalImage}`}
+                        alt="Zoomed Product"
+                        className="w-full h-full object-contain"
+                    />
+                </motion.div>
+            </motion.div>
+        )}
+    </AnimatePresence>
+        </motion.div >
     );
 };
 
