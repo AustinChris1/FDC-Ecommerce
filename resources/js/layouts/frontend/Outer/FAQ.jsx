@@ -79,8 +79,8 @@ const FAQ = () => {
             animate="visible"
         >
             <Helmet>
-                <title>FAQ - First Digit Communications</title>
-                <meta name="description" content="Find answers to frequently asked questions about First Digit Communications products, orders, shipping, and more." />
+                <title>FAQ - FirstSmart Mart</title>
+                <meta name="description" content="Find answers to frequently asked questions about FirstSmart Mart products, orders, shipping, and more." />
             </Helmet>
 
             <div className="container mx-auto max-w-4xl pt-10"> {/* Added pt-10 for spacing below Navbar */}

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import HeroSlider from './HeroSection'; // Assuming HeroSlider is in the same directory or correctly imported
 import ProductCardBox from './ProductCardBox'; // Import the new ProductCardBox component
 import axios from 'axios';
+import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
 import { useInView } from 'react-intersection-observer';
 import { useCart } from './CartContext'; // Assuming CartContext is available
@@ -123,6 +124,11 @@ const Top = () => {
     // This is the main container for your homepage content
     return (
         <div className="relative w-full overflow-hidden dark:bg-gray-950 bg-white mt-10 min-h-screen">
+                        <Helmet>
+                            <title>FirstSmart Mart</title>
+                            <meta name="description" content="Shop the latest products at FirstSmart Mart." />
+                        </Helmet>
+            
             <div ref={heroSectionRef} className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden">
                 <HeroSlider products={products} handleAddToCart={addToCart} />
             </div>

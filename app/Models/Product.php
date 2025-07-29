@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
 use App\Models\Review;
+use App\Models\Location; // Ensure Location is imported
 
 class Product extends Model
 {
@@ -21,7 +22,7 @@ class Product extends Model
         'meta_keywords',
         'selling_price',
         'original_price',
-        'qty',
+        'qty', // This is your online stock / global unallocated pool
         'image',
         'image2',
         'image3',
@@ -30,8 +31,8 @@ class Product extends Model
         'featured',
         'popular',
         'brand',
-        'specifications', // NEW: Added specifications
-        'features', // NEW: Added features
+        'specifications',
+        'features',
         'is_new_arrival',
         'is_flash_sale',
         'flash_sale_price',
@@ -39,20 +40,18 @@ class Product extends Model
         'flash_sale_ends_at',
     ];
 
-    // NEW: Cast the 'specifications' attribute to array
-    // This will automatically convert the JSON string from the DB to a PHP array/object
-    // and convert PHP arrays/objects to JSON string when saving to DB.
     protected $casts = [
         'is_new_arrival' => 'boolean',
         'is_flash_sale' => 'boolean',
         'flash_sale_price' => 'decimal:2',
         'flash_sale_starts_at' => 'datetime',
         'flash_sale_ends_at' => 'datetime',
-        'specifications' => 'array', // Assuming you want to cast these JSON columns to arrays
+        'specifications' => 'array',
         'features' => 'array',
     ];
 
-    protected $with = ['category'];
+    // Append this accessor to JSON output for easy access
+    protected $appends = ['total_overall_quantity']; // Renamed from 'allQty' for convention
 
     public function category()
     {
@@ -69,10 +68,26 @@ class Product extends Model
         return $this->hasMany(Wishlist::class);
     }
 
-     public function locations()
+    // public function locations()
+    // {
+    //     return $this->belongsToMany(Location::class, 'product_location')
+    //                 ->withPivot('quantity_in_store')
+    //                 ->withTimestamps();
+    // }
+ public function locations()
     {
-        return $this->belongsToMany(Location::class, 'product_location')
-                    ->withPivot('quantity_in_store') // Include the quantity column from the pivot table
-                    ->withTimestamps(); // If you want to use the timestamps on the pivot table
+        return $this->belongsToMany(Location::class, 'product_location', 'product_id', 'location_id')
+                    ->withPivot('quantity_in_store')
+                    ->withTimestamps();
+    }
+    public function getTotalOverallQuantityAttribute()
+    {
+        // Sum quantities from all locations this product is attached to
+        // Ensure 'locations' relationship is loaded before calling this accessor.
+        // If not loaded, it will return 0 or cause N+1 query issues.
+        $allocatedStoreQty = $this->locations->sum('pivot.quantity_in_store');
+
+        // 'qty' is your online stock / global unallocated pool
+        return $this->qty + $allocatedStoreQty;
     }
 }

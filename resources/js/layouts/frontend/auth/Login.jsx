@@ -167,12 +167,12 @@ const Login = () => {
                     setLoading(false);
                 });
         })
-        .catch((csrfError) => {
-            setLoading(false);
-            toast.error("Failed to prepare login. Please try again later.");
-            setError({ general: "CSRF token error." });
-            console.error("CSRF Error:", csrfError);
-        });
+            .catch((csrfError) => {
+                setLoading(false);
+                toast.error("Failed to prepare login. Please try again later.");
+                setError({ general: "CSRF token error." });
+                console.error("CSRF Error:", csrfError);
+            });
     };
 
     // Framer Motion Variants
@@ -329,6 +329,16 @@ const Login = () => {
                                                    text-blue-600 hover:underline
                                                    dark:text-blue-400 dark:hover:underline">
                         Register Now
+                    </Link>
+                </p>
+
+                <p className="text-center mt-6
+                             text-gray-600 dark:text-gray-400">
+                    Forgot Password?{" "}
+                    <Link to="/forgot-password" className="font-semibold
+                                                   text-blue-600 hover:underline
+                                                   dark:text-blue-400 dark:hover:underline">
+                        Reset it here
                     </Link>
                 </p>
             </motion.div>

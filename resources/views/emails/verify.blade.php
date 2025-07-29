@@ -128,7 +128,7 @@
         </div>
         <div class="content">
             <p style="font-size:18px; color:#FFFFFF; margin-bottom: 25px;">Hi <span class="username-highlight">{{ $username }}</span>!</p>
-            <p>Thank you for registering your account with First Digit Communications. To complete your registration and unlock full access, please verify your email address by clicking the button below:</p>
+            <p>Thank you for registering your account with FirstSmart Mart. To complete your registration and unlock full access, please verify your email address by clicking the button below:</p>
             <div style="text-align: center;">
                 <a href="{{ $verificationUrl }}" class="email-button">Verify Your Email</a>
             </div>
@@ -137,9 +137,9 @@
             <p style="word-break: break-all; font-size:14px; color:#6366F1;">{{ $verificationUrl }}</p>
         </div>
         <div class="email-footer">
-            <p>This email was sent to you by First Digit Communications. Please do not reply directly to this message.</p>
+            <p>This email was sent to you by FirstSmart Mart. Please do not reply directly to this message.</p>
             <p style="margin-top:10px;">For any questions, visit our <a href="#" style="color:#A855F7;">Help Center</a> or <a href="mailto:support@firstdigit.com.ng" style="color:#A855F7;">contact support</a>.</p>
-            <p style="margin-top:15px; color:#6B6B8A;">&copy; {{ date('Y') }} First Digit Communications. All rights reserved.</p>
+            <p style="margin-top:15px; color:#6B6B8A;">&copy; {{ date('Y') }} FirstSmart Mart. All rights reserved.</p>
         </div>
     </div>
 </body>

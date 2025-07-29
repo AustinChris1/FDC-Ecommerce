@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import Load from './Load';
+import Load from './Load'; // Assuming this is your loading spinner component
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 import {
@@ -18,7 +18,8 @@ import {
     Hourglass,
     Ban,
     Truck,
-    User
+    User,
+    RefreshCw // Added for a potential refresh button, though not implemented in this version
 } from 'lucide-react';
 
 const UserOrders = () => {
@@ -28,39 +29,56 @@ const UserOrders = () => {
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage] = useState(7);
+    const [itemsPerPage] = useState(7); // Number of orders to display per page
 
     const userEmail = localStorage.getItem('auth_email');
+    const authToken = localStorage.getItem('auth_token');
 
+    // useCallback to memoize the fetchOrders function
     const fetchOrders = useCallback(async () => {
-        if (!userEmail) {
+        if (!userEmail || !authToken) {
             toast.error("You must be logged in to view your orders.");
             setLoading(false);
-            setError("Authentication required.");
-            navigate('/login');
+            setError("Authentication required. Please log in to view your orders.");
+            navigate('/login'); // Redirect to login if not authenticated
             return;
         }
 
         setLoading(true);
-        setError(null);
+        setError(null); // Clear previous errors
         try {
+            // IMPORTANT NOTE FOR OPTIMIZATION AND SECURITY:
+            // Fetching ALL orders and then filtering on the client-side (as currently done)
+            // is inefficient and potentially insecure if 'allOrders' contains sensitive data
+            // for other users.
+            //
+            // RECOMMENDATION: Implement a backend endpoint like '/api/user/orders'
+            // that returns ONLY the orders for the authenticated user.
+            // This would significantly improve performance and security.
             const res = await axios.get('/api/allOrders', {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json' // Ensure JSON response is requested
                 }
             });
 
-            if (res.status === 200 && res.data.orders) {
+            if (res.status === 200 && Array.isArray(res.data.orders)) {
                 const fetchedOrders = res.data.orders;
+
+                // Filter orders by the authenticated user's email
+                // This client-side filtering should ideally be done on the backend.
                 let filtered = fetchedOrders.filter(
                     order => order.email && order.email.toLowerCase() === userEmail.toLowerCase()
                 );
 
+                // Sort orders by creation date in descending order (newest first)
                 filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+                // Deduplicate orders based on order_number and grand_total
+                // This helps in case of duplicate entries from the backend for the same order
                 const uniqueOrdersMap = new Map();
-
                 filtered.forEach(order => {
+                    // Using order_number and grand_total as a composite key for uniqueness
                     const key = `${order.order_number}-${order.grand_total}`;
                     if (!uniqueOrdersMap.has(key)) {
                         uniqueOrdersMap.set(key, order);
@@ -68,38 +86,57 @@ const UserOrders = () => {
                 });
 
                 const processedOrders = Array.from(uniqueOrdersMap.values());
-
                 setUserOrders(processedOrders);
+
                 if (processedOrders.length === 0) {
                     toast.info("No orders found for your account.");
                 }
             } else {
-                toast.error(res.data.message || "Failed to fetch orders.");
-                setError(res.data.message || "Failed to fetch orders.");
+                // Handle cases where status is 200 but data structure is unexpected
+                toast.warn(res.data.message || "No orders found or unexpected data format.");
+                setUserOrders([]); // Ensure orders are cleared
             }
         } catch (err) {
-            console.error("Error fetching orders:", err.response?.data || err);
-            const errorMessage = err.response?.data?.message || "Network error or server issue. Could not load orders.";
+            console.error("Error fetching orders:", err.response?.data || err.message || err);
+            let errorMessage = "An unexpected error occurred. Could not load orders.";
+            if (err.response) {
+                if (err.response.status === 401 || err.response.status === 403) {
+                    errorMessage = "Authentication failed. Please log in again.";
+                    navigate('/login'); // Redirect to login on auth failure
+                } else {
+                    errorMessage = err.response.data?.message || `Server error: ${err.response.status}`;
+                }
+            } else if (err.request) {
+                errorMessage = "Network error. Please check your internet connection.";
+            }
             toast.error(errorMessage);
             setError(errorMessage);
+            setUserOrders([]); // Clear orders on error
         } finally {
             setLoading(false);
         }
-    }, [userEmail, navigate]);
+    }, [userEmail, authToken, navigate]); // Dependencies for useCallback
 
+    // useEffect to fetch orders on component mount and when fetchOrders changes
     useEffect(() => {
         document.title = "My Orders - First Digits";
         fetchOrders();
     }, [fetchOrders]);
 
-    const offset = currentPage * itemsPerPage;
-    const currentOrders = userOrders.slice(offset, offset + itemsPerPage);
-    const pageCount = Math.ceil(userOrders.length / itemsPerPage);
+    // Memoize pagination calculations for performance
+    const { currentOrders, pageCount } = useMemo(() => {
+        const offset = currentPage * itemsPerPage;
+        const current = userOrders.slice(offset, offset + itemsPerPage);
+        const count = Math.ceil(userOrders.length / itemsPerPage);
+        return { currentOrders: current, pageCount: count };
+    }, [userOrders, currentPage, itemsPerPage]);
 
+    // Handler for page change in pagination
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
     };
 
+    // Helper function to determine status badge color
     const getStatusColor = (status) => {
         switch (status) {
             case 'completed': return 'bg-green-600 text-white';
@@ -114,6 +151,7 @@ const UserOrders = () => {
         }
     };
 
+    // Helper function to determine status icon
     const getStatusIcon = (status) => {
         switch (status) {
             case 'completed': return <CheckCircle className="w-4 h-4 mr-1" />;
@@ -128,6 +166,7 @@ const UserOrders = () => {
         }
     };
 
+    // Framer Motion variants for container and table rows
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -136,14 +175,7 @@ const UserOrders = () => {
     const rowVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
-        // Light mode hover (bg-gray-200), Dark mode hover (bg-gray-800)
-        hover: { backgroundColor: "var(--hover-bg-color)" }
     };
-
-    // Use a state or context to determine the current theme if you have one
-    // For this example, I'll assume you switch between light/dark classes directly.
-    // You might need to adjust this if you have a theme provider.
-    // For Framer Motion hover, we'll need to dynamically set the color.
 
     if (loading) {
         return (
@@ -234,13 +266,13 @@ const UserOrders = () => {
                                     {currentOrders.map((order) => (
                                         <motion.tr
                                             key={order.id}
-                                            className="bg-white even:bg-gray-50 dark:even:bg-gray-850 dark:odd:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                                            // Adjusted classes for better light/dark mode distinction
+                                            className="bg-white dark:bg-gray-900 even:bg-gray-50 dark:even:bg-gray-850 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                                             variants={rowVariants}
                                             initial="hidden"
                                             animate="visible"
                                             exit="hidden"
                                             // Dynamically set hover color based on a class that determines the mode
-                                            // For simplicity, I'm using a direct style, but you might have a global theme toggle
                                             whileHover={{ backgroundColor: document.documentElement.classList.contains('dark') ? '#2D3748' : '#F3F4F6' }}
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -253,12 +285,12 @@ const UserOrders = () => {
                                                 ₦{order.grand_total ? order.grand_total.toLocaleString() : '0'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
-                                                {order.payment_method.replace(/_/g, ' ') || 'N/A'}
+                                                {order.payment_method?.replace(/_/g, ' ') || 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)} flex items-center justify-center`}>
                                                     {getStatusIcon(order.status)}
-                                                    {order.status.replace(/_/g, ' ')}
+                                                    {order.status?.replace(/_/g, ' ') || 'Unknown'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -290,7 +322,6 @@ const UserOrders = () => {
                                 onPageChange={handlePageClick}
                                 containerClassName={"flex space-x-2 items-center"}
                                 pageClassName={"block"}
-                                // Light mode classes for pagination
                                 pageLinkClassName={"block px-4 py-2 leading-tight bg-gray-200 border border-gray-300 text-gray-700 hover:bg-gray-300 hover:text-gray-900 rounded-md transition-colors duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"}
                                 previousClassName={"block"}
                                 previousLinkClassName={"block px-4 py-2 leading-tight bg-gray-200 border border-gray-300 text-gray-700 hover:bg-gray-300 hover:text-gray-900 rounded-md transition-colors duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"}

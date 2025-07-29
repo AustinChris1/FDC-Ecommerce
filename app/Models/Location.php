@@ -19,13 +19,17 @@ class Location extends Model
         'is_active',
     ];
 
-    /**
-     * A location can have many products through the product_location pivot table.
-     */
+    // Define the many-to-many relationship with Product using the 'product_location' pivot table
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_location')
-                    ->withPivot('quantity_in_store') // Include the quantity column from the pivot table
-                    ->withTimestamps(); // If you want to use the timestamps on the pivot table
+        return $this->belongsToMany(Product::class, 'product_location', 'location_id', 'product_id')
+            ->withPivot('quantity_in_store') // Crucial for getting the quantity
+            ->withTimestamps(); // If you have created_at/updated_at in pivot
+    }
+
+    // A location can have multiple users (admins) assigned to it
+    public function users()
+    {
+        return $this->hasMany(User::class, 'location_id');
     }
 }

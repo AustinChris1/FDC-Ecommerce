@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
- use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'order_number',
@@ -22,28 +22,35 @@ class Order extends Model
         'zip_code',
         'subtotal',
         'shipping_cost',
-        'discount_amount', 
+        'discount_amount',
         'grand_total',
         'payment_method',
         'paystack_reference',
-        'amount_paid',  
+        'amount_paid',
         'status',
         'items_json',
-        'is_pos_sale',     
+        'is_pos_sale',
+        'location_id',
     ];
 
     protected $casts = [
         'items_json' => 'array',
-        'is_pos_sale' => 'boolean', 
+        'is_pos_sale' => 'boolean',
         'subtotal' => 'float',
         'discount_amount' => 'float',
         'amount_paid' => 'float',
         'grand_total' => 'float',
         'shipping_cost' => 'float',
-    ];  
-    
+        'location_id' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }

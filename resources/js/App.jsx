@@ -32,6 +32,10 @@ import ScrollToTopButton from './layouts/frontend/Components/hooks/ScrollToTopBu
 import ChatSupportButton from './layouts/frontend/Components/ChatSupportButton';
 import SiteNotification from './layouts/frontend/Components/SiteNotification';
 import SubNavbar from './layouts/frontend/Components/SubNavbar';
+import Stores from './layouts/frontend/Components/Stores';
+import ForgotPassword from './layouts/frontend/auth/ForgotPassword';
+import ResetPassword from './layouts/frontend/auth/ResetPassword';
+import AnimatedBackground from './layouts/frontend/Components/AnimatedBackground'; // Import the new component
 
 
 const Master = lazy(() => import('./layouts/admin/Master'));
@@ -105,6 +109,7 @@ function Layout() {
                     }
                 />
                 <Route path="/" element={<Home />} />
+                <Route path="/outlets" element={<Stores />} />
                 <Route path='/track-order' element={<TrackOrder />} />
                 <Route path='/flash-sales' element={<FlashSale />} />
                 <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
@@ -127,11 +132,15 @@ function Layout() {
                 <Route path="/403" element={<Forbidden />} />
                 <Route path="/login" element={<ProtectedRoute element={<Login />} />} />
                 <Route path="/register" element={<ProtectedRoute element={<Register />} />} />
+                <Route path="/forgot-password" element={<ProtectedRoute element={<ForgotPassword />} />} />
+                <Route path="/reset-password" element={<ProtectedRoute element={<ResetPassword />} />} />
                 <Route path="/email/resend" element={<ResendEmail />} />
                 <Route path="/email/verify" element={<VerifyEmail />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             {!isAdminRoute && <Footer />}
+            {/* Render AnimatedBackground only on non-admin routes */}
+            {!isAdminRoute && <AnimatedBackground />}
         </>
     );
 }
@@ -168,7 +177,7 @@ function App() {
                                     <LoadingSpinner />
                                 </div>
                             ) : (
-                                <Suspense fallback={<LoadingSpinner />}> 
+                                <Suspense fallback={<LoadingSpinner />}>
                                     <Layout />
                                     <ScrollToTopButton/>
                                     {/* <ChatSupportButton/> */}

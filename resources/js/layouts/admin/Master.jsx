@@ -24,6 +24,9 @@ import GeneralSettings from '../../components/admin/GeneralSetttings';
 import Sales from '../../components/admin/Sales';
 import Activity from '../../components/admin/Activity';
 import ActivityDashboard from '../../components/admin/Activity';
+import LocationManagement from '../../components/admin/LocationManagement';
+import ProductLocationInventory from '../../components/admin/ProductsLocationInventory';
+import StoreDashboard from '../../components/admin/StoreDashboard';
 
 
 const Master = () => {
@@ -63,7 +66,7 @@ const Master = () => {
 
                         {/* Category Management */}
                         <Route path="category" element={<Category />} /> {/* Renamed from category */}
-                        <Route path="category/view" element={<ViewCategory />} /> 
+                        <Route path="category/view" element={<ViewCategory />} />
                         <Route path="category/edit/:id" element={<EditCategory />} />
 
                         {/* Product Management */}
@@ -73,7 +76,7 @@ const Master = () => {
 
                         {/* Order Management (New) */}
                         <Route path="orders/" element={<ViewOrders />} />
-=                        <Route path="orders/view/:order_number" element={<ViewOrderDetails />} />
+                        =                        <Route path="orders/view/:order_number" element={<ViewOrderDetails />} />
 
 
                         {/* User Management (New) */}
@@ -86,7 +89,9 @@ const Master = () => {
                         <Route path='activity' element={<ActivityDashboard />} />
 
                         <Route path='sales' element={<Sales />} />
-
+                        <Route path='locations' element={<LocationManagement />} />
+                        <Route path='locations/inventory' element={<ProductLocationInventory />} />
+                        <Route path="store/:storeId" element={<StoreDashboard />} />
                         {/* Catch-all for unknown admin routes */}
                         <Route path="*" element={<NotFound />} />
                     </Routes>

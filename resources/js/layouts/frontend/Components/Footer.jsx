@@ -30,7 +30,7 @@ const Iframe = ({ src }) => (
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            title="First Digit Communications Location"
+            title="FirstSmart Mart Location"
         ></iframe>
     </div>
 );
@@ -148,7 +148,7 @@ const Footer = () => {
                             {/* Conditional rendering for logos based on darkMode state */}
                             <img
                                 src={darkMode ? fdcLogo : fdcLogoBlack}
-                                alt="First Digit Communications"
+                                alt="FirstSmart Mart"
                                 className={`${darkMode ? 'h-10 w-auto' : 'h-12 w-auto'}`} /* Adjusted sizes for better visual balance */
                             />
                         </Link>

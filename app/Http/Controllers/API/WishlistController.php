@@ -21,7 +21,8 @@ class WishlistController extends Controller
             ], 401);
         }
 
-        $wishlistItems = Auth::user()->wishlists()->with('product')->get();
+        // Eager load the 'product' relationship, and nested within that, the 'category' relationship
+        $wishlistItems = Auth::user()->wishlists()->with('product.category')->get();
 
         return response()->json([
             'status' => 200,
@@ -48,8 +49,8 @@ class WishlistController extends Controller
 
         // Check if the product is already in the wishlist
         $existingWishlistItem = Wishlist::where('user_id', $user_id)
-                                        ->where('product_id', $product_id)
-                                        ->first();
+                                         ->where('product_id', $product_id)
+                                         ->first();
 
         if ($existingWishlistItem) {
             return response()->json([
@@ -64,10 +65,12 @@ class WishlistController extends Controller
             'product_id' => $product_id,
         ]);
 
+        // Load product details including its category for the newly added item
+        // This ensures the frontend receives the full data structure immediately
         return response()->json([
             'status' => 200,
             'message' => 'Product added to wishlist successfully!',
-            'wishlistItem' => $wishlistItem->load('product'), // Load product details
+            'wishlistItem' => $wishlistItem->load('product.category'), // Load product and its category
         ]);
     }
 
@@ -83,8 +86,8 @@ class WishlistController extends Controller
         $user_id = Auth::id();
 
         $deletedCount = Wishlist::where('user_id', $user_id)
-                                ->where('product_id', $product_id)
-                                ->delete();
+                                 ->where('product_id', $product_id)
+                                 ->delete();
 
         if ($deletedCount > 0) {
             return response()->json([

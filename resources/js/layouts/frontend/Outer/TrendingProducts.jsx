@@ -101,8 +101,8 @@ const TrendingProducts = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Trending Products - First Digit Communications</title>
-                <meta name="description" content="Discover the hottest and most popular trending products at First Digit Communications. Shop what's in demand!" />
+                <title>Trending Products - FirstSmart Mart</title>
+                <meta name="description" content="Discover the hottest and most popular trending products at FirstSmart Mart. Shop what's in demand!" />
             </Helmet>
 
             <div className="container mx-auto max-w-7xl">

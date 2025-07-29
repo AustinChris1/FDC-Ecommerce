@@ -10,7 +10,7 @@ import {
     LogOut,
     KeySquare,
     ShoppingBag,
-    Truck, MessageSquare, HelpCircle, Sun, Moon
+    Truck, Building, MessageSquare, HelpCircle, Sun, Moon
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -217,6 +217,7 @@ const Navbar = () => {
 
     const helpMenuItems = [
         { name: 'Track Order', link: '/track-order', icon: Truck },
+        { name: 'Physical Outlets', link: '/outlets', icon: Building },
         { name: 'Contact', link: '/contact', icon: MessageSquare },
         { name: 'FAQ', link: 'support/faq', icon: HelpCircle },
     ];
@@ -233,7 +234,7 @@ const Navbar = () => {
                 <Link to="/" onClick={() => handleNavigation('/')} className="flex-shrink-0">
                     <img
                         src={darkMode ? fdcLogo : fdcLogoBlack} // Conditional rendering for logos
-                        alt="First Digit Communications"
+                        alt="FirstSmart Mart"
                         className={`${darkMode ? 'h-14 lg:h-14 w-auto sm:h-14' : 'h-14 w-24 sm:h-14'}`}
                     />
                 </Link>
@@ -397,7 +398,7 @@ const Navbar = () => {
                             <Link to="/" onClick={() => handleNavigation('/')} className="flex-shrink-0">
                                 <img
                                     src={darkMode ? fdcLogo : fdcLogoBlack}
-                                    alt="First Digit Communications"
+                                    alt="FirstSmart Mart"
                                     className="h-14 w-auto sm:h-14"
                                 />
                             </Link>

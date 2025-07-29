@@ -774,7 +774,7 @@ const Checkout = () => {
                                         </p>
                                         <div className="space-y-2 text-gray-700 dark:text-gray-200">
                                             <p><span className="font-semibold text-gray-500 dark:text-gray-400">Bank Name:</span> Zenith Bank</p>
-                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Name:</span> First Digit Communications Limited</p>
+                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Name:</span> FirstSmart Mart Limited</p>
                                             <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Number:</span> 1310110966</p>
                                             <p className="flex items-center"><span className="font-semibold text-gray-500 mr-2 dark:text-gray-400">Order Number:</span> <ReceiptText className="w-5 h-5 mr-1" /> <span className="font-bold text-lg text-yellow-600 dark:text-yellow-300">{orderNumber}</span></p>
                                             <p><span className="font-semibold text-gray-500 dark:text-gray-400">Amount:</span> ₦{grandTotal.toLocaleString()}</p>

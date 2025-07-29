@@ -33,8 +33,8 @@ const TermsOfServicePage = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Terms of Service - First Digit Communications</title>
-                <meta name="description" content="Review the Terms of Service for First Digit Communications regarding website usage, product purchases, and intellectual property rights." />
+                <title>Terms of Service - FirstSmart Mart</title>
+                <meta name="description" content="Review the Terms of Service for FirstSmart Mart regarding website usage, product purchases, and intellectual property rights." />
             </Helmet>
 
             <div className="container mx-auto max-w-4xl pt-24">
@@ -96,7 +96,7 @@ const TermsOfServicePage = () => {
                     >
                         <h2 className="text-3xl font-bold text-gray-800 mb-4 dark:text-white">4. Intellectual Property</h2>
                         <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                            The Site and its original content, features, and functionality are and will remain the exclusive property of First Digit Communications Ltd. and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of First Digit Communications Ltd..
+                            The Site and its original content, features, and functionality are and will remain the exclusive property of FirstSmart Mart Ltd. and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of FirstSmart Mart Ltd..
                         </p>
                     </motion.section>
                 </div>

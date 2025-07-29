@@ -14,6 +14,7 @@ import {
     CirclePercent,    // Used for progress indicators (if needed)
     Activity,            // Activity Logs
 } from 'lucide-react'; // Import Lucide React icons
+import { Locate } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => { // Receives isOpen and toggleSidebar from parent
     const location = useLocation(); // To highlight active link
@@ -138,6 +139,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => { // Receives isOpen and toggleSi
                                 >
                                     <CirclePercent className="w-5 h-5 mr-3 text-blue-500" />
                                     Sales
+                                </Link>
+                            </motion.div>
+                            <motion.div
+                                whileHover="hover"
+                                whileTap="tap"
+                                variants={linkHoverVariants}
+                            >
+                                <Link
+                                    className={`flex items-center p-3 rounded-lg transition-all duration-200 ${location.pathname === '/admin/locations' ? activeLinkClasses : normalLinkClasses}`}
+                                    to="/admin/locations"
+                                    onClick={window.innerWidth < 1024 ? toggleSidebar : undefined} // Only close sidebar on click if it's mobile
+                                >
+                                    <Locate className="w-5 h-5 mr-3 text-blue-500" />
+                                    Store locations
                                 </Link>
                             </motion.div>
 

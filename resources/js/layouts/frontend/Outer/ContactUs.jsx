@@ -110,8 +110,8 @@ const ContactUs = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Contact Us - First Digit Communications</title>
-                <meta name="description" content="Get in touch with First Digit Communications. Send us your questions or feedback." />
+                <title>Contact Us - FirstSmart Mart</title>
+                <meta name="description" content="Get in touch with FirstSmart Mart. Send us your questions or feedback." />
             </Helmet>
 
             <motion.div

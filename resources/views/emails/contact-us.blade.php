@@ -121,7 +121,7 @@
         <div class="footer">
             <p>This email was generated automatically by your website's contact form.</p>
             <p>Please do not reply directly to this email. For assistance, contact <a href="mailto:help@firstdigit.com.ng">help@firstdigit.com.ng</a></p>
-            <p style="margin-top:15px; color:#6B6B8A;">&copy; 2025 First Digit Communications. All rights reserved.</p>
+            <p style="margin-top:15px; color:#6B6B8A;">&copy; 2025 FirstSmart Mart. All rights reserved.</p>
         </div>
     </div>
 </body>

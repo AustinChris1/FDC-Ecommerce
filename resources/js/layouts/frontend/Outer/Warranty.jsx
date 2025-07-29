@@ -33,8 +33,8 @@ const Warranty = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Product Warranty - First Digit Communications</title>
-                <meta name="description" content="Understand the product warranty coverage for your purchases at First Digit Communications, including claim procedures and exclusions." />
+                <title>Product Warranty - FirstSmart Mart</title>
+                <meta name="description" content="Understand the product warranty coverage for your purchases at FirstSmart Mart, including claim procedures and exclusions." />
             </Helmet>
 
             <div className="container mx-auto max-w-4xl pt-10">
@@ -74,7 +74,7 @@ const Warranty = () => {
                             If you believe your product is defective and covered under warranty, please follow these steps:
                         </p>
                         <ol className="list-decimal list-inside text-gray-700 space-y-2 mb-6 dark:text-gray-300">
-                            <li>**Contact Customer Support:** Reach out to us at <a href="mailto:help@firstdigitt.com.ng" className="text-blue-600 hover:underline dark:text-blue-400">help@firstdigitt.com.ng</a> with your order number, a description of the issue, and any relevant photos or videos.</li>
+                            <li>**Contact Customer Support:** Reach out to us at <a href="mailto:help@firstdigit.com.ng" className="text-blue-600 hover:underline dark:text-blue-400">help@firstdigit.com.ng</a> with your order number, a description of the issue, and any relevant photos or videos.</li>
                             <li>**Troubleshooting:** Our team may provide initial troubleshooting steps to resolve the issue.</li>
                             <li>**Manufacturer Contact:** If the issue persists, we will guide you through the process of contacting the manufacturer directly for warranty service, as they are often best equipped to handle product-specific repairs or replacements.</li>
                             <li>**Proof of Purchase:** Keep your original receipt or order confirmation as proof of purchase; it is required for all warranty claims.</li>

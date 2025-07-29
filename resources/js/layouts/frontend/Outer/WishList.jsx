@@ -65,8 +65,8 @@ const Wishlist = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Your Wishlist - First Digit Communications</title>
-                <meta name="description" content="View and manage your saved products in your wishlist at First Digit Communications. Shop your favorite items later!" />
+                <title>Your Wishlist - FirstSmart Mart</title>
+                <meta name="description" content="View and manage your saved products in your wishlist at FirstSmart Mart. Shop your favorite items later!" />
             </Helmet>
 
             <div className="mt-24"></div> {/* Spacer for Navbar */}

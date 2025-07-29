@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str; // Import the Str helper for slug generation
 use Carbon\Carbon; // Import Carbon for date/time handling
 use Illuminate\Support\Facades\Log; // Import Log facade for logging
+use App\Models\Location;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+
+
 class ProductController extends Controller
 {
     /**
@@ -137,13 +142,24 @@ class ProductController extends Controller
     /**
      * Retrieve all products.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $products = Product::where('status', '0')->orderBy('created_at', 'desc')->get();
-        return response()->json([
-            'status' => 200,
-            'products' => $products
-        ]);
+        try {
+            // Eager load 'category' and 'locations' relationships
+            // The 'locations' relationship will include 'quantity_in_store' from the pivot table
+            $products = Product::with(['category', 'locations'])->get();
+
+            return new JsonResponse([
+                'status' => 200,
+                'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 500,
+                'message' => 'Failed to fetch products.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -154,10 +170,10 @@ class ProductController extends Controller
     public function newArrivals()
     {
         $newArrivals = Product::where('is_new_arrival', true)
-                            ->where('status', 0) // Assuming 0 means active
-                            ->orderBy('created_at', 'desc')
-                            ->take(20) // Limit to a reasonable number
-                            ->get();
+            ->where('status', 0) // Assuming 0 means active
+            ->orderBy('created_at', 'desc')
+            ->take(20) // Limit to a reasonable number
+            ->get();
 
         return response()->json([
             'status' => 200,
@@ -172,11 +188,11 @@ class ProductController extends Controller
     public function flashSales()
     {
         $flashSales = Product::where('is_flash_sale', true)
-                            ->where('status', 0) // Assuming 0 means active
-                            ->where('flash_sale_starts_at', '<=', Carbon::now())
-                            ->where('flash_sale_ends_at', '>=', Carbon::now())
-                            ->orderBy('flash_sale_ends_at', 'asc') // Order by end time to show soonest ending sales
-                            ->get();
+            ->where('status', 0) // Assuming 0 means active
+            ->where('flash_sale_starts_at', '<=', Carbon::now())
+            ->where('flash_sale_ends_at', '>=', Carbon::now())
+            ->orderBy('flash_sale_ends_at', 'asc') // Order by end time to show soonest ending sales
+            ->get();
 
         return response()->json([
             'status' => 200,
@@ -206,7 +222,7 @@ class ProductController extends Controller
     /**
      * Update an existing product.
      */
- public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         // --- LOGGING START ---
         Log::info('Product update request received.', ['product_id' => $id, 'request_data' => $request->all()]);
@@ -373,7 +389,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::find($id); 
+        $product = Product::find($id);
         if ($product) {
             // Delete associated images before deleting the product record
             $imagePaths = [$product->image, $product->image2, $product->image3, $product->image4];
@@ -395,4 +411,174 @@ class ProductController extends Controller
             ], 404);
         }
     }
+
+    public function posSearch(Request $request)
+    {
+        $query = $request->input('query');
+        $locationId = $request->input('location_id');
+
+        if (!$locationId) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Location ID is required for POS product search.'
+            ], 400);
+        }
+
+        // Fetch products that are active and associated with the given location
+        $products = Product::where('status', 0)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', '%' . $query . '%')
+                    ->orWhere('brand', 'LIKE', '%' . $query . '%')
+                    // Add other searchable fields like SKU if you have them
+                    ->orWhere('link', 'LIKE', '%' . $query . '%');
+            })
+            ->whereHas('locations', function ($q) use ($locationId) {
+                $q->where('locations.id', $locationId);
+            })
+            ->with([
+                'locations' => function ($q) use ($locationId) {
+                    $q->where('locations.id', $locationId)
+                        ->select('locations.id', 'locations.name') // Select only necessary location fields
+                        ->withPivot('quantity_in_store'); // Crucially get the pivot quantity
+                }
+            ])
+            ->get();
+
+        // Transform products to include the specific location's stock directly
+        // and ensure the 'stock' field in the frontend cart refers to this.
+        $transformedProducts = $products->map(function ($product) use ($locationId) {
+            $locationPivot = $product->locations->firstWhere('id', $locationId);
+            $stockAtLocation = $locationPivot ? $locationPivot->pivot->quantity_in_store : 0;
+
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'selling_price' => $product->selling_price,
+                'brand' => $product->brand,
+                'image' => $product->image,
+                'stock_at_location' => $stockAtLocation, // This is the key change for frontend
+                // You might also include product.qty (online stock) if the frontend needs to see it
+                'online_stock' => $product->qty,
+                // 'total_overall_quantity' => $product->total_overall_quantity, // If accessor is appended and needed
+            ];
+        });
+
+        return response()->json([
+            'status' => 200,
+            'products' => $transformedProducts
+        ]);
+    }
+
+    public function getSuggestedPosProducts(Request $request, $locationId): JsonResponse
+    {
+        // Basic authorization check: Only admins (role_as 1 or 2) can view suggested products
+        $user = Auth::user();
+        if (!$user || !in_array($user->role_as, [1, 2])) {
+            return new JsonResponse([ // Explicitly use new JsonResponse
+                'status' => 403,
+                'message' => 'Forbidden. You do not have permission to view products for this location.',
+            ], 403);
+        }
+
+        // Optional: If a location admin, ensure they are only requesting their assigned location
+        if ($user->role_as === 1 && $user->location_id !== (int)$locationId) {
+            return new JsonResponse([ // Explicitly use new JsonResponse
+                'status' => 403,
+                'message' => 'Forbidden. You can only view products for your assigned location.',
+            ], 403);
+        }
+
+        $location = Location::find($locationId);
+        if (!$location) {
+            return new JsonResponse([ // Explicitly use new JsonResponse
+                'status' => 404,
+                'message' => 'Location not found.',
+            ], 404);
+        }
+
+        try {
+            // Get pagination parameters from the request
+            $perPage = $request->input('per_page', 8); // Default to 8 items per page, matching frontend constant
+
+            // Fetch products with their quantity_in_store for the specified location
+            // Use paginate() instead of get() to return paginated data
+            $products = Product::select('products.id', 'products.name', 'products.selling_price', 'products.brand', 'products.image', 'product_location.quantity_in_store as stock_at_location')
+                ->join('product_location', 'products.id', '=', 'product_location.product_id')
+                ->where('product_location.location_id', $locationId)
+                ->where('products.status', 0) // Assuming 0 means active product
+                ->where('product_location.quantity_in_store', '>', 0) // Only show in-stock products
+                ->orderBy('products.name') // Order by name, or by a more relevant metric like 'sales_count' if you track it
+                ->paginate($perPage); // Paginate the results
+
+            return new JsonResponse([ // Explicitly use new JsonResponse
+                'status' => 200,
+                'products' => $products, // This will now be a Paginator instance, which has 'data', 'last_page', etc.
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([ // Explicitly use new JsonResponse
+                'status' => 500,
+                'message' => 'Failed to fetch suggested products.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+        public function getStoreProducts($locationId): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Authorization: Only Super Admin (role_as 2) or the assigned Location Admin (role_as 1)
+        if (!$user || ($user->role_as === 0)) { // Regular users cannot access
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Unauthorized. You do not have permission to view store products.',
+            ], 403);
+        }
+
+        // Additional check for Location Admin: can only view products for their assigned location
+        if ($user->role_as === 1 && $user->location_id !== (int)$locationId) {
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Forbidden. You are not authorized to view products for this location.',
+            ], 403);
+        }
+
+        $location = Location::find($locationId);
+        if (!$location) {
+            return new JsonResponse([
+                'status' => 404,
+                'message' => 'Location not found.',
+            ], 404);
+        }
+
+        try {
+            // Join products with product_location to get quantity_in_store for the specific location
+            $products = Product::select(
+                                'products.id',
+                                'products.name',
+                                'products.brand',
+                                'products.selling_price',
+                                'products.image',
+                                'product_location.quantity_in_store as stock_at_location'
+                            )
+                            ->join('product_location', 'products.id', '=', 'product_location.product_id')
+                            ->where('product_location.location_id', $locationId)
+                            ->where('products.status', 0) // Assuming 0 means active product
+                            ->orderBy('products.name')
+                            ->get();
+
+            return new JsonResponse([
+                'status' => 200,
+                'products' => $products,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error fetching store products for location ID {$locationId}: " . $e->getMessage());
+            return new JsonResponse([
+                'status' => 500,
+                'message' => 'Failed to fetch store products.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

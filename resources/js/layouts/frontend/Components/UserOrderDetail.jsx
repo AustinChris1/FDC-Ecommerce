@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import html2canvas from 'html2canvas'; // Using direct import as requested
-import jsPDF from 'jspdf';           // Using direct import as requested
+import jsPDF from 'jspdf';             // Using direct import as requested
 
 
 const UserOrderDetail = () => {
@@ -41,8 +41,10 @@ const UserOrderDetail = () => {
     const contentRef = useRef(null); // Ref to the content that will be converted to PDF
 
     const userEmail = localStorage.getItem('auth_email');
-    const userLoggedInId = localStorage.getItem('auth_id');
+    // const userLoggedInId = localStorage.getItem('auth_id'); // Not directly used for authorization here, email is primary
+    const authToken = localStorage.getItem('auth_token');
 
+    // Define API_URL using environment variables
     const API_URL = import.meta.env.PROD
         ? 'https://spx.firstdigit.com.ng/api' // your Laravel backend domain or subdomain
         : 'http://localhost:8000/api';
@@ -54,21 +56,22 @@ const UserOrderDetail = () => {
             setLoading(false);
             return;
         }
-        if (!userEmail) {
+        if (!userEmail || !authToken) { // Check for authToken too
             toast.error("You must be logged in to view order details.");
             setError("Authentication required.");
             setLoading(false);
-            navigate('/login');
+            navigate('/login'); // Redirect to login if not authenticated
             return;
         }
 
         setLoading(true);
         setError(null);
         try {
-            const res = await axios.get(`${API_URL}/orders/view/${orderNumber}`, {
+            const res = await axios.get(`${API_URL}/orders/view/${orderNumber}`, { // Use API_URL here
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                    'Authorization': `Bearer ${authToken}`, // Use authToken
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json' // Request JSON response
                 },
                 withCredentials: true,
             });
@@ -76,14 +79,17 @@ const UserOrderDetail = () => {
             if (res.data.status === 200 && res.data.order) {
                 const fetchedOrder = res.data.order;
 
-                const isAuthorized = fetchedOrder.email.toLowerCase() === userEmail.toLowerCase();
+                // Authorization check: Ensure the order belongs to the logged-in user's email
+                // For POS sales, the order might not have a customer email if it was a walk-in,
+                // but for a user to view it, their email must match.
+                const isAuthorized = fetchedOrder.email && fetchedOrder.email.toLowerCase() === userEmail.toLowerCase();
 
                 if (isAuthorized) {
                     setOrder(fetchedOrder);
                 } else {
                     toast.error("You are not authorized to view this order.");
-                    setError("Unauthorized access.");
-                    navigate('/user/orders');
+                    setError("Unauthorized access. This order does not belong to your account.");
+                    navigate('/user/orders'); // Redirect back to user orders
                 }
             } else if (res.data.status === 404) {
                 toast.error(res.data.message || "Order not found.");
@@ -93,14 +99,24 @@ const UserOrderDetail = () => {
                 setError(res.data.message || "Failed to fetch order details.");
             }
         } catch (err) {
-            console.error("Error fetching order details:", err.response?.data || err);
-            const errorMessage = err.response?.data?.message || "Network error or server issue. Could not load order details.";
+            console.error("Error fetching order details:", err.response?.data || err.message || err);
+            let errorMessage = "Network error or server issue. Could not load order details.";
+            if (err.response) {
+                if (err.response.status === 401 || err.response.status === 403) {
+                    errorMessage = "Authentication failed. Please log in again.";
+                    navigate('/login');
+                } else {
+                    errorMessage = err.response.data?.message || `Server error: ${err.response.status}`;
+                }
+            } else if (err.request) {
+                errorMessage = "Network error. Please check your internet connection.";
+            }
             toast.error(errorMessage);
             setError(errorMessage);
         } finally {
             setLoading(false);
         }
-    }, [orderNumber, userEmail, userLoggedInId, navigate, API_URL]);
+    }, [orderNumber, userEmail, authToken, navigate, API_URL]); // Added authToken and API_URL to dependencies
 
     useEffect(() => {
         document.title = `Order Details: ${orderNumber || 'Loading...'}`;
@@ -134,25 +150,25 @@ const UserOrderDetail = () => {
         clonedElement.style.left = '-9999px';
         clonedElement.style.top = '-9999px';
 
-        // Override specific Tailwind-like classes for light theme
-        clonedElement.querySelectorAll('.dark\\:bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF'); // Main background
-        clonedElement.querySelectorAll('.dark\\:bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8'); // Card backgrounds
-        clonedElement.querySelectorAll('.dark\\:bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2'); // Alternating table rows
-        clonedElement.querySelectorAll('.dark\\:bg-gray-800').forEach(el => el.style.backgroundColor = '#E9E9E9'); // Table header/other backgrounds
+        // Override specific Tailwind-like classes for light theme in the cloned element
+        // This ensures the PDF always has a light background regardless of current theme
+        clonedElement.querySelectorAll('.dark\\:bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF');
+        clonedElement.querySelectorAll('.dark\\:bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8');
+        clonedElement.querySelectorAll('.dark\\:bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2');
+        clonedElement.querySelectorAll('.dark\\:bg-gray-800').forEach(el => el.style.backgroundColor = '#E9E9E9');
 
         clonedElement.querySelectorAll('.dark\\:text-gray-200').forEach(el => el.style.color = '#333333');
         clonedElement.querySelectorAll('.dark\\:text-gray-300').forEach(el => el.style.color = '#555555');
         clonedElement.querySelectorAll('.dark\\:text-gray-400').forEach(el => el.style.color = '#777777');
-        clonedElement.querySelectorAll('.dark\\:text-white').forEach(el => el.style.color = '#333333'); // Text that was originally white
+        clonedElement.querySelectorAll('.dark\\:text-white').forEach(el => el.style.color = '#333333');
 
-        // Adjust specific accent colors for better contrast on light background
-        clonedElement.querySelectorAll('.dark\\:text-blue-400').forEach(el => el.style.color = '#0066CC'); // Darker blue
-        clonedElement.querySelectorAll('.dark\\:text-yellow-300').forEach(el => el.style.color = '#CC9900'); // Darker yellow/gold
-        clonedElement.querySelectorAll('.dark\\:text-emerald-400').forEach(el => el.style.color = '#008000'); // Darker green for grand total
-        clonedElement.querySelectorAll('.dark\\:text-purple-400').forEach(el => el.style.color = '#800080'); // Darker purple
-        clonedElement.querySelectorAll('.dark\\:text-orange-400').forEach(el => el.style.color = '#FF8C00'); // Darker orange
+        clonedElement.querySelectorAll('.dark\\:text-blue-400').forEach(el => el.style.color = '#0066CC');
+        clonedElement.querySelectorAll('.dark\\:text-yellow-300').forEach(el => el.style.color = '#CC9900');
+        clonedElement.querySelectorAll('.dark\\:text-emerald-400').forEach(el => el.style.color = '#008000');
+        clonedElement.querySelectorAll('.dark\\:text-purple-400').forEach(el => el.style.color = '#800080');
+        clonedElement.querySelectorAll('.dark\\:text-orange-400').forEach(el => el.style.color = '#FF8C00');
 
-        // Status pill backgrounds and text
+        // Status pill backgrounds and text for PDF
         clonedElement.querySelectorAll('.dark\\:bg-green-600').forEach(el => { el.style.backgroundColor = '#D4EDDA'; el.style.color = '#155724'; });
         clonedElement.querySelectorAll('.dark\\:bg-orange-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
         clonedElement.querySelectorAll('.dark\\:bg-yellow-500').forEach(el => { el.style.backgroundColor = '#FFF3CD'; el.style.color = '#856404'; });
@@ -162,10 +178,8 @@ const UserOrderDetail = () => {
         clonedElement.querySelectorAll('.dark\\:bg-purple-600').forEach(el => { el.style.backgroundColor = '#E2BBEB'; el.style.color = '#4A005B'; });
         clonedElement.querySelectorAll('.dark\\:bg-gray-600').forEach(el => { el.style.backgroundColor = '#E2E6EA'; el.style.color = '#495057'; });
 
-
         clonedElement.querySelectorAll('.dark\\:border-gray-800').forEach(el => el.style.borderColor = '#DDDDDD');
         clonedElement.querySelectorAll('.dark\\:divide-gray-700').forEach(el => el.style.borderColor = '#EEEEEE');
-
 
         // Make the PDF header visible
         const pdfHeader = clonedElement.querySelector('.pdf-header');
@@ -353,6 +367,9 @@ const UserOrderDetail = () => {
                     <h1 style={{ color: '#333333', fontSize: '24px', fontWeight: 'bold' }}>First Digits E-Commerce Receipt</h1>
                     <p style={{ color: '#555555', fontSize: '14px' }}>Order: #{order.order_number}</p>
                     <p style={{ color: '#555555', fontSize: '14px' }}>Date: {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                    {order.is_pos_sale && order.location_name && (
+                        <p style={{ color: '#555555', fontSize: '14px' }}>Location: {order.location_name}</p>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -376,14 +393,14 @@ const UserOrderDetail = () => {
                                 <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Status:</span>
                                 <span className={`ml-2 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusColor(order.status)} flex items-center`}>
                                     {getStatusIcon(order.status)}
-                                    {order.status.replace(/_/g, ' ')}
+                                    {order.status?.replace(/_/g, ' ') || 'Unknown'}
                                 </span>
                             </p>
                             <p className="flex items-center">
                                 <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Payment Method:</span>
                                 <span className="ml-2 flex items-center">
                                     <CreditCard className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
-                                    {order.payment_method.replace(/_/g, ' ')}
+                                    {order.payment_method?.replace(/_/g, ' ') || 'N/A'}
                                 </span>
                             </p>
                             {order.paystack_reference && (
@@ -396,13 +413,13 @@ const UserOrderDetail = () => {
                                 <span className="font-semibold w-36 text-gray-600 dark:text-gray-400">Order Date:</span>
                                 <span className="ml-2 flex items-center">
                                     <Calendar className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-500" />
-                                    {new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+                                    {order.created_at ? new Date(order.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A'}
                                 </span>
                             </p>
                             <p className="flex items-center text-xl font-bold text-emerald-700 dark:text-emerald-400 pt-2">
                                 <span className="font-semibold w-36">Grand Total:</span>
                                 <span className="ml-2 flex items-center">
-                                    ₦{order.grand_total.toLocaleString()}
+                                    ₦{order.grand_total ? order.grand_total.toLocaleString() : '0'}
                                 </span>
                             </p>
                         </div>
@@ -418,7 +435,7 @@ const UserOrderDetail = () => {
                     >
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                             <User className="w-6 h-6 mr-3 text-purple-700 dark:text-purple-400" />
-                            Customer & Shipping
+                            Customer & {order.is_pos_sale ? 'Store Location' : 'Shipping'} Info
                         </h2>
                         <div className="space-y-3 text-gray-700 dark:text-gray-300">
                             <p className="flex items-center">
@@ -439,22 +456,42 @@ const UserOrderDetail = () => {
                                     {order.phone || 'N/A'}
                                 </span>
                             </p>
-                            {order.shipping_address1 && (
-                                <p className="flex items-start">
-                                    <span className="font-semibold w-24 pt-1 text-gray-600 dark:text-gray-400">Address:</span>
-                                    <span className="ml-2 flex items-start flex-grow">
-                                        <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 dark:text-gray-500 flex-shrink-0" />
-                                        <span>
-                                            {order.shipping_address1}, {order.shipping_address2 && `${order.shipping_address2}, `}
-                                            {order.city}, {order.state}, {order.zip_code}
+
+                            {/* Conditional rendering for Shipping Address vs. POS Location */}
+                            {order.is_pos_sale ? (
+                                <>
+                                    <p className="flex items-start">
+                                        <span className="font-semibold w-24 pt-1 text-gray-600 dark:text-gray-400">Location:</span>
+                                        <span className="ml-2 flex items-start flex-grow">
+                                            <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 dark:text-gray-500 flex-shrink-0" />
+                                            <span>
+                                                {order.location_name || 'N/A'}
+                                                {order.location_address && `, ${order.location_address}`}
+                                                {order.location_phone && ` (Phone: ${order.location_phone})`}
+                                            </span>
                                         </span>
-                                    </span>
-                                </p>
-                            )}
-                            {!order.shipping_address1 && order.is_pos_sale && (
-                                <p className="text-gray-500 dark:text-gray-500 text-sm mt-4 italic">
-                                    This was a POS sale (no shipping address recorded).
-                                </p>
+                                    </p>
+                                    <p className="text-gray-500 dark:text-gray-500 text-sm mt-4 italic flex items-center">
+                                        <Info className="w-4 h-4 mr-1 flex-shrink-0" /> This was a Point of Sale (POS) transaction.
+                                    </p>
+                                </>
+                            ) : (
+                                order.shipping_address1 ? (
+                                    <p className="flex items-start">
+                                        <span className="font-semibold w-24 pt-1 text-gray-600 dark:text-gray-400">Address:</span>
+                                        <span className="ml-2 flex items-start flex-grow">
+                                            <MapPin className="w-4 h-4 mr-2 mt-1 text-gray-500 dark:text-gray-500 flex-shrink-0" />
+                                            <span>
+                                                {order.shipping_address1}, {order.shipping_address2 && `${order.shipping_address2}, `}
+                                                {order.city}, {order.state}, {order.zip_code}
+                                            </span>
+                                        </span>
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-500 dark:text-gray-500 text-sm mt-4 italic">
+                                        No shipping address recorded for this order.
+                                    </p>
+                                )
                             )}
                         </div>
                     </motion.div>
@@ -486,10 +523,10 @@ const UserOrderDetail = () => {
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {orderItems.map((item, index) => (
                                         <tr key={index} className="even:bg-gray-50 odd:bg-white dark:even:bg-gray-850 dark:odd:bg-gray-900">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">{item.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.qty || item.quantity}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">₦{item.price.toLocaleString()}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-700 dark:text-emerald-400">₦{(item.qty * item.price).toLocaleString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">{item.name || 'N/A'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{item.qty || item.quantity || '0'}</td> {/* Handle both 'qty' and 'quantity' */}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">₦{(item.price || 0).toLocaleString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-700 dark:text-emerald-400">₦{((item.qty || item.quantity || 0) * (item.price || 0)).toLocaleString()}</td>
                                         </tr>
                                     ))}
                                 </tbody>

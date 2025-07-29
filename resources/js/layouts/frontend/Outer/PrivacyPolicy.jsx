@@ -33,8 +33,8 @@ const PrivacyPolicy = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Privacy Policy - First Digit Communications</title>
-                <meta name="description" content="Read the Privacy Policy of First Digit Communications to understand how we collect, use, and protect your personal information." />
+                <title>Privacy Policy - FirstSmart Mart</title>
+                <meta name="description" content="Read the Privacy Policy of FirstSmart Mart to understand how we collect, use, and protect your personal information." />
             </Helmet>
 
             <div className="container mx-auto max-w-4xl pt-10">
@@ -55,7 +55,7 @@ const PrivacyPolicy = () => {
                     >
                         <h2 className="text-3xl font-bold text-gray-800 mb-4 dark:text-white">Introduction</h2>
                         <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                            This Privacy Policy describes how First Digit Communications Ltd. (referred to as "we", "us", or "our") collects, uses, and discloses your personal information when you visit or make a purchase from https://spx.firstdigit.com.ng (the "Site").
+                            This Privacy Policy describes how FirstSmart Mart Ltd. (referred to as "we", "us", or "our") collects, uses, and discloses your personal information when you visit or make a purchase from https://spx.firstdigit.com.ng (the "Site").
                         </p>
                     </motion.section>
 

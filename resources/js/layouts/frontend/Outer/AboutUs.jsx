@@ -33,8 +33,8 @@ const AboutUs = () => {
             animate="visible"
         >
             <Helmet>
-                <title>About Us - First Digit Communications</title>
-                <meta name="description" content="Learn more about First Digit Communications: our mission, vision, and values." />
+                <title>About Us - FirstSmart Mart</title>
+                <meta name="description" content="Learn more about FirstSmart Mart: our mission, vision, and values." />
             </Helmet>
 
             <motion.div
@@ -44,7 +44,7 @@ const AboutUs = () => {
             >
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 text-gray-800 bg-clip-text
                            dark:text-white dark:bg-clip-text dark:text-transparent dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-600 leading-tight">
-                    About First Digit Communications
+                    About FirstSmart Mart
                 </h1>
                 <p className="text-center text-lg text-gray-600 mb-10 max-w-xl mx-auto dark:text-gray-400">
                     Driving innovation and connecting communities since our inception.
@@ -102,7 +102,7 @@ const AboutUs = () => {
                         <div>
                             <h2 className="text-2xl font-bold text-yellow-700 mb-2 dark:text-yellow-300">Our Journey</h2>
                             <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                                Founded in [Year], First Digit Communications began with a simple goal: to make digital communication accessible and reliable for everyone. Over the years, we've grown, adapted, and innovated, always staying true to our core mission of connecting people.
+                                Founded in [Year], FirstSmart Mart began with a simple goal: to make digital communication accessible and reliable for everyone. Over the years, we've grown, adapted, and innovated, always staying true to our core mission of connecting people.
                             </p>
                         </div>
                     </motion.div>
@@ -115,7 +115,7 @@ const AboutUs = () => {
                         <div>
                             <h2 className="text-2xl font-bold text-purple-700 mb-2 dark:text-purple-300">Our Team</h2>
                             <p className="text-gray-700 leading-relaxed dark:text-gray-300">
-                                Behind First Digit Communications is a passionate team of experts dedicated to technological excellence and outstanding customer service. We believe in collaboration, continuous learning, and pushing the boundaries of what's possible in digital communication.
+                                Behind FirstSmart Mart is a passionate team of experts dedicated to technological excellence and outstanding customer service. We believe in collaboration, continuous learning, and pushing the boundaries of what's possible in digital communication.
                             </p>
                         </div>
                     </motion.div>

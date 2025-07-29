@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../LoadingSpinner';
+import ProductLocationInventory from '../ProductsLocationInventory'; // NEW: Import the inventory component
 
 const EditProducts = () => {
     const { id } = useParams();
@@ -396,6 +397,18 @@ const EditProducts = () => {
                             aria-selected={activeTab === 'specifications'}
                         >
                             Specifications & Features
+                        </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <button
+                            className={`px-5 py-3 text-lg font-semibold border-b-2 border-transparent transition-colors duration-300 ${activeTab === 'specifications' ? 'text-blue-600 border-blue-600' : 'text-gray-700 hover:text-blue-600'}`}
+                            onClick={() => setActiveTab('inventory-by-location')}
+                            type="button"
+                            role="tab"
+                            aria-controls="inventory-by-location"
+                            aria-selected={activeTab === 'inventory-by-location'}
+                        >
+                            Inventory by Location
                         </button>
                     </li>
                 </ul>
@@ -822,6 +835,23 @@ const EditProducts = () => {
                                         </div>
                                     </motion.div>
                                 )}
+                            </motion.div>
+                        )}
+                        {/* NEW: Inventory by Location Tab Content */}
+                        {activeTab === 'inventory-by-location' && (
+                            <motion.div
+                                key="inventoryByLocationTab"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="tab-pane bg-white rounded-lg p-6 border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+                                role="tabpanel"
+                                aria-labelledby="inventory-by-location-tab"
+                            >
+                                {/* Render the ProductLocationInventory component here */}
+                                {id && <ProductLocationInventory productId={id} />}
+                                {!id && <p className="text-red-500">Product ID is required to manage inventory by location.</p>}
                             </motion.div>
                         )}
 

@@ -33,8 +33,8 @@ const ShippingReturns = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Shipping & Returns - First Digit Communications</title>
-                <meta name="description" content="Find detailed information about shipping options, delivery times, and our hassle-free return policy at First Digit Communications." />
+                <title>Shipping & Returns - FirstSmart Mart</title>
+                <meta name="description" content="Find detailed information about shipping options, delivery times, and our hassle-free return policy at FirstSmart Mart." />
             </Helmet>
 
             <div className="container mx-auto max-w-4xl pt-10">

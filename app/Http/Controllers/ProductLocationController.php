@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Location;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 class ProductLocationController extends Controller
 {
     /**
@@ -51,25 +54,32 @@ class ProductLocationController extends Controller
         }
 
         // Eager load products with pivot data
-        $productsInLocation = $location->products()->where('status', 0)->get(); // Assuming status 0 means active product
+        // Assuming status 0 means active product, and you want to show only active
+        $productsInLocation = $location->products()->where('status', 0)->get();
 
         return response()->json([
             'status' => 200,
             'location_id' => $locationId,
-            'products' => $productsInLocation
+            'location_name' => $location->name, // Add location name for frontend
+            'products' => $productsInLocation->map(function ($product) {
+                // Flatten the pivot data into the main product object for easier frontend consumption
+                $product->quantity_in_store = $product->pivot->quantity_in_store;
+                unset($product->pivot); // Remove the pivot object if you don't need it
+                return $product;
+            })
         ]);
     }
 
-
-    /**
-     * Attach/Update a product's quantity at a specific location.
-     * If the product is already attached to the location, its quantity will be updated.
-     * Otherwise, it will be attached.
-     * POST /api/products/{product_id}/locations
-     * Request body: { "location_id": 1, "quantity_in_store": 50 }
-     */
-    public function attachOrUpdateProductLocation(Request $request, $productId)
+    public function attachOrUpdateProductLocation(Request $request, $productId): JsonResponse
     {
+        // Check if the authenticated user is a super admin
+        if (!Auth::check() || Auth::user()->role_as !== 2) { // Assuming 'role' 2 is for super admin
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized: Only super administrators can manage product locations.'
+            ], 403);
+        }
+
         $product = Product::find($productId);
         if (!$product) {
             return response()->json([
@@ -110,8 +120,16 @@ class ProductLocationController extends Controller
      * Detach a product from a specific location.
      * DELETE /api/products/{product_id}/locations/{location_id}
      */
-    public function detachProductLocation($productId, $locationId)
+    public function detachProductLocation($productId, $locationId): JsonResponse
     {
+        // Check if the authenticated user is a super admin
+        if (!Auth::check() || Auth::user()->role_as !== 2) { // Assuming 'role' 2 is for super admin
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized: Only super administrators can manage product locations.'
+            ], 403);
+        }
+
         $product = Product::find($productId);
         if (!$product) {
             return response()->json([

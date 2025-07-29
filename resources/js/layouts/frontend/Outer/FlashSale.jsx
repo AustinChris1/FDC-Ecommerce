@@ -120,8 +120,8 @@ const FlashSale = () => {
             animate="visible"
         >
             <Helmet>
-                <title>Flash Sales - First Digit Communications</title>
-                <meta name="description" content="Discover limited-time flash sales and grab amazing deals on your favorite products at First Digit Communications." />
+                <title>Flash Sales - FirstSmart Mart</title>
+                <meta name="description" content="Discover limited-time flash sales and grab amazing deals on your favorite products at FirstSmart Mart." />
             </Helmet>
 
             <div className="container mx-auto max-w-7xl">
