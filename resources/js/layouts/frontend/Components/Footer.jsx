@@ -18,7 +18,7 @@ import fdcLogoBlack from '../assets/fdcLogoBlack.png'; // Dark logo for light ba
 
 // Google Map Iframe
 const iframeSrc =
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126091.50068803449!2d7.481260032478743!3d9.030942164225989!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0b964ec887e5%3A0x12a34843356767e8!2sNimota%20Plaza!5e0!3m2!1sen!2sng!4v1726406738672!5m2!1sen!2sng';
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.697486822452!2d7.47294477508003!3d9.006972291079313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e76c1256372d3%3A0x6b72a088921200ab!2sIyemi%20Plaza%2C%20Ebeano%20Rd%2C%20Gudu%20District%2C%20Abuja%2C%20Federal%20Capital%20Territory%20900105%2C%20Abuja%2C%20Nigeria!5e0!3m2!1sen!2sus!4v1700684251390!5m2!1sen!2sus';
 
 const Iframe = ({ src }) => (
     <div className="w-full pb-6 h-64 sm:h-80 rounded-xl overflow-hidden shadow-md dark:shadow-xl">
@@ -126,8 +126,8 @@ const Footer = () => {
     return (
         <motion.footer
             className="w-full p-6 text-gray-700
-                       bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 /* Light mode gradient: soft, inviting grays */
-                       dark:text-gray-200 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950" /* Dark mode gradient: deep, rich grays */
+                         bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 /* Light mode gradient: soft, inviting grays */
+                         dark:text-gray-200 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950" /* Dark mode gradient: deep, rich grays */
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -140,8 +140,8 @@ const Footer = () => {
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12
-                                border-b border-gray-300 /* Light mode border: subtle gray */
-                                dark:border-gray-700"> {/* Dark mode border: darker gray */}
+                                 border-b border-gray-300 /* Light mode border: subtle gray */
+                                 dark:border-gray-700"> {/* Dark mode border: darker gray */}
                     {/* Column 1: Brand Info & Socials */}
                     <motion.div variants={itemVariants}>
                         <Link to="/" className="inline-block mb-4">
@@ -153,33 +153,33 @@ const Footer = () => {
                             />
                         </Link>
                         <p className="text-sm leading-relaxed mb-4
-                                      text-gray-600 /* Light mode text: darker gray for readability */
-                                      dark:text-gray-200"> {/* Dark mode text: lighter gray */}
+                                     text-gray-600 /* Light mode text: darker gray for readability */
+                                     dark:text-gray-200"> {/* Dark mode text: lighter gray */}
                             Your ultimate destination for cutting-edge electronics and smart innovations. Experience the future, today.
                         </p>
                         <div className="flex space-x-4">
                             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
                                 className="w-8 h-8 flex items-center justify-center rounded-full transition-all p-1
-                                           bg-gray-200 hover:bg-blue-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
-                                           dark:bg-gray-700 dark:hover:bg-blue-600 dark:text-white"> {/* Dark mode social icon background/text/hover */}
+                                         bg-gray-200 hover:bg-blue-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
+                                         dark:bg-gray-700 dark:hover:bg-blue-600 dark:text-white"> {/* Dark mode social icon background/text/hover */}
                                 <img src={fb} alt="Facebook" className="w-5 h-5" />
                             </a>
                             <a href="https://instagram.com/firstdigits" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
                                 className="w-8 h-8 flex items-center justify-center rounded-full transition-all p-1
-                                           bg-gray-200 hover:bg-pink-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
-                                           dark:bg-gray-700 dark:hover:bg-pink-600 dark:text-white"> {/* Dark mode social icon background/text/hover */}
+                                         bg-gray-200 hover:bg-pink-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
+                                         dark:bg-gray-700 dark:hover:bg-pink-600 dark:text-white"> {/* Dark mode social icon background/text/hover */}
                                 <img src={ig} alt="Instagram" className="w-5 h-5" />
                             </a>
                             <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)"
                                 className="w-8 h-8 flex items-center justify-center rounded-full transition-all p-1
-                                           bg-gray-200 hover:bg-gray-700 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
-                                           dark:bg-gray-700 dark:hover:bg-gray-400 dark:text-white"> {/* Dark mode social icon background/text/hover */}
+                                         bg-gray-200 hover:bg-gray-700 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
+                                         dark:bg-gray-700 dark:hover:bg-gray-400 dark:text-white"> {/* Dark mode social icon background/text/hover */}
                                 <img src={x} alt="X (Twitter)" className="w-5 h-5" />
                             </a>
                             <a href="tel:+2347052500468" aria-label="Phone"
                                 className="w-8 h-8 flex items-center justify-center rounded-full transition-all p-1
-                                           bg-gray-200 hover:bg-green-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
-                                           dark:bg-gray-700 dark:hover:bg-green-600 dark:text-white"> {/* Dark mode social icon background/text/white */}
+                                         bg-gray-200 hover:bg-green-500 text-gray-700 hover:text-white /* Light mode social icon background/text/hover */
+                                         dark:bg-gray-700 dark:hover:bg-green-600 dark:text-white"> {/* Dark mode social icon background/text/white */}
                                 <img src={phoneIcon} alt="Phone" className="w-5 h-5" />
                             </a>
                         </div>
@@ -188,93 +188,93 @@ const Footer = () => {
                     {/* Column 2: Quick Links */}
                     <motion.div variants={itemVariants}>
                         <h3 className="text-xl font-bold mb-6
-                                       text-gray-900 /* Light mode header text: dark gray */
-                                       dark:text-white">Quick Links</h3>
+                                     text-gray-900 /* Light mode header text: dark gray */
+                                     dark:text-white">Quick Links</h3>
                         <ul className="space-y-3">
                             <li><Link to="/shop" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Shop All</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Shop All</Link></li>
                             <li><Link to="/collections/trending" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Trending Products</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Trending Products</Link></li>
                             <li><Link to="/collections/new-arrival" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> New Arrival</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> New Arrival</Link></li>
                             <li><Link to="/about" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> About Us</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> About Us</Link></li>
                             <li><Link to="/contact" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Contact</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Contact</Link></li>
                         </ul>
                     </motion.div>
 
                     {/* Column 3: Support & Information */}
                     <motion.div variants={itemVariants}>
                         <h3 className="text-xl font-bold mb-6
-                                       text-gray-900 /* Light mode header text: dark gray */
-                                       dark:text-white">Support</h3>
+                                     text-gray-900 /* Light mode header text: dark gray */
+                                     dark:text-white">Support</h3>
                         <ul className="space-y-3">
                             <li><Link to="/support/faq" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> FAQ</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> FAQ</Link></li>
                             <li><Link to="/support/shipping-returns" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Shipping & Returns</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Shipping & Returns</Link></li>
                             <li><Link to="/support/warranty" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Warranty</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Warranty</Link></li>
                             <li><Link to="/privacy" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Privacy Policy</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Privacy Policy</Link></li>
                             <li><Link to="/terms" className="text-base flex items-center group transition-colors
-                                           hover:text-blue-600 /* Light mode link hover */
-                                           dark:hover:text-cyan-400"> {/* Dark mode link hover */}
+                                             hover:text-blue-600 /* Light mode link hover */
+                                             dark:hover:text-cyan-400"> {/* Dark mode link hover */}
                                 <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity
-                                                       text-blue-400 /* Light mode arrow color */
-                                                       dark:text-cyan-400" /> Terms of Service</Link></li>
+                                                     text-blue-400 /* Light mode arrow color */
+                                                     dark:text-cyan-400" /> Terms of Service</Link></li>
                         </ul>
                     </motion.div>
 
                     {/* Column 4: Address & Map */}
                     <motion.div variants={itemVariants}>
                         <h3 className="text-xl font-bold mb-6
-                                       text-gray-900 /* Light mode header text: dark gray */
-                                       dark:text-white">Our Location</h3>
+                                     text-gray-900 /* Light mode header text: dark gray */
+                                     dark:text-white">Our Location</h3>
                         <p className="leading-relaxed mb-6 flex items-start
-                                      text-gray-600 /* Light mode text: darker gray */
-                                      dark:text-gray-300"> {/* Dark mode text: lighter gray */}
+                                     text-gray-600 /* Light mode text: darker gray */
+                                     dark:text-gray-300"> {/* Dark mode text: lighter gray */}
                             <MapPin className="w-5 h-5 mr-3 mt-1 flex-shrink-0
-                                               text-gray-500 /* Light mode icon color: medium gray */
-                                               dark:text-gray-400" /> {/* Dark mode icon color: lighter gray */}
-                            Suite 011, Nimota Plaza, Plot 855, Tafawa Balewa Way, Area 11, Garki Abuja, Nigeria
+                                             text-gray-500 /* Light mode icon color: medium gray */
+                                             dark:text-gray-400" /> {/* Dark mode icon color: lighter gray */}
+                            B33 First Floor, Iyemi Plaza, Along Ebeano road, Gudu District Abuja
                         </p>
                         <Iframe src={iframeSrc} />
                     </motion.div>
@@ -282,23 +282,23 @@ const Footer = () => {
 
                 {/* Bottom Section: Copyright & Legal Links */}
                 <motion.div variants={itemVariants} className="pt-8 text-center text-sm
-                                                               text-gray-500 /* Light mode text: medium gray */
-                                                               dark:text-gray-500"> {/* Dark mode text: same medium gray */}
+                                             text-gray-500 /* Light mode text: medium gray */
+                                             dark:text-gray-500"> {/* Dark mode text: same medium gray */}
                     <div className="flex items-center justify-center mb-2">
                         <Copyright className="w-4 h-4 mr-2
-                                               text-gray-500 /* Light mode icon color */
-                                               dark:text-gray-500" />
+                                             text-gray-500 /* Light mode icon color */
+                                             dark:text-gray-500" />
                         <span>Copyright © {currentYear} All rights reserved.</span>
                     </div>
                     <div className="flex flex-col sm:flex-row text-center justify-center gap-4 sm:gap-10 mt-4">
                         <Link to="/terms" className="transition-colors
-                                       text-gray-500 hover:text-blue-600 /* Light mode link/hover */
-                                       dark:text-gray-400 dark:hover:text-blue-400"> {/* Dark mode link/hover */}
+                                     text-gray-500 hover:text-blue-600 /* Light mode link/hover */
+                                     dark:text-gray-400 dark:hover:text-blue-400"> {/* Dark mode link/hover */}
                             Terms of Use
                         </Link>
                         <Link to="/privacy" className="transition-colors
-                                       text-gray-500 hover:text-blue-600 /* Light mode link/hover */
-                                       dark:text-gray-400 dark:hover:text-blue-400"> {/* Dark mode link/hover */}
+                                     text-gray-500 hover:text-blue-600 /* Light mode link/hover */
+                                     dark:text-gray-400 dark:hover:text-blue-400"> {/* Dark mode link/hover */}
                             Privacy Notice
                         </Link>
                     </div>

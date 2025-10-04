@@ -10,9 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 class LocationController extends Controller
 {
-    /**
-     * Display a listing of the resource (all active locations for frontend).
-     */
     public function index()
     {
         $locations = Location::where('is_active', true)->orderBy('name')->get();
@@ -22,9 +19,6 @@ class LocationController extends Controller
         ]);
     }
 
-    /**
-     * Display a listing of all resources (including inactive, for admin).
-     */
     public function allLocationsForAdmin()
     {
         $locations = Location::orderBy('name')->get();
@@ -47,7 +41,7 @@ class LocationController extends Controller
         }
 
         try {
-            $locations = Location::where('is_active', true)->get(['id', 'name']); // Only get necessary fields
+            $locations = Location::where('is_active', true)->get(['id', 'name']);
             return response()->json([
                 'status' => 200,
                 'locations' => $locations,
@@ -61,9 +55,6 @@ class LocationController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -145,9 +136,6 @@ class LocationController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $location = Location::find($id);
@@ -184,9 +172,6 @@ class LocationController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $location = Location::find($id);

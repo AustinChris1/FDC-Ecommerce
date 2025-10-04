@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { CalendarDays, MapPin, Smartphone, Tablet, Monitor, Users, Globe } from 'lucide-react'; // Added more specific icons
+import { CalendarDays, MapPin, Smartphone, Tablet, Monitor, Users, Globe } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Helmet } from 'react-helmet-async'; // For SEO management
+import { Helmet } from 'react-helmet-async';
 
 // Professional and vibrant palette adjusted for a lighter background
 const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#A855F7', '#EC4899', '#34D399'];
 
 export default function ActivityDashboard() {
   const [visitorsPerDay, setVisitorsPerDay] = useState([]);
-  const [topCountries, setTopCountries] = useState([]); // Renamed from topLocations for clarity
+  const [topCountries, setTopCountries] = useState([]);
   const [totalVisits, setTotalVisits] = useState(0);
   const [mostActiveHours, setMostActiveHours] = useState([]);
   const [totalUniqueIPs, setTotalUniqueIPs] = useState(0);
   const [topCities, setTopCities] = useState([]);
-  const [topDevices, setTopDevices] = useState([]); // Raw user agent data
-  const [topPlatforms, setTopPlatforms] = useState([]); // Parsed OS/device name from backend
+  const [topDevices, setTopDevices] = useState([]);
+  const [topPlatforms, setTopPlatforms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     setError(false);
-    // Fetch data from your Laravel API endpoint
+
     fetch('/api/analytics/dashboard')
       .then(res => {
         if (!res.ok) {
@@ -33,7 +33,7 @@ export default function ActivityDashboard() {
       .then(data => {
         // Set all fetched data to their respective states
         setVisitorsPerDay(data.visitors_per_day || []);
-        setTopCountries(data.top_locations || []); // Backend still sends as top_locations
+        setTopCountries(data.top_locations || []);
         setTotalVisits(data.total_visits || 0);
         setMostActiveHours(data.most_active_hours || []);
         setTotalUniqueIPs(data.total_unique_ips || 0);
@@ -48,10 +48,8 @@ export default function ActivityDashboard() {
         setError(true);
         setLoading(false);
       });
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
-  // Helper to choose appropriate device icon based on device/platform string
-  // Adjusted colors to be visible on lighter backgrounds
   const getDeviceIcon = (deviceString) => {
     const lowerCaseDevice = deviceString.toLowerCase();
     if (lowerCaseDevice.includes('iphone') || lowerCaseDevice.includes('android') || lowerCaseDevice.includes('mobile phone')) {
@@ -64,9 +62,9 @@ export default function ActivityDashboard() {
       return <Monitor size={16} className="inline-block mr-2 text-green-600" />;
     }
     if (lowerCaseDevice.includes('robot') || lowerCaseDevice.includes('crawler')) {
-      return <Users size={16} className="inline-block mr-2 text-gray-500" />; // For bots
+      return <Users size={16} className="inline-block mr-2 text-gray-500" />;
     }
-    return <Users size={16} className="inline-block mr-2 text-gray-500" />; // Default fallback
+    return <Users size={16} className="inline-block mr-2 text-gray-500" />;
   };
 
   // Custom Tooltip for Recharts (adjusted for light theme compatibility)
@@ -294,7 +292,7 @@ export default function ActivityDashboard() {
                   fill="#8884d8"
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   labelLine={false}
-                  labelStyle={{ fill: '#333', fontSize: '12px' }} // Set label color for light background
+                  labelStyle={{ fill: '#333', fontSize: '12px' }}
                 >
                   {topPlatforms.map((entry, index) => (
                     <Cell key={`platform-cell-${index}`} fill={COLORS[index % COLORS.length]} />

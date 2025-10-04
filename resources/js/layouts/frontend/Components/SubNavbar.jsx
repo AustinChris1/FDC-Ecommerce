@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import Load from './Load'; // Assuming you have this component
+import Load from './Load';
 
 const SubNavbar = () => {
     const navigate = useNavigate();
@@ -12,11 +12,9 @@ const SubNavbar = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Number of categories to display directly on the SubNavbar
-    const displayedCategoryCount = 4; // You can adjust this number
+    const displayedCategoryCount = 4;
 
     useEffect(() => {
-        // Fetch categories for the SubNavbar
         axios.get('/api/getCategory')
             .then(res => {
                 if (res.data.status === 200 && res.data.category) {
@@ -41,7 +39,7 @@ const SubNavbar = () => {
     }, []);
 
     const handleCategoryClick = (link) => {
-        setIsSidebarOpen(false); // Close sidebar on category click
+        setIsSidebarOpen(false);
         navigate(link);
     };
 
@@ -100,7 +98,6 @@ const SubNavbar = () => {
                                     <span className="absolute left-0 bottom-0 w-full h-[2px] dark:bg-cyan-400 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
                                 </Link>
                             ))}
-                            {/* Optionally, add a "More" link if there are more categories than displayed */}
                             {categories.length > displayedCategoryCount && !loading && (
                                 <button
                                     onClick={() => setIsSidebarOpen(true)}
@@ -114,10 +111,7 @@ const SubNavbar = () => {
                     )}
                 </div>
 
-                {/* Placeholder for right-side items, or remove if not needed */}
-                {/* This div is crucial to maintain 'justify-between' behavior, making the middle section flex-grow */}
                 <div className="hidden md:block w-fit">
-                    {/* You can add other quick links or icons here if desired, e.g., a currency selector */}
                 </div>
             </div>
 

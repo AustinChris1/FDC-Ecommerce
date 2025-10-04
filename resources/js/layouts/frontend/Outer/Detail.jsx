@@ -155,6 +155,28 @@ const ProductDetail = () => {
         }
     };
 
+useEffect(() => {
+    if (product) {
+        let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+
+        const isProductInList = recentlyViewed.some(p => p.id === product.id);
+
+        if (!isProductInList) {
+            recentlyViewed.unshift({
+                id: product.id,
+                name: product.name,
+                image: product.image,
+                category_link: categoryLink,
+                product_link: productLink,
+            });
+
+            recentlyViewed = recentlyViewed.slice(0, 8);
+
+            localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+        }
+    }
+}, [product]); 
+
     const totalReviews = reviews.length;
     const totalPagesReviews = Math.ceil(totalReviews / reviewsPerPage);
     const startIndex = (currentPage - 1) * reviewsPerPage;
@@ -163,7 +185,6 @@ const ProductDetail = () => {
     const changeReviewsPage = (pageNumber) => {
         if (pageNumber < 1 || pageNumber > totalPagesReviews) return;
         setCurrentPage(pageNumber);
-        // Scroll to the reviews section when changing page
         window.scrollTo({ top: document.getElementById('reviews-section')?.offsetTop - 100, behavior: 'smooth' });
     };
 
@@ -491,117 +512,116 @@ const ProductDetail = () => {
                 </motion.div>
             </div>
 
-            {/* Product Tabs Section */ }
-    <motion.div className="mt-16 mb-6 dark:bg-gray-900 bg-white rounded-xl shadow-2xl p-3 sm:p-8 lg:p-5 dark:border dark:border-gray-800 border border-gray-200" variants={containerVariants}>
-        {/* Sticky and responsive tab buttons */}
-        <div
-            className="sticky z-40 top-[84px] dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 flex flex-wrap justify-center gap-1 px-1 py-1 sm:flex-nowrap sm:gap-4 sm:px-4 sm:py-3"
-        >
-            <TabButton
-                icon={<Info className="w-3 h-3 sm:w-5 sm:h-5" />}
-                label="Description"
-                isActive={activeTab === 'description'}
-                onClick={() => setActiveTab('description')}
-            />
-            <TabButton
-                icon={<Package className="w-3 h-3 sm:w-5 sm:h-5" />}
-                label="Specifications"
-                isActive={activeTab === 'specifications'}
-                onClick={() => setActiveTab('specifications')}
-            />
-            <TabButton
-                icon={<ListChecks className="w-3 h-3 sm:w-5 sm:h-5" />}
-                label="Features"
-                isActive={activeTab === 'features'}
-                onClick={() => setActiveTab('features')}
-            />
-            <TabButton
-                icon={<Lightbulb className="w-3 h-3 sm:w-5 sm:h-5" />}
-                label={`Reviews (${totalReviews})`}
-                isActive={activeTab === 'reviews'}
-                onClick={() => setActiveTab('reviews')}
-            />
-        </div>
-        <AnimatePresence mode='wait'>
-            <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-            >
-                {activeTab === 'description' && (
-                    <div className="pt-8">
-                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Info className="w-8 h-8" />Product Description</h3>
-                        <p className="dark:text-gray-300 text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-                            {product.description || 'No detailed description is available for this product yet. Please check back later!'}
-                        </p>
-                    </div>
-                )}
-
-                {activeTab === 'specifications' && (
-                    <div className="pt-8">
-                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Package className="w-8 h-8" />Technical Specifications</h3>
-                        {productSpecifications.length > 0 ? (
-                            <div className="overflow-x-auto rounded-lg dark:border dark:border-gray-700 border border-gray-300">
-                                <table className="w-full text-left dark:text-gray-300 text-gray-700">
-                                    <thead className="text-xs dark:text-gray-400 text-gray-500 uppercase dark:bg-gray-800 bg-gray-100">
-                                        <tr>
-                                            <th scope="col" className="px-6 py-3">Specification</th>
-                                            <th scope="col" className="px-6 py-3">Detail</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {productSpecifications.map((spec, index) => (
-                                            <tr key={index} className="dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 dark:hover:bg-gray-800 hover:bg-gray-50 transition-colors duration-200">
-                                                <td className="px-6 py-4 font-medium dark:text-white text-gray-800 whitespace-nowrap">{spec.feature}</td>
-                                                <td className="px-6 py-4">{spec.value}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <p className="dark:text-gray-400 text-gray-600">No specifications available for this product.</p>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'features' && (
-                    <div className="pt-8">
-                        <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1">
-                            <ListChecks className="w-8 h-8" />
-                            Key Features
-                        </h3>
-
-                        {productFeatures.length > 0 ? (
-                            <ul className="list-disc list-inside space-y-3 dark:text-gray-300 text-gray-700 text-lg ml-4">
-                                {productFeatures.map((item, index) => (
-                                    <li key={index} className="flex items-start">
-                                        <ChevronRight className="w-5 h-5 mt-1 mr-2 flex-shrink-0 dark:text-cyan-400 text-blue-600" />
-                                        <span>{item.feature}</span> {/* ✅ Corrected here */}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="dark:text-gray-400 text-gray-600">No features listed for this product.</p>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'reviews' && (
+            {/* Product Tabs Section */}
+            <motion.div className="mt-16 mb-6 dark:bg-gray-900 bg-white rounded-xl shadow-2xl p-3 sm:p-8 lg:p-5 dark:border dark:border-gray-800 border border-gray-200" variants={containerVariants}>
+                <div
+                    className="sticky z-40 top-[84px] dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 flex flex-wrap justify-center gap-1 px-1 py-1 sm:flex-nowrap sm:gap-4 sm:px-4 sm:py-3"
+                >
+                    <TabButton
+                        icon={<Info className="w-3 h-3 sm:w-5 sm:h-5" />}
+                        label="Description"
+                        isActive={activeTab === 'description'}
+                        onClick={() => setActiveTab('description')}
+                    />
+                    <TabButton
+                        icon={<Package className="w-3 h-3 sm:w-5 sm:h-5" />}
+                        label="Specifications"
+                        isActive={activeTab === 'specifications'}
+                        onClick={() => setActiveTab('specifications')}
+                    />
+                    <TabButton
+                        icon={<ListChecks className="w-3 h-3 sm:w-5 sm:h-5" />}
+                        label="Features"
+                        isActive={activeTab === 'features'}
+                        onClick={() => setActiveTab('features')}
+                    />
+                    <TabButton
+                        icon={<Lightbulb className="w-3 h-3 sm:w-5 sm:h-5" />}
+                        label={`Reviews (${totalReviews})`}
+                        isActive={activeTab === 'reviews'}
+                        onClick={() => setActiveTab('reviews')}
+                    />
+                </div>
+                <AnimatePresence mode='wait'>
                     <motion.div
-                        id="reviews-section"
+                        key={activeTab}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="dark:bg-gray-900 bg-white rounded-xl pt-8"
                     >
-                        <h3 className="text-3xl font-bold mb-8 dark:text-cyan-400 text-blue-700">Customer Reviews ({totalReviews})</h3>
+                        {activeTab === 'description' && (
+                            <div className="pt-8">
+                                <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Info className="w-8 h-8" />Product Description</h3>
+                                <p className="dark:text-gray-300 text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                                    {product.description || 'No detailed description is available for this product yet. Please check back later!'}
+                                </p>
+                            </div>
+                        )}
 
-                        {/* Review Form */}
-                                                        {localStorage.getItem('auth_token') ? (
+                        {activeTab === 'specifications' && (
+                            <div className="pt-8">
+                                <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1"><Package className="w-8 h-8" />Technical Specifications</h3>
+                                {productSpecifications.length > 0 ? (
+                                    <div className="overflow-x-auto rounded-lg dark:border dark:border-gray-700 border border-gray-300">
+                                        <table className="w-full text-left dark:text-gray-300 text-gray-700">
+                                            <thead className="text-xs dark:text-gray-400 text-gray-500 uppercase dark:bg-gray-800 bg-gray-100">
+                                                <tr>
+                                                    <th scope="col" className="px-6 py-3">Specification</th>
+                                                    <th scope="col" className="px-6 py-3">Detail</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {productSpecifications.map((spec, index) => (
+                                                    <tr key={index} className="dark:bg-gray-900 bg-white dark:border-b dark:border-gray-700 border-b border-gray-200 dark:hover:bg-gray-800 hover:bg-gray-50 transition-colors duration-200">
+                                                        <td className="px-6 py-4 font-medium dark:text-white text-gray-800 whitespace-nowrap">{spec.feature}</td>
+                                                        <td className="px-6 py-4">{spec.value}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <p className="dark:text-gray-400 text-gray-600">No specifications available for this product.</p>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'features' && (
+                            <div className="pt-8">
+                                <h3 className="text-2xl font-bold mb-6 dark:text-cyan-400 text-blue-700 flex items-center gap-1">
+                                    <ListChecks className="w-8 h-8" />
+                                    Key Features
+                                </h3>
+
+                                {productFeatures.length > 0 ? (
+                                    <ul className="list-disc list-inside space-y-3 dark:text-gray-300 text-gray-700 text-lg ml-4">
+                                        {productFeatures.map((item, index) => (
+                                            <li key={index} className="flex items-start">
+                                                <ChevronRight className="w-5 h-5 mt-1 mr-2 flex-shrink-0 dark:text-cyan-400 text-blue-600" />
+                                                <span>{item.feature}</span> {/* ✅ Corrected here */}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="dark:text-gray-400 text-gray-600">No features listed for this product.</p>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'reviews' && (
+                            <motion.div
+                                id="reviews-section"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="dark:bg-gray-900 bg-white rounded-xl pt-8"
+                            >
+                                <h3 className="text-3xl font-bold mb-8 dark:text-cyan-400 text-blue-700">Customer Reviews ({totalReviews})</h3>
+
+                                {/* Review Form */}
+                                {localStorage.getItem('auth_token') ? (
                                     <motion.form
                                         onSubmit={handleReviewSubmit}
                                         className="mb-12 p-6 dark:bg-gray-800 bg-gray-100 rounded-lg shadow-inner dark:border dark:border-gray-700 border border-gray-300"
@@ -637,114 +657,112 @@ const ProductDetail = () => {
                                     </p>
                                 )}
 
-
-                        {/* Display Reviews */}
-                        {reviews.length > 0 ? (
-                            <div className="space-y-8">
-                                {currentReviews.map((review) => (
-                                    <motion.div
-                                        key={review.id}
-                                        className="p-6 dark:bg-gray-800 bg-gray-100 rounded-lg shadow-md dark:border dark:border-gray-700 border border-gray-300"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="flex items-center mb-3">
-                                            <div className="dark:bg-gray-700 bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-lg mr-4">
-                                                {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'U'}
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold dark:text-white text-gray-800">{review.user_name || 'Anonymous User'}</p>
-                                                <StarRating rating={review.rating} />
-                                            </div>
-                                        </div>
-                                        <p className="dark:text-gray-300 text-gray-700 text-sm mb-4">{formatDate(review.created_at)}</p>
-                                        <p className="dark:text-gray-200 text-gray-900 leading-relaxed whitespace-pre-line">{review.review}</p>
-                                    </motion.div>
-                                ))}
-                                {/* Pagination for Reviews */}
-                                {totalPagesReviews > 1 && (
-                                    <div className="flex justify-center items-center space-x-2 mt-8">
-                                        <motion.button
-                                            onClick={() => changeReviewsPage(currentPage - 1)}
-                                            disabled={currentPage === 1}
-                                            className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            <ArrowLeft className="w-5 h-5" />
-                                        </motion.button>
-                                        {[...Array(totalPagesReviews)].map((_, index) => (
-                                            <motion.button
-                                                key={index}
-                                                onClick={() => changeReviewsPage(index + 1)}
-                                                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${currentPage === index + 1
-                                                        ? 'dark:bg-cyan-600 bg-blue-600 text-white'
-                                                        : 'dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300'
-                                                    }`}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
+                                {/* Display Reviews */}
+                                {reviews.length > 0 ? (
+                                    <div className="space-y-8">
+                                        {currentReviews.map((review) => (
+                                            <motion.div
+                                                key={review.id}
+                                                className="p-6 dark:bg-gray-800 bg-gray-100 rounded-lg shadow-md dark:border dark:border-gray-700 border border-gray-300"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.3 }}
                                             >
-                                                {index + 1}
-                                            </motion.button>
+                                                <div className="flex items-center mb-3">
+                                                    <div className="dark:bg-gray-700 bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-lg mr-4">
+                                                        {review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'U'}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold dark:text-white text-gray-800">{review.user?.name || 'Anonymous User'}</p>
+                                                        <StarRating rating={review.rating} />
+                                                    </div>
+                                                </div>
+                                                <p className="dark:text-gray-300 text-gray-700 text-sm mb-4">{formatDate(review.created_at)}</p>
+                                                <p className="dark:text-gray-200 text-gray-900 leading-relaxed whitespace-pre-line">{review.review}</p>
+                                            </motion.div>
                                         ))}
-                                        <motion.button
-                                            onClick={() => changeReviewsPage(currentPage + 1)}
-                                            disabled={currentPage === totalPagesReviews}
-                                            className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            <ArrowRight className="w-5 h-5" />
-                                        </motion.button>
+                                        {/* Pagination for Reviews */}
+                                        {totalPagesReviews > 1 && (
+                                            <div className="flex justify-center items-center space-x-2 mt-8">
+                                                <motion.button
+                                                    onClick={() => changeReviewsPage(currentPage - 1)}
+                                                    disabled={currentPage === 1}
+                                                    className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                >
+                                                    <ArrowLeft className="w-5 h-5" />
+                                                </motion.button>
+                                                {[...Array(totalPagesReviews)].map((_, index) => (
+                                                    <motion.button
+                                                        key={index}
+                                                        onClick={() => changeReviewsPage(index + 1)}
+                                                        className={`px-4 py-2 rounded-lg font-semibold transition-colors ${currentPage === index + 1
+                                                            ? 'dark:bg-cyan-600 bg-blue-600 text-white'
+                                                            : 'dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300'
+                                                            }`}
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                    >
+                                                        {index + 1}
+                                                    </motion.button>
+                                                ))}
+                                                <motion.button
+                                                    onClick={() => changeReviewsPage(currentPage + 1)}
+                                                    disabled={currentPage === totalPagesReviews}
+                                                    className="px-4 py-2 dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-gray-600 hover:bg-gray-300 transition-colors"
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                >
+                                                    <ArrowRight className="w-5 h-5" />
+                                                </motion.button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center p-8 dark:bg-gray-800 bg-gray-100 rounded-lg dark:text-gray-400 text-gray-600 border dark:border-gray-700 border-gray-300">
+                                        <p className="text-lg font-medium mb-4">No reviews yet for this product.</p>
+                                        <p>Be the first to share your thoughts!</p>
                                     </div>
                                 )}
-                            </div>
-                        ) : (
-                            <div className="text-center p-8 dark:bg-gray-800 bg-gray-100 rounded-lg dark:text-gray-400 text-gray-600 border dark:border-gray-700 border-gray-300">
-                                <p className="text-lg font-medium mb-4">No reviews yet for this product.</p>
-                                <p>Be the first to share your thoughts!</p>
-                            </div>
-                        )}
+                            </motion.div>
+                        )}                    </motion.div>
+                </AnimatePresence>
+            </motion.div>
+
+            {/* Image Modal */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <motion.div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={closeModal}
+                    >
+                        <motion.div
+                            className="relative max-w-5xl max-h-[90vh] w-full"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking on image
+                        >
+                            <button
+                                onClick={closeModal}
+                                className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black/50 rounded-full p-2"
+                                aria-label="Close image modal"
+                            >
+                                <X className="w-8 h-8" />
+                            </button>
+                            <img
+                                src={`/${modalImage}`}
+                                alt="Zoomed Product"
+                                className="w-full h-full object-contain"
+                            />
+                        </motion.div>
                     </motion.div>
                 )}
-            </motion.div>
-        </AnimatePresence>
-    </motion.div>
-
-    {/* Image Modal */ }
-    <AnimatePresence>
-        {isModalOpen && (
-            <motion.div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={closeModal}
-            >
-                <motion.div
-                    className="relative max-w-5xl max-h-[90vh] w-full"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking on image
-                >
-                    <button
-                        onClick={closeModal}
-                        className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black/50 rounded-full p-2"
-                        aria-label="Close image modal"
-                    >
-                        <X className="w-8 h-8" />
-                    </button>
-                    <img
-                        src={`/${modalImage}`}
-                        alt="Zoomed Product"
-                        className="w-full h-full object-contain"
-                    />
-                </motion.div>
-            </motion.div>
-        )}
-    </AnimatePresence>
+            </AnimatePresence>
         </motion.div >
     );
 };

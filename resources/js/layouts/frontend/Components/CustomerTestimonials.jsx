@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
-// Placeholder data for testimonials
-// In a real application, you might fetch these from your backend
 const testimonials = [
     {
         id: 1,
@@ -77,7 +75,7 @@ const CustomerTestimonials = () => {
                     const nextIndex = (prevIndex + 1) % (testimonials.length - (itemsToShow - 1));
                     return nextIndex;
                 });
-            }, 5000); // Change testimonial every 5 seconds
+            }, 5000); 
         };
 
         const stopAutoplay = () => {
@@ -92,14 +90,14 @@ const CustomerTestimonials = () => {
         }
 
         return () => stopAutoplay();
-    }, [itemsToShow]); // Restart autoplay if itemsToShow changes
+    }, [itemsToShow]); 
 
     const handleNext = () => {
         setCurrentIndex(prevIndex => {
             const nextIndex = (prevIndex + 1) % (testimonials.length - (itemsToShow - 1));
             return nextIndex;
         });
-        clearInterval(intervalRef.current); // Pause autoplay on manual interaction
+        clearInterval(intervalRef.current);
     };
 
     const handlePrev = () => {
@@ -107,7 +105,7 @@ const CustomerTestimonials = () => {
             const newIndex = prevIndex - 1;
             return newIndex < 0 ? testimonials.length - (itemsToShow - 1) - 1 : newIndex;
         });
-        clearInterval(intervalRef.current); // Pause autoplay on manual interaction
+        clearInterval(intervalRef.current);
     };
 
 
@@ -120,7 +118,7 @@ const CustomerTestimonials = () => {
     const testimonialCardVariants = {
         hidden: { opacity: 0, scale: 0.9, y: 30 },
         visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-        exit: { opacity: 0, scale: 0.9, y: -30, transition: { duration: 0.4, ease: "easeIn" } } // Exit animation
+        exit: { opacity: 0, scale: 0.9, y: -30, transition: { duration: 0.4, ease: "easeIn" } }
     };
 
     // Calculate the offset for the carousel transformation
@@ -128,12 +126,12 @@ const CustomerTestimonials = () => {
 
     return (
         <section
-            ref={sectionRef} // Attach ref for intersection observer
+            ref={sectionRef} 
             className="py-16 md:py-24 bg-gray-50 text-gray-900 relative overflow-hidden border-t border-gray-200
                        dark:bg-gray-950 dark:text-white dark:border-gray-800"
             style={{
                 backgroundImage: `radial-gradient(at 0% 100%, rgba(200,200,250,0.4) 0%, transparent 50%),
-                                  radial-gradient(at 100% 0%, rgba(250,200,200,0.4) 0%, transparent 50%)`, // Lighter, more airy gradients
+                                  radial-gradient(at 100% 0%, rgba(250,200,200,0.4) 0%, transparent 50%)`,
                 backgroundBlendMode: 'overlay',
             }}
         >
@@ -172,7 +170,7 @@ const CustomerTestimonials = () => {
                         <motion.div
                             ref={carouselRef}
                             className="flex"
-                            initial={false} // Prevent initial animation on transform
+                            initial={false}
                             animate={{ x: carouselOffset + '%' }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         >
@@ -180,11 +178,11 @@ const CustomerTestimonials = () => {
                                 {testimonials.map((testimonial, i) => (
                                     <motion.div
                                         key={testimonial.id}
-                                        className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4" // Use padding for gap
+                                        className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4" 
                                         variants={testimonialCardVariants}
                                         initial="hidden"
                                         animate="visible"
-                                        exit="exit" // Apply exit animation
+                                        exit="exit"
                                     >
                                         <div className="bg-white rounded-xl p-8 shadow-xl h-full flex flex-col justify-between
                                                     group transform hover:scale-103 transition-transform duration-300 ease-out

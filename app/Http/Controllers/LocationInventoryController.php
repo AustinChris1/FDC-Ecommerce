@@ -4,21 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Location; // Use your Location model
-use App\Models\Product; // Use your Product model
+use App\Models\Location; 
+use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class LocationInventoryController extends Controller
 {
-    /**
-     * Get products and their quantities for a specific location.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $locationId
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getLocationInventory(Request $request, $locationId)
     {
         Log::info("Attempting to fetch inventory for location ID: {$locationId}");
@@ -48,7 +41,6 @@ class LocationInventoryController extends Controller
 
         if ($user->role_as == 2) { // Super Admin
             Log::info("Super admin (User ID: {$user->id}) accessing inventory for location ID: {$locationId}.");
-            // No additional checks needed for super admin
         } elseif ($user->role_as == 1) { // Location Admin
             if ($user->location_id != $locationId) {
                 Log::warning("Location admin (User ID: {$user->id}, Location ID: {$user->location_id}) attempted to access unauthorized location inventory (Target Location ID: {$locationId}).");
@@ -68,8 +60,7 @@ class LocationInventoryController extends Controller
 
         // Fetch products associated with this location, including their pivot quantity
         try {
-            // Use the products relationship defined in your Location model
-            $products = $location->products()->with('category')->get(); // Eager load category if it exists
+            $products = $location->products()->with('category')->get();
 
             // Transform data for frontend
             $inventory = $products->map(function ($product) {
@@ -77,11 +68,10 @@ class LocationInventoryController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'sku' => $product->brand,
-                    'category' => $product->category->name ?? 'N/A', // Access category name if relation exists
-                    'brand' => $product->brand, // Assuming brand exists
+                    'category' => $product->category->name ?? 'N/A',
+                    'brand' => $product->brand,
                     'quantity_in_store' => $product->pivot->quantity_in_store,
                     'selling_price' => $product->selling_price,
-                    // Add other relevant product details you want to display
                 ];
             });
 

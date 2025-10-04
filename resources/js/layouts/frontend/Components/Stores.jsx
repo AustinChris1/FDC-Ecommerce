@@ -2,25 +2,24 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import LoadingSpinner from './Loader'; // Adjust path as needed
+import LoadingSpinner from './Loader';
 import { MapPin, Phone, Clock, Search, Building } from 'lucide-react';
 
 const Stores = () => {
     const [locations, setLocations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedState, setSelectedState] = useState(''); // State for filtering by geographical state
+    const [selectedState, setSelectedState] = useState('');
 
-    // MODIFIED: Function to extract a simple "state" from store name or address
     const extractStateFromAddress = (name, address) => {
-        const combinedText = `${name || ''} ${address || ''}`.toLowerCase(); // Combine name and address for search
+        const combinedText = `${name || ''} ${address || ''}`.toLowerCase();
 
         const nigerianStates = [
             'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
             'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'Gombe', 'Imo',
             'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos',
             'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers',
-            'Sokoto', 'Taraba', 'Yobe', 'Zamfara', 'FCT' // Added FCT explicitly
+            'Sokoto', 'Taraba', 'Yobe', 'Zamfara', 'FCT'
         ];
 
         // Check for specific states first
@@ -33,18 +32,17 @@ const Stores = () => {
                 return state;
             }
         }
-        return 'Other'; // Default if no known state is found in either field
+        return 'Other';
     };
 
     // Fetch locations data
     const fetchLocations = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/api/locations'); // No auth token needed for public view
+            const response = await axios.get('/api/locations');
             if (response.data.status === 200) {
                 const processedLocations = response.data.locations.map(loc => ({
                     ...loc,
-                    // MODIFIED: Pass both name and address to the state extraction function
                     parsedState: extractStateFromAddress(loc.name, loc.address),
                     working_hours: loc.working_hours || 'Mon-Fri: 9 AM - 5 PM, Sat: 10 AM - 3 PM'
                 }));
@@ -118,10 +116,10 @@ const Stores = () => {
         },
         hover: {
             scale: 1.03,
-            boxShadow: "0px 12px 24px rgba(0,0,0,0.15)", // More pronounced shadow on hover
+            boxShadow: "0px 12px 24px rgba(0,0,0,0.15)",
             transition: { duration: 0.2 }
         },
-        tap: { scale: 0.98 }, // Subtle tap animation
+        tap: { scale: 0.98 },
         exit: { opacity: 0, y: -20, transition: { duration: 0.2 } },
     };
 

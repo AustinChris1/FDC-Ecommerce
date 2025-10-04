@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -13,6 +13,8 @@ const OrderConfirmation = () => {
     const [orderDetails, setOrderDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [siteSettings, setSiteSettings] = useState(null);
+    const [errorSettings, setErrorSettings] = useState(false);
 
     const fetchOrderDetails = useCallback(async () => {
         if (!orderNumber) {
@@ -26,7 +28,6 @@ const OrderConfirmation = () => {
         try {
             setLoading(true);
             setError(false);
-            // Fetch order details from your backend API
             const response = await axios.get(`/api/orders/view/${orderNumber}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
@@ -55,7 +56,38 @@ const OrderConfirmation = () => {
         fetchOrderDetails();
     }, [fetchOrderDetails]);
 
-    // Animation variants (kept as is, they look good)
+    useEffect(() => {
+        setLoading(true);
+        setErrorSettings(false);
+        axios.get(`/api/settings/general`) 
+            .then(res => {
+                if (res.status === 200 && res.data.settings) {
+                    setSiteSettings(res.data.settings);
+                } else {
+                    toast.error(res.data.message || "Failed to load site settings.");
+                    setErrorSettings(true);
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching site settings:", err);
+                toast.error("Network error or server issue. Could not load site settings.");
+                setErrorSettings(true);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
+    const bank_name = useMemo(() => {
+        return siteSettings?.bank_name ?? '';
+    }, [siteSettings]);
+    const acct_name = useMemo(() => {
+        return siteSettings?.acct_name ?? '';
+    }, [siteSettings]);
+    const acct_no = useMemo(() => {
+        return parseFloat(siteSettings?.acct_no ?? 0);
+    }, [siteSettings]);
+
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -91,7 +123,7 @@ const OrderConfirmation = () => {
             .then(() => {
                 toast.success(
                     <div className="flex items-center">
-                        <ClipboardCopy className="text-green-500 dark:text-green-400 mr-2" /> {/* Adjusted icon color */}
+                        <ClipboardCopy className="text-green-500 dark:text-green-400 mr-2" />
                         <span>Copied to clipboard!</span>
                     </div>,
                     { icon: false }
@@ -110,7 +142,7 @@ const OrderConfirmation = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-200 flex items-center justify-center p-4">
-                <Loader className="w-12 h-12 animate-spin text-blue-600 dark:text-lime-400" /> {/* Adjusted loader color */}
+                <Loader className="w-12 h-12 animate-spin text-blue-600 dark:text-lime-400" />
                 <p className="ml-4 text-lg">Loading order details...</p>
             </div>
         );
@@ -132,7 +164,7 @@ const OrderConfirmation = () => {
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-red-500 mb-4 leading-tight">
                         Order Not Found
                     </h1>
-                    <p className="text-base sm:text-lg mb-6 text-gray-700 dark:text-gray-200"> {/* Adjusted text color */}
+                    <p className="text-base sm:text-lg mb-6 text-gray-700 dark:text-gray-200">
                         We couldn't load the details for order number "{orderNumber}". It might be invalid, or an error occurred.
                     </p>
                     <Link
@@ -170,7 +202,7 @@ const OrderConfirmation = () => {
                     transition={{ type: "spring", stiffness: 260, damping: 20 }}
                     className="mb-4 sm:mb-6 flex justify-center"
                 >
-                    <CheckCircle className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 dark:text-lime-400" /> {/* Adjusted icon color */}
+                    <CheckCircle className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 dark:text-lime-400" />
                 </motion.div>
 
                 <motion.h1
@@ -180,7 +212,7 @@ const OrderConfirmation = () => {
                     Order Confirmed!
                 </motion.h1>
 
-                <motion.p className="text-base sm:text-lg mb-5 sm:mb-6 text-gray-700 dark:text-gray-200" variants={itemVariants}> {/* Adjusted text color */}
+                <motion.p className="text-base sm:text-lg mb-5 sm:mb-6 text-gray-700 dark:text-gray-200" variants={itemVariants}>
                     Thank you for your purchase. Your order has been successfully placed.
                 </motion.p>
 
@@ -189,7 +221,7 @@ const OrderConfirmation = () => {
                         className="mb-6 sm:mb-8 p-3 sm:p-4 bg-gray-100 rounded-lg border border-gray-300 inline-block w-full max-w-xs sm:max-w-none dark:bg-gray-800 dark:border-gray-700" // Light mode classes added
                         variants={itemVariants}
                     >
-                        <p className="text-gray-600 text-sm sm:text-base mb-1 sm:mb-2 dark:text-gray-400">Your Order Number:</p> {/* Adjusted text color */}
+                        <p className="text-gray-600 text-sm sm:text-base mb-1 sm:mb-2 dark:text-gray-400">Your Order Number:</p>
                         <div className="flex items-center justify-center space-x-2">
                             <motion.span
                                 className="text-blue-600 text-2xl sm:text-3xl font-bold tracking-wide break-all dark:text-yellow-300" // Adjusted text color
@@ -218,21 +250,21 @@ const OrderConfirmation = () => {
                         <h3 className="text-xl sm:text-2xl font-bold text-blue-600 mb-3 sm:mb-4 flex items-center dark:text-blue-400"> {/* Adjusted heading color */}
                             <Banknote className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3" /> Bank Transfer Details
                         </h3>
-                        <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-3 dark:text-gray-300"> {/* Adjusted text color */}
+                        <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-3 dark:text-gray-300">
                             Please complete your transfer of <span className="font-bold text-blue-700 dark:text-cyan-400">₦{grand_total ? grand_total.toLocaleString() : 'N/A'}</span> using the Order Number provided above.
                             Your order will be processed once payment is confirmed.
                         </p>
-                        <div className="space-y-1.5 sm:space-y-2 text-gray-800 text-sm sm:text-base dark:text-gray-200"> {/* Adjusted text color */}
-                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Bank Name:</span> Fidelity Bank</p> {/* Adjusted text color */}
-                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Account Name:</span> First Digits Ltd</p> {/* Adjusted text color */}
-                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Account Number:</span> 0123456789</p> {/* Adjusted text color */}
+                        <div className="space-y-1.5 sm:space-y-2 text-gray-800 text-sm sm:text-base dark:text-gray-200">
+                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Bank Name:</span> {bank_name}</p>
+                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Account Name:</span> {acct_name}</p>
+                            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Account Number:</span> {acct_no}</p>
                         </div>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4 dark:text-gray-400"> {/* Adjusted text color */}
+                        <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4 dark:text-gray-400">
                             Remember to include your **Order Number** in the transaction description.
                         </p>
                     </motion.div>
                 ) : (
-                    <motion.p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 dark:text-gray-400" variants={itemVariants}> {/* Adjusted text color */}
+                    <motion.p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 dark:text-gray-400" variants={itemVariants}>
                         Your payment has been processed successfully. We've sent a confirmation email to your registered email address.
                     </motion.p>
                 )}

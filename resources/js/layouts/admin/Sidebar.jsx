@@ -2,37 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    LayoutDashboard,    // Dashboard icon
-    HardDrive,          // Categories (as a drive/storage)
-    Package,            // Products (as a package/item)
-    Users,              // Users/Teams (used for Teams in your code)
-    ClipboardList,      // Orders
-    Settings,           // General Settings
-    BarChart,           // Reports/Analytics (used for View Products in your code)
-    ChevronDown,        // For sub-menu dropdowns (if implemented later)
-    X,                  // Close button for mobile
-    CirclePercent,    // Used for progress indicators (if needed)
-    Activity,            // Activity Logs
-} from 'lucide-react'; // Import Lucide React icons
+    LayoutDashboard,
+    HardDrive,
+    Package,
+    Users,
+    ClipboardList,
+    Settings,
+    BarChart,
+    ChevronDown,
+    X,
+    CirclePercent,
+    Activity,
+} from 'lucide-react';
 import { Locate } from 'lucide-react';
 
-const Sidebar = ({ isOpen, toggleSidebar }) => { // Receives isOpen and toggleSidebar from parent
-    const location = useLocation(); // To highlight active link
-    const authEmail = localStorage.getItem('auth_email') || 'Admin User'; // Fallback for display
+const Sidebar = ({ isOpen, toggleSidebar }) => { 
+    const location = useLocation(); 
+    const authEmail = localStorage.getItem('auth_email') || 'Admin User';
 
-    // State to manage sub-menu open/close (if you decide to add sub-menus)
-    // No changes here as they are not directly related to the responsiveness issue
     const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
     const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
 
-    // Effect to close sidebar on mobile navigation
     useEffect(() => {
-        // Only trigger if on a small screen and the sidebar is currently open
-        // We ensure toggleSidebar exists to prevent errors if it's somehow not passed
         if (window.innerWidth < 1024 && isOpen && toggleSidebar) {
-            toggleSidebar(); // Close sidebar on navigation if it's mobile
+            toggleSidebar();
         }
-    }, [location.pathname]); // Dependency on location.pathname ensures it runs on route change
+    }, [location.pathname]); 
 
     // Effect to prevent body scroll when sidebar is open on mobile
     useEffect(() => {
@@ -91,7 +86,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => { // Receives isOpen and toggleSi
             {/* Conditional rendering for mobile, always render on desktop */}
             {(isOpen || window.innerWidth >= 1024) && (
                 <motion.div
-                    className="fixed lg:static lg:h-screen lg:pt-0 top-0 left-0 h-full w-64 bg-white shadow-xl lg:shadow-none border-r border-gray-200 z-40 flex flex-col pt-16"
+                    className="fixed lg:static lg:h-screen lg:pt-0 top-0 left-0 bottom-0 h-full w-64 bg-white shadow-xl lg:shadow-none border-r border-gray-200 z-40 flex flex-col pt-16"
                     initial={window.innerWidth < 1024 && !isOpen ? "hidden" : "visible"} // Only animate in from 'hidden' if on mobile and *not* already open
                     animate="visible" // Always transition to 'visible' state (either animated in or statically present)
                     exit="hidden" // Only animate out (slide left) when 'isOpen' becomes false on mobile

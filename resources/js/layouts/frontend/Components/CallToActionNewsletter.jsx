@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Mail, ArrowRight, ShoppingBag, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify'; // For user feedback
+import { toast } from 'react-toastify';
 
 const CallToActionNewsletter = () => {
     const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ const CallToActionNewsletter = () => {
     // For scroll-based animation
     const { ref, inView } = useInView({
         triggerOnce: true,
-        threshold: 0.1, // Trigger when 10% of the component is visible
+        threshold: 0.1,
     });
 
     const handleSubscribe = (e) => {
@@ -20,10 +20,9 @@ const CallToActionNewsletter = () => {
             toast.error('Please enter a valid email address!');
             return;
         }
-        // In a real application, you'd send this email to your backend
         console.log('Subscribed with:', email);
         toast.success(`Thank you for subscribing, ${email}!`);
-        setEmail(''); // Clear the input
+        setEmail('');
     };
 
     // Framer Motion variants
@@ -48,7 +47,7 @@ const CallToActionNewsletter = () => {
 
     return (
         <section
-            ref={ref} // Attach ref for intersection observer
+            ref={ref}
             className="py-16 md:py-24 bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-950 text-white relative overflow-hidden border-t border-gray-800"
         >
             {/* Subtle background abstract shapes/glows */}

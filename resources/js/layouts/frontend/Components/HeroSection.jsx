@@ -1,22 +1,17 @@
-// HeroSection.jsx (Your HeroSlider component from the previous response)
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, ArrowRight, Sparkles, Gift, Flame, Package, Wallet, Tag, Cloud, Zap, Percent, ShoppingCart, Truck, CreditCard, Star } from 'lucide-react';
 
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-creative';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-// Import required modules
 import { EffectCreative, Autoplay, Pagination, Navigation } from 'swiper/modules';
 
-// --- Global Animation Variants (Adjusted for faster, more impactful entry) ---
 
 const contentContainerVariants = {
     hidden: { opacity: 0 },

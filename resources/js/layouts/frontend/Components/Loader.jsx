@@ -1,17 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react'; // Using a single icon for a subtle animation
+import { Loader2 } from 'lucide-react';
 
 const LoadingSpinner = ({ size = 'lg' }) => {
-    // Determine size classes
     const sizeClasses = {
         'sm': 'w-8 h-8 text-cyan-400',
         'md': 'w-12 h-12 text-lime-400',
-        'lg': 'w-16 h-16 text-blue-500', // Default large for full-screen
+        'lg': 'w-16 h-16 text-blue-500',
         'xl': 'w-24 h-24 text-purple-400',
     };
 
-    // Determine text size based on spinner size
     const textClasses = {
         'sm': 'text-sm',
         'md': 'text-base',
@@ -25,7 +23,7 @@ const LoadingSpinner = ({ size = 'lg' }) => {
             opacity: 1,
             transition: {
                 duration: 0.5,
-                when: "beforeChildren", // Animate container before children
+                when: "beforeChildren",
                 staggerChildren: 0.1
             }
         },
@@ -35,8 +33,8 @@ const LoadingSpinner = ({ size = 'lg' }) => {
     const dotVariants = {
         initial: { y: "0%" },
         animate: {
-            y: ["0%", "-50%", "0%"], // Bounce effect
-            scaleY: [1, 0.6, 1], // Squash and stretch
+            y: ["0%", "-50%", "0%"],
+            scaleY: [1, 0.6, 1],
             transition: {
                 duration: 0.8,
                 repeat: Infinity,
@@ -50,9 +48,9 @@ const LoadingSpinner = ({ size = 'lg' }) => {
         animate: (i) => ({
             pathLength: 1,
             opacity: [0.2, 1, 0.2],
-            rotate: 360, // Continuous rotation
+            rotate: 360,
             transition: {
-                duration: 2 + i * 0.2, // Staggered and slightly varied speed
+                duration: 2 + i * 0.2,
                 ease: "linear",
                 repeat: Infinity,
                 repeatType: "loop"

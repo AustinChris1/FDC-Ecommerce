@@ -16,11 +16,10 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AdminSettingsController;
 use App\Http\Controllers\API\WishlistController;
-use App\Http\Controllers\LocationController; // Import LocationController
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProductLocationController;
 use App\Http\Controllers\LocationInventoryController;
 
-// NEW: Public Location Routes (e.g., for "Find a Store" page)
 Route::get('locations', [LocationController::class, 'index']); // Get all active locations
 
 
@@ -29,6 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::post('/wishlist/add', [WishlistController::class, 'add']);
     Route::delete('/wishlist/remove/{product_id}', [WishlistController::class, 'remove']);
+
+    Route::post('/user/update/{id}', [UsersController::class, 'UserUpdate']);
+
 });
 
 // Activity dashboard
@@ -73,11 +75,10 @@ Route::get('fetchProducts/{categoryLink}/{productLink}', [FrontendController::cl
 Route::get('/search', [FrontendController::class, 'search']);
 Route::get('/team/view', [TeamController::class, 'index']);
 Route::get('/settings/general', [AdminSettingsController::class, 'getSettings']);
-
+Route::get('products-by-category/{categoryLink}', [FrontendController::class, 'productsByCategory']);
 Route::post('forgot-password', [AuthController::class, 'sendResetLinkEmail']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
-// NEW: Public Location Routes (e.g., for "Find a Store" page)
-Route::get('locations', [LocationController::class, 'index']); // Get all active locations
+Route::get('locations', [LocationController::class, 'index']);
 
 // Admin Routes (Protected by Sanctum and Role Middleware)
 Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
@@ -88,9 +89,8 @@ Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
             'message' => 'Authenticated',
         ]);
     });
-        // ---  ROUTE FOR THE AUTHENTICATED USER'S DETAILS ---
+
     Route::get('/user', function (Request $request) {
-        // Eager load the location relationship for the authenticated user
         $user = $request->user()->load('location'); 
         return response()->json([
             'status' => 200,
@@ -103,15 +103,14 @@ Route::middleware(['auth:sanctum', 'isApiAdmin'])->group(function () {
      Route::get('/admin/pos/products/suggested/{locationId}', [ProductController::class, 'getSuggestedPosProducts']);
     Route::get('/admin/locations/{locationId}/inventory', [LocationInventoryController::class, 'getLocationInventory']);
 
-    // NEW: Location Management Routes (Admin Only)
-    Route::get('admin/locations', [LocationController::class, 'allLocationsForAdmin']); // Get all locations including inactive
+    Route::get('admin/locations', [LocationController::class, 'allLocationsForAdmin']);
     Route::post('admin/locations', [LocationController::class, 'store']);
     Route::get('admin/locations/{id}', [LocationController::class, 'show']);
     Route::post('admin/locations/{id}', [LocationController::class, 'update']);
     Route::delete('admin/locations/{id}', [LocationController::class, 'destroy']);
     Route::get('locations/all', [LocationController::class, 'allLocations']);
 
-        // NEW: Store Dashboard Specific Routes
+        //Store Dashboard Specific Routes
     Route::get('/admin/stores/{locationId}/admins', [UsersController::class, 'getStoreAdmins']); // Get admins for a specific store
     Route::get('/admin/stores/{locationId}/products', [ProductController::class, 'getStoreProducts']); // Get products for a specific store
 

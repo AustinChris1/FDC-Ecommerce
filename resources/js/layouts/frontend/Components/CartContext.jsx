@@ -1,7 +1,6 @@
-// src/context/CartContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { ShoppingCart } from 'lucide-react'; // For the toast icon
+import { ShoppingCart } from 'lucide-react';
 
 const CartContext = createContext();
 
@@ -10,7 +9,6 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-    // Initialize cart from localStorage or an empty array
     const [cartItems, setCartItems] = useState(() => {
         try {
             const localCart = localStorage.getItem('cartItems');
@@ -21,7 +19,6 @@ export const CartProvider = ({ children }) => {
         }
     });
 
-    // New state for cart sidebar visibility
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     // Save cart to localStorage whenever it changes
@@ -56,7 +53,7 @@ export const CartProvider = ({ children }) => {
                 icon: <ShoppingCart className="text-lime-400" />
             });
         }
-        setIsCartOpen(true); // Open the cart sidebar when an item is added
+        setIsCartOpen(true);
     };
 
     const removeFromCart = (productId) => {
@@ -77,7 +74,7 @@ export const CartProvider = ({ children }) => {
     const clearCart = () => {
         setCartItems([]);
         toast.info('Cart cleared!');
-        setIsCartOpen(false); // Close cart sidebar when cleared
+        setIsCartOpen(false);
     };
 
     // Function to toggle cart sidebar
@@ -103,9 +100,9 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        isCartOpen, // Add to context value
-        toggleCart, // Add to context value
-        setIsCartOpen, // Add to context value if direct control needed
+        isCartOpen, 
+        toggleCart, 
+        setIsCartOpen,
     };
 
     return (

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import LoadingSpinner from './LoadingSpinner'; // Assuming you have this
+import LoadingSpinner from './LoadingSpinner';
 import {
     Search,
     PlusCircle,
@@ -21,10 +21,10 @@ import {
     RefreshCw,
     Package,
     Tag,
-    MapPin, // New icon for location
-    UserCheck, // For authenticated user details
-    ChevronLeft, // For pagination
-    ChevronRight, // For pagination
+    MapPin,
+    UserCheck,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -33,27 +33,28 @@ const Sales = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-    // Cart item structure: { id, name, selling_price, qty, stock_at_location, brand, image }
     const [cart, setCart] = useState([]);
     const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', phone: '' });
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [amountPaid, setAmountPaid] = useState('');
     const [discountAmount, setDiscountAmount] = useState(0);
     const [processedOrder, setProcessedOrder] = useState(null);
+    const [discountType, setDiscountType] = useState('none');
+    const [discountPercentage, setDiscountPercentage] = useState(0);
 
     // State for locations and user's assigned location
     const [locations, setLocations] = useState([]);
     const [selectedLocationId, setSelectedLocationId] = useState('');
     const [isLocationsLoading, setIsLocationsLoading] = useState(true);
     const [authUserLocationId, setAuthUserLocationId] = useState(null);
-    const [authUserRole, setAuthUserRole] = useState(null); // 0: user, 1: admin, 2: super admin
+    const [authUserRole, setAuthUserRole] = useState(null);
 
     // State for Suggested Products Pagination
     const [suggestedProducts, setSuggestedProducts] = useState([]);
     const [isSuggestedProductsLoading, setIsSuggestedProductsLoading] = useState(false);
     const [suggestedProductsCurrentPage, setSuggestedProductsCurrentPage] = useState(1);
     const [suggestedProductsTotalPages, setSuggestedProductsTotalPages] = useState(1);
-    const SUGGESTED_PRODUCTS_PER_PAGE = 8; // Define how many suggested products per page
+    const SUGGESTED_PRODUCTS_PER_PAGE = 8;
 
 
     const productSearchTimeout = useRef(null);
@@ -61,7 +62,7 @@ const Sales = () => {
 
     useEffect(() => {
         document.title = "POS Sales";
-        fetchInitialData(); // Fetch user details and locations on component mount
+        fetchInitialData();
     }, []);
 
     // Effect to fetch suggested products when selectedLocationId or current page changes
@@ -69,23 +70,21 @@ const Sales = () => {
         if (selectedLocationId) {
             fetchSuggestedProducts(selectedLocationId, suggestedProductsCurrentPage);
         } else {
-            setSuggestedProducts([]); // Clear suggested products if no location is selected
+            setSuggestedProducts([]);
             setSuggestedProductsTotalPages(1);
             setSuggestedProductsCurrentPage(1);
         }
-    }, [selectedLocationId, suggestedProductsCurrentPage]); // Added suggestedProductsCurrentPage as dependency
+    }, [selectedLocationId, suggestedProductsCurrentPage]);
 
-    // NEW: Effect to trigger receipt download immediately after a sale is processed
     useEffect(() => {
         if (processedOrder) {
-            // Give a small delay to ensure the DOM has updated with the receipt content
             const timer = setTimeout(() => {
                 printReceipt();
-            }, 500); // Adjust delay if needed
+            }, 500);
 
-            return () => clearTimeout(timer); // Cleanup timer
+            return () => clearTimeout(timer);
         }
-    }, [processedOrder]); // Depend on processedOrder
+    }, [processedOrder]);
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -96,13 +95,11 @@ const Sales = () => {
             toast.error("Authentication token missing. Please log in.");
             setLoading(false);
             setIsLocationsLoading(false);
-            // navigate('/login'); // Uncomment if you want to redirect to login
             return;
         }
 
         try {
-            // Fetch authenticated user details
-            const userResponse = await axios.get('/api/user', { // Assuming this endpoint returns user details
+            const userResponse = await axios.get('/api/user', {
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
 
@@ -112,21 +109,18 @@ const Sales = () => {
                 setAuthUserLocationId(user.location_id);
 
                 // Fetch locations based on user role
-                const locationsResponse = await axios.get('/api/locations', { // Using public locations endpoint
+                const locationsResponse = await axios.get('/api/locations', {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
 
                 if (locationsResponse.data.status === 200 && Array.isArray(locationsResponse.data.locations)) {
                     setLocations(locationsResponse.data.locations);
 
-                    // If user is a location admin, pre-select their location and disable the dropdown
                     if (user.role_as === 1 && user.location_id) {
                         setSelectedLocationId(user.location_id);
                     } else if (user.role_as === 2 && locationsResponse.data.locations.length > 0) {
-                        // For Super Admins, default to the first location if available, otherwise leave blank
                         setSelectedLocationId(locationsResponse.data.locations[0].id);
                     } else {
-                        // For General Admins (role_as 1, no location_id) or other roles, no location is pre-selected
                         setSelectedLocationId('');
                         if (user.role_as === 1 && !user.location_id) {
                             toast.warn("As a general admin, you must be assigned to a location to make sales.");
@@ -147,7 +141,6 @@ const Sales = () => {
         }
     };
 
-    // Fetch suggested products for the selected location with pagination
     const fetchSuggestedProducts = async (locationId, page) => {
         setIsSuggestedProductsLoading(true);
         try {
@@ -156,8 +149,8 @@ const Sales = () => {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
             });
             if (response.data.status === 200 && response.data.products) {
-                setSuggestedProducts(response.data.products.data); // Laravel's paginate returns 'data' array
-                setSuggestedProductsTotalPages(response.data.products.last_page); // Laravel's last_page
+                setSuggestedProducts(response.data.products.data);
+                setSuggestedProductsTotalPages(response.data.products.last_page);
             } else {
                 setSuggestedProducts([]);
                 setSuggestedProductsTotalPages(1);
@@ -167,7 +160,6 @@ const Sales = () => {
             console.error("Error fetching suggested products:", error.response?.data || error.message);
             setSuggestedProducts([]);
             setSuggestedProductsTotalPages(1);
-            // Only show error if it's not a 403 (forbidden for non-admins)
             if (error.response?.status !== 403) {
                 toast.error("Error loading suggested products.");
             }
@@ -176,7 +168,6 @@ const Sales = () => {
         }
     };
 
-    // Pagination handlers for suggested products
     const handlePrevSuggestedPage = () => {
         setSuggestedProductsCurrentPage(prevPage => Math.max(1, prevPage - 1));
     };
@@ -185,7 +176,6 @@ const Sales = () => {
         setSuggestedProductsCurrentPage(prevPage => Math.min(suggestedProductsTotalPages, prevPage + 1));
     };
 
-    // --- Product Search & Selection ---
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchTerm(query);
@@ -195,11 +185,10 @@ const Sales = () => {
         }
 
         const term = query.trim();
-        if (term.length > 2 && selectedLocationId) { // Only search if location is selected
+        if (term.length > 2 && selectedLocationId) {
             productSearchTimeout.current = setTimeout(async () => {
                 setLoading(true);
                 try {
-                    // Use the new POS-specific search endpoint
                     const response = await axios.get('/api/admin/pos/products/search', {
                         params: { query: term, location_id: selectedLocationId },
                         headers: {
@@ -233,7 +222,6 @@ const Sales = () => {
         setSearchResults([]);
         setSearchTerm('');
 
-        // Use stock_at_location for validation
         const productStock = parseInt(product.stock_at_location);
         if (productStock === 0) {
             toast.error(`${product.name} is out of stock at this location.`);
@@ -254,9 +242,9 @@ const Sales = () => {
             setCart([...cart, {
                 id: product.id,
                 name: product.name,
-                price: parseFloat(product.selling_price), // Use selling_price for the price in cart
+                price: parseFloat(product.selling_price),
                 qty: 1,
-                stock_at_location: productStock, // Store location-specific stock
+                stock_at_location: productStock,
                 brand: product.brand,
                 image: product.image
             }]);
@@ -268,8 +256,8 @@ const Sales = () => {
         setCart(cart.map(item => {
             if (item.id === id) {
                 const newQty = item.qty + delta;
-                if (newQty < 1) return null; // Mark for removal
-                if (newQty > item.stock_at_location) { // Check against the stored location-specific stock
+                if (newQty < 1) return null;
+                if (newQty > item.stock_at_location) {
                     toast.warn(`Cannot add more than available stock (${item.stock_at_location}) for ${item.name} at this location.`);
                     return item;
                 }
@@ -284,14 +272,11 @@ const Sales = () => {
         toast.info("Item removed from cart.");
     };
 
-    // --- Calculations ---
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const grandTotal = Math.max(0, subtotal - parseFloat(discountAmount || 0));
     const changeDue = paymentMethod === 'cash' ? Math.max(0, parseFloat(amountPaid || 0) - grandTotal) : 0;
 
-    // --- Payment Processing ---
     const handleProcessSale = async () => {
-        // Frontend validation for general admin without assigned location
         if (authUserRole === 1 && authUserLocationId === null) {
             toast.error("As a general admin, you are not authorized to make sales without an assigned location.");
             return;
@@ -314,36 +299,32 @@ const Sales = () => {
         setLoading(true);
         try {
             const saleData = {
-                is_pos: 1, // <--- IMPORTANT: This flag tells the backend it's a POS sale
-                location_id: selectedLocationId, // <--- NEW: Send the selected location ID
+                is_pos: 1,
+                location_id: selectedLocationId,
                 customer_name: customerInfo.name || null,
                 customer_email: customerInfo.email || null,
                 customer_phone: customerInfo.phone || null,
-                payment_method: paymentMethod, // 'cash', 'card_pos', 'bank_transfer'
+                payment_method: paymentMethod,
                 amount_paid: parseFloat(amountPaid || 0),
                 discount_amount: parseFloat(discountAmount || 0),
                 grand_total: grandTotal,
                 items: cart.map(item => ({
-                    id: item.id, // Use id
-                    qty: item.qty, // Use quantity
-                    price: item.price, // Price at the time of sale (selling_price)
-                    name: item.name, // Also send product name for items_json
+                    id: item.id,
+                    qty: item.qty,
+                    price: item.price,
+                    name: item.name,
                 }))
             };
-            console.log("Sending sale data:", saleData); // For debugging
             const res = await axios.post('/api/orders/place', saleData, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
             });
 
-            if (res.data.status === 200) { // Check res.data.status as per Laravel convention
+            if (res.data.status === 200) {
                 toast.success("Sale processed successfully!");
-                // Store the returned order, including the location_id which should be returned by the backend
                 setProcessedOrder({
                     ...res.data.order,
-                    // Ensure location_id is available on the processed order for the receipt
                     location_id: selectedLocationId
                 });
-                // The useEffect will now handle the printReceipt call
             } else {
                 toast.error(res.data.message || "Failed to process sale.");
             }
@@ -356,7 +337,7 @@ const Sales = () => {
     };
 
     const handleNewSale = () => {
-        setProcessedOrder(null); // Clear processed order to show main POS interface
+        setProcessedOrder(null);
         setCart([]);
         setCustomerInfo({ name: '', email: '', phone: '' });
         setPaymentMethod('cash');
@@ -364,8 +345,6 @@ const Sales = () => {
         setDiscountAmount(0);
         setSearchTerm('');
         setSearchResults([]);
-        // Keep selectedLocationId as it is, assuming admin stays at the same location
-        // If you want to force re-selection, set setSelectedLocationId('');
     };
 
     // --- Receipt Printing ---
@@ -411,14 +390,11 @@ const Sales = () => {
         return <LoadingSpinner />;
     }
 
-    // Determine if the location select should be disabled
     const isLocationSelectDisabled = isLocationsLoading || locations.length === 0 || (authUserRole === 1 && authUserLocationId !== null);
 
-    // Determine if the "Process Sale" button should be disabled
     const isProcessSaleDisabled = cart.length === 0 || loading || !selectedLocationId || (authUserRole === 1 && authUserLocationId === null);
 
 
-    // Framer Motion variants
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -448,7 +424,6 @@ const Sales = () => {
             </header>
 
             {processedOrder ? (
-                // --- Sale Confirmation / Receipt Display ---
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -465,9 +440,7 @@ const Sales = () => {
                             <p><strong>Order No:</strong> #{processedOrder.order_number}</p>
                             <p><strong>Date:</strong> {new Date(processedOrder.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                             {processedOrder.customer_name && <p><strong>Customer:</strong> {processedOrder.customer_name}</p>}
-                            {/* Safely access payment_method */}
                             <p><strong>Payment Method:</strong> {processedOrder.payment_method?.replace(/_/g, ' ') || 'N/A'}</p>
-                            {/* Display location on receipt if available */}
                             {processedOrder.location_id && locations.find(loc => loc.id === processedOrder.location_id) && (
                                 <p><strong>Location:</strong> {locations.find(loc => loc.id === processedOrder.location_id).name}</p>
                             )}
@@ -475,7 +448,6 @@ const Sales = () => {
                         <div className="mb-4">
                             <h4 className="font-semibold mb-2">Items:</h4>
                             <ul className="divide-y divide-gray-200">
-                                {/* Safely parse items_json */}
                                 {(JSON.parse(processedOrder.items_json || '[]')).map((item, index) => (
                                     <li key={index} className="flex justify-between py-1">
                                         <span>{item.name} x {item.qty}</span>
@@ -485,7 +457,6 @@ const Sales = () => {
                             </ul>
                         </div>
                         <div className="border-t border-gray-200 pt-4 text-right">
-                            {/* Safely access grand_total and discount_amount */}
                             <p className="font-semibold text-lg">Subtotal: ₦{parseFloat((processedOrder.grand_total ?? 0) + (processedOrder.discount_amount ?? 0)).toLocaleString()}</p>
                             {(processedOrder.discount_amount ?? 0) > 0 && (
                                 <p className="font-semibold text-red-600">Discount: -₦{parseFloat(processedOrder.discount_amount).toLocaleString()}</p>
@@ -516,9 +487,7 @@ const Sales = () => {
                     </div>
                 </motion.div>
             ) : (
-                // --- Main POS Interface ---
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Panel: Product Search & Cart */}
                     <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 flex flex-col h-full">
                         <h2 className="text-2xl font-bold text-gray-900 mb-5 flex items-center">
                             <Package className="w-6 h-6 mr-3 text-orange-600" /> Products & Cart
@@ -535,7 +504,7 @@ const Sales = () => {
                                 value={selectedLocationId}
                                 onChange={(e) => {
                                     setSelectedLocationId(parseInt(e.target.value));
-                                    setSuggestedProductsCurrentPage(1); // Reset page when location changes
+                                    setSuggestedProductsCurrentPage(1);
                                 }}
                                 disabled={isLocationSelectDisabled}
                             >
@@ -545,7 +514,6 @@ const Sales = () => {
                                     <option value="">No locations available</option>
                                 ) : (
                                     <>
-                                        {/* If user is a location admin with an assigned location, only show that option */}
                                         {(authUserRole === 1 && authUserLocationId !== null) ? (
                                             locations.filter(loc => loc.id === authUserLocationId).map(location => (
                                                 <option key={location.id} value={location.id}>
@@ -553,7 +521,6 @@ const Sales = () => {
                                                 </option>
                                             ))
                                         ) : (
-                                            // For Super Admins or General Admins, show all locations
                                             <>
                                                 <option value="">-- Select a Location --</option>
                                                 {locations.map(location => (
@@ -623,7 +590,6 @@ const Sales = () => {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="font-bold text-blue-600">₦{parseFloat(product.selling_price).toLocaleString()}</p>
-                                                    {/* Display stock_at_location */}
                                                     <p className="text-xs text-gray-500">Stock: {product.stock_at_location}</p>
                                                 </div>
                                             </motion.li>
@@ -664,7 +630,6 @@ const Sales = () => {
                                         </motion.div>
                                     ))}
                                 </div>
-                                {/* Suggested Products Pagination */}
                                 {suggestedProductsTotalPages > 1 && (
                                     <div className="flex justify-center items-center mt-4 space-x-2">
                                         <button
@@ -755,13 +720,12 @@ const Sales = () => {
                         </div>
                     </div>
 
-                    {/* Right Panel: Customer Info & Payment */}
+                    {/* Customer Info & Payment */}
                     <div className="lg:col-span-1 bg-white rounded-xl shadow-lg p-6 flex flex-col">
                         <h2 className="text-2xl font-bold text-gray-900 mb-5 flex items-center">
                             <User className="w-6 h-6 mr-3 text-blue-600" /> Customer & Payment
                         </h2>
 
-                        {/* Customer Information */}
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">Customer Details (Optional)</h3>
                             <div className="space-y-3">
@@ -789,22 +753,86 @@ const Sales = () => {
                             </div>
                         </div>
 
-                        {/* Discount */}
+                        {/*Discount */}
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">Discount</h3>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₦</span>
-                                <input
-                                    type="number"
-                                    placeholder="Discount Amount"
-                                    className="w-full pl-8 p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={discountAmount}
-                                    onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                                    min="0"
-                                />
-                            </div>
-                        </div>
 
+                            <div className="flex flex-wrap gap-4 mb-4 items-center md:space-x-4">
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="discountType"
+                                        value="none"
+                                        checked={discountType === 'none'}
+                                        onChange={() => {
+                                            setDiscountType('none');
+                                            setDiscountAmount(0);
+                                            setDiscountPercentage(0);
+                                        }}
+                                        className="form-radio text-blue-600 h-4 w-4 transition duration-150 ease-in-out"
+                                    />
+                                    <span className="ml-2 text-gray-700">No Discount</span>
+                                </label>
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="discountType"
+                                        value="percentage"
+                                        checked={discountType === 'percentage'}
+                                        onChange={() => {
+                                            setDiscountType('percentage');
+                                            setDiscountAmount(0);
+                                        }}
+                                        className="form-radio text-blue-600 h-4 w-4 transition duration-150 ease-in-out"
+                                    />
+                                    <span className="ml-2 text-gray-700">Percentage (%)</span>
+                                </label>
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="discountType"
+                                        value="amount"
+                                        checked={discountType === 'amount'}
+                                        onChange={() => {
+                                            setDiscountType('amount');
+                                            setDiscountPercentage(0);
+                                        }}
+                                        className="form-radio text-blue-600 h-4 w-4 transition duration-150 ease-in-out"
+                                    />
+                                    <span className="ml-2 text-gray-700">Amount (₦)</span>
+                                </label>
+                            </div>
+
+                            {discountType !== 'none' && (
+                                <div className="relative mt-2">
+                                    <input
+                                        type="number"
+                                        placeholder={discountType === 'percentage' ? "Discount Percentage" : "Discount Amount"}
+                                        className={`w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${discountType === 'amount' ? 'pl-8' : ''
+                                            }`}
+                                        value={discountType === 'percentage' ? discountPercentage : discountAmount}
+                                        onChange={(e) => {
+                                            const value = Math.max(0, parseFloat(e.target.value) || 0);
+
+                                            if (discountType === 'percentage') {
+                                                setDiscountPercentage(value);
+                                                const calculatedAmount = (value / 100) * subtotal;
+                                                setDiscountAmount(calculatedAmount);
+                                            } else {
+                                                setDiscountAmount(value);
+                                            }
+                                        }}
+                                        min="0"
+                                    />
+                                    {discountType === 'percentage' && (
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">%</span>
+                                    )}
+                                    {discountType === 'amount' && (
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">₦</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         {/* Payment Method */}
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">Payment Method</h3>
@@ -844,8 +872,6 @@ const Sales = () => {
                                 <ClipboardCopy className="w-5 h-5 mr-1" /> Bank Transfer
                             </label>
                         </div>
-
-                        {/* Amount Paid (for cash) */}
                         {paymentMethod === 'cash' && (
                             <div className="mb-6">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Amount Paid</h3>

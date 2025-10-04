@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Heart } from 'lucide-react'; // Import Heart icon for consistency
+import { Heart } from 'lucide-react';
 
 const WishlistContext = createContext();
 
@@ -14,12 +14,18 @@ export const WishlistProvider = ({ children }) => {
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loadingWishlist, setLoadingWishlist] = useState(true);
 
+
+    const handleAuthError = () => {
+        localStorage.removeItem('auth_token');
+        setWishlistItems([]);
+        toast.error("Your session has expired. Please log in again.");
+    };
+
     const fetchWishlist = useCallback(async () => {
-        // Check if user is authenticated (you'll need to implement your auth check)
-        const token = localStorage.getItem('auth_token'); // Or wherever you store your token
+        const token = localStorage.getItem('auth_token');
         if (!token) {
             setLoadingWishlist(false);
-            setWishlistItems([]); // Clear wishlist if not logged in
+            setWishlistItems([]);
             return;
         }
 
@@ -27,34 +33,31 @@ export const WishlistProvider = ({ children }) => {
             const response = await axios.get('/api/wishlist', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    withCredentials: true
                 }
             });
 
             if (response.data.status === 200) {
                 setWishlistItems(response.data.wishlist);
             } else if (response.data.status === 401) {
-                // User is not authenticated or token expired
-                setWishlistItems([]);
-                toast.info("Please log in to view your wishlist.");
+                handleAuthError();
             } else {
                 toast.error(response.data.message || "Failed to fetch wishlist.");
             }
         } catch (error) {
             console.error("Error fetching wishlist:", error);
             if (error.response && error.response.status === 401) {
-                 // Handle explicit unauthorized state (e.g., redirect to login)
-                setWishlistItems([]);
+                handleAuthError();
+            } else {
+                console.error("Could not load wishlist. Please try again.");
             }
-            console.error("Could not load wishlist. Please try again.");
         } finally {
             setLoadingWishlist(false);
         }
-    }, []); // No dependencies for fetchWishlist if it only uses token
+    }, []);
 
     useEffect(() => {
         fetchWishlist();
-    }, [fetchWishlist]); // Re-fetch when fetchWishlist itself changes (unlikely) or on mount
+    }, [fetchWishlist]);
 
     const addToWishlist = async (product) => {
         const token = localStorage.getItem('auth_token');
@@ -81,7 +84,6 @@ export const WishlistProvider = ({ children }) => {
             });
 
             if (response.data.status === 200) {
-                // Add the new item to the state, ensuring 'product' details are included
                 setWishlistItems(prevItems => [...prevItems, response.data.wishlistItem]);
                 toast.success(`${product.name} added to wishlist!`, {
                     icon: <Heart className="text-red-400" />
@@ -137,7 +139,7 @@ export const WishlistProvider = ({ children }) => {
         addToWishlist,
         removeFromWishlist,
         isProductInWishlist,
-        fetchWishlist // Expose fetchWishlist to allow re-fetching
+        fetchWishlist
     };
 
     return (

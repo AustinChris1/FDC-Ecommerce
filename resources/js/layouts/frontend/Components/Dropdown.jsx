@@ -7,7 +7,7 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
     const toggleButtonRef = useRef(null);
-    const timeoutRef = useRef(null); // Ref for our hover timeout
+    const timeoutRef = useRef(null); 
 
     const handleToggle = () => setIsOpen(!isOpen);
 
@@ -24,10 +24,9 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
         }
         timeoutRef.current = setTimeout(() => {
             setIsOpen(false);
-        }, 150); // Small delay to allow moving between button and dropdown
+        }, 150);
     }, []);
 
-    // Close dropdown when clicking outside for both mobile and desktop (if open by click)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
@@ -79,9 +78,9 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
         >
             <button
                 ref={toggleButtonRef}
-                onClick={isMobile ? handleToggle : undefined} // Only click for mobile
-                onFocus={!isMobile ? openDropdown : undefined} // For keyboard navigation on desktop
-                onBlur={!isMobile ? closeDropdown : undefined} // For keyboard navigation on desktop
+                onClick={isMobile ? handleToggle : undefined} 
+                onFocus={!isMobile ? openDropdown : undefined} 
+                onBlur={!isMobile ? closeDropdown : undefined}
                 className={`flex items-center justify-between w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md
                     ${isMobile
                         ? 'text-gray-800 hover:text-indigo-600 dark:text-gray-200 dark:hover:text-indigo-400 text-xl font-semibold py-3 px-2'
@@ -106,7 +105,7 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
                 )}
             </button>
 
-            {!isMobile && ( // Desktop underline effect with subtle animation
+            {!isMobile && ( 
                 <span className="absolute left-0 bottom-0 w-full h-[3px] bg-indigo-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-full"></span>
             )}
 
@@ -118,8 +117,8 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
                         initial="hidden"
                         animate="visible"
                         exit="hidden"
-                        onMouseEnter={!isMobile ? openDropdown : undefined} // Keep open on dropdown hover
-                        onMouseLeave={!isMobile ? closeDropdown : undefined} // Close when leaving dropdown
+                        onMouseEnter={!isMobile ? openDropdown : undefined} 
+                        onMouseLeave={!isMobile ? closeDropdown : undefined}
                         className={`z-50 overflow-hidden
                             ${isMobile
                                 ? 'pl-4 mt-2 space-y-2' // Mobile styling
@@ -148,10 +147,9 @@ const NewDropdownMenu = ({ title, items, handleNavigation, isMobile = false }) =
                                         }`}
                                     onClick={() => {
                                         handleNavigation(item.link);
-                                        setIsOpen(false); // Close dropdown after navigation
+                                        setIsOpen(false);
                                     }}
                                 >
-                                    {/* MODIFIED: Check for item.icon (React component) or item.image (path) */}
                                     {item.icon && React.createElement(item.icon, { className: "w-6 h-6 mr-3 text-gray-500 dark:text-gray-400" })}
                                     {item.image && typeof item.image === 'string' && (
                                         <img

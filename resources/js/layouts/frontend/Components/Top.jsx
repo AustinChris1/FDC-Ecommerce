@@ -1,25 +1,26 @@
-// homepage.jsx (or Top.jsx)
 import React, { useState, useEffect, useMemo } from 'react';
-import HeroSlider from './HeroSection'; // Assuming HeroSlider is in the same directory or correctly imported
-import ProductCardBox from './ProductCardBox'; // Import the new ProductCardBox component
+import HeroSlider from './HeroSection'; 
+import ProductCardBox from './ProductCardBox';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
 import { useInView } from 'react-intersection-observer';
-import { useCart } from './CartContext'; // Assuming CartContext is available
+import { useCart } from './CartContext';
 import Load from './Load';
 
 const Top = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { addToCart } = useCart(); // Assuming useCart is available
+    const { addToCart } = useCart();
+    const [lastViewedCategoryLink, setLastViewedCategoryLink] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState([]);
+    const [similarProductsLoading, setSimilarProductsLoading] = useState(false);
 
     const { ref: heroSectionRef, inView: heroSectionInView } = useInView({
         triggerOnce: true,
-        threshold: 0.1, // Trigger when 10% of the component is in view
+        threshold: 0.1,
     });
 
-    // --- Data Fetching ---
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -51,7 +52,7 @@ const Top = () => {
                         const isCurrentlyFlashSale = product.is_flash_sale && flashSaleStartsAt && flashSaleEndsAt &&
                             now >= flashSaleStartsAt && now <= flashSaleEndsAt;
 
-                        // Calculate discount percentage for EACH product here
+                        // Calculate discount percentage
                         let discountPercentage = 0;
                         if (product.original_price && product.selling_price && parseFloat(product.original_price) > parseFloat(product.selling_price)) {
                             discountPercentage = ((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100;
@@ -68,9 +69,9 @@ const Top = () => {
                             flash_sale_ends_at: product.flash_sale_ends_at,
                             original_price: product.original_price,
                             selling_price: product.selling_price,
-                            discountPercentage: parseFloat(discountPercentage.toFixed(2)), // Add this property to each product
-                            popular: product.popular || false, // Ensure 'popular' property exists
-                            featured: product.featured || false // Ensure 'featured' property exists
+                            discountPercentage: parseFloat(discountPercentage.toFixed(2)),
+                            popular: product.popular || false,
+                            featured: product.featured || false
                         };
                     });
 
@@ -91,7 +92,44 @@ const Top = () => {
         fetchData();
     }, []);
 
-    // Memoized product subsets for the boxes
+
+
+    useEffect(() => {
+        const recentlyViewedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+        if (recentlyViewedItems.length > 0) {
+            const lastViewedItem = recentlyViewedItems[0];
+            setLastViewedCategoryLink(lastViewedItem.category_link);
+        }
+    }, []);
+
+    useEffect(() => {
+        const fetchSimilarProducts = async () => {
+            if (lastViewedCategoryLink) {
+                setSimilarProductsLoading(true);
+                try {
+                    const res = await axios.get(`/api/products-by-category/${lastViewedCategoryLink}`);
+                    if (res.data.status === 200) {
+                        const allSimilar = res.data.products;
+                        const filteredSimilar = allSimilar.filter(p => {
+                            const recentlyViewedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+                            const lastViewedProductId = recentlyViewedItems.length > 0 ? recentlyViewedItems[0].id : null;
+                            return p.id !== lastViewedProductId;
+                        });
+                        const randomSimilar = filteredSimilar.sort(() => 0.5 - Math.random()).slice(0, 4);
+                        setSimilarProducts(randomSimilar);
+                    } else {
+                        toast.error("Unable to fetch similar products.");
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch similar products:", error);
+                } finally {
+                    setSimilarProductsLoading(false);
+                }
+            }
+        };
+        fetchSimilarProducts();
+    }, [lastViewedCategoryLink]);
+
     const everydayPricesProducts = useMemo(() =>
         products.filter(p => p.qty > 0).sort(() => 0.5 - Math.random()).slice(0, 4),
         [products]
@@ -103,11 +141,10 @@ const Top = () => {
     );
 
     const todaysBigDealsProducts = useMemo(() =>
-        // Filter for products with a discount and sort by the highest discount percentage
         products
-            .filter(p => p.discountPercentage > 0 && p.qty > 0) // Now correctly access p.discountPercentage
-            .sort((a, b) => b.discountPercentage - a.discountPercentage) // Sort by the calculated discountPercentage
-            .slice(0, 4), // Get the top 4 products with the biggest discounts
+            .filter(p => p.discountPercentage > 0 && p.qty > 0)
+            .sort((a, b) => b.discountPercentage - a.discountPercentage)
+            .slice(0, 4),
         [products]
     );
 
@@ -121,14 +158,13 @@ const Top = () => {
         [products]
     );
 
-    // This is the main container for your homepage content
     return (
         <div className="relative w-full overflow-hidden dark:bg-gray-950 bg-white mt-10 min-h-screen">
-                        <Helmet>
-                            <title>FirstSmart Mart</title>
-                            <meta name="description" content="Shop the latest products at FirstSmart Mart." />
-                        </Helmet>
-            
+            <Helmet>
+                <title>FirstSmart Mart</title>
+                <meta name="description" content="Shop the latest products at FirstSmart Mart." />
+            </Helmet>
+
             <div ref={heroSectionRef} className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden">
                 <HeroSlider products={products} handleAddToCart={addToCart} />
             </div>
@@ -139,41 +175,61 @@ const Top = () => {
                         <Load />
                     </div>
                 ) : (<>
-                    <ProductCardBox
-                        title="Everyday Great Prices"
-                        products={everydayPricesProducts}
-                        linkHref="/shop"
-                        inView={heroSectionInView}
-                        customDelay={0.1}
-                    />
-                    <ProductCardBox
-                        title="Flash Sale Products"
-                        products={flashSaleProducts}
-                        linkHref="/flash-sales"
-                        inView={heroSectionInView}
-                        customDelay={0.2}
-                    />
-                    <ProductCardBox
-                        title="Popular Products Today"
-                        products={todaysPopularProducts}
-                        linkHref="/trending"
-                        inView={heroSectionInView}
-                        customDelay={0.3}
-                    />
-                    <ProductCardBox
-                        title="Today's Big Deals"
-                        products={todaysBigDealsProducts} // Now truly big deals by discount percentage
-                        linkHref="/"
-                        inView={heroSectionInView}
-                        customDelay={0.4} // Adjusted delay for stagger effect
-                    />
-                    <ProductCardBox
-                        title="Deals on Top Brands"
-                        products={topBrandsProducts}
-                        linkHref="/collections/top-brands"
-                        inView={heroSectionInView}
-                        customDelay={0.5}
-                    />
+                    {similarProducts.length > 0 && (
+                        <ProductCardBox
+                            title={`Because you viewed ${lastViewedCategoryLink.replace(/-/g, ' ')}`}
+                            products={similarProducts}
+                            linkHref={`/category/${lastViewedCategoryLink}`}
+                            inView={heroSectionInView}
+                            customDelay={0.0}
+                        />
+                    )}
+                    {everydayPricesProducts.length > 0 && (
+                        <ProductCardBox
+                            title="Everyday Great Prices"
+                            products={everydayPricesProducts}
+                            linkHref="/shop"
+                            inView={heroSectionInView}
+                            customDelay={0.1}
+                        />
+                    )}
+                    {flashSaleProducts.length > 0 && (
+                        <ProductCardBox
+                            title="Flash Sale Products"
+                            products={flashSaleProducts}
+                            linkHref="/flash-sales"
+                            inView={heroSectionInView}
+                            customDelay={0.2}
+                        />
+                    )}
+                    {todaysPopularProducts.length > 0 && (
+                        <ProductCardBox
+                            title="Popular Products Today"
+                            products={todaysPopularProducts}
+                            linkHref="/trending"
+                            inView={heroSectionInView}
+                            customDelay={0.3}
+                        />
+                    )}
+                    {todaysBigDealsProducts.length > 0 && (
+                        <ProductCardBox
+                            title="Today's Big Deals"
+                            products={todaysBigDealsProducts}
+                            linkHref="/"
+                            inView={heroSectionInView}
+                            customDelay={0.4}
+                        />
+                    )}
+                    {topBrandsProducts.length > 0 && (
+                        <ProductCardBox
+                            title="Deals on Top Brands"
+                            products={topBrandsProducts}
+                            linkHref="/collections/top-brands"
+                            inView={heroSectionInView}
+                            customDelay={0.5}
+                        />
+                    )}
+
                 </>
                 )}
             </div>

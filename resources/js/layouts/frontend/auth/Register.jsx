@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff, User, Mail, Lock, UserPlus } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock, UserPlus, Phone } from "lucide-react"; // Added Phone icon
 import Load from "../Components/Load";
 import { motion } from 'framer-motion';
 
@@ -14,6 +14,7 @@ const Register = () => {
     const [registerInput, setRegister] = useState({
         name: "",
         email: "",
+        phone: "", // Added new state variable for phone
         password: "",
         password_confirmation: "",
     });
@@ -62,6 +63,7 @@ const Register = () => {
                 localStorage.setItem("auth_token", res.data.token);
                 localStorage.setItem("auth_name", res.data.username);
                 localStorage.setItem("auth_email", res.data.email);
+                localStorage.setItem("auth_phone", res.data.phone); // Store phone number
                 localStorage.setItem("role", res.data.role);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
 
@@ -110,6 +112,7 @@ const Register = () => {
         const data = {
             name: registerInput.name,
             email: registerInput.email,
+            phone: registerInput.phone, // Added phone to the data payload
             password: registerInput.password,
             password_confirmation: registerInput.password_confirmation,
         };
@@ -128,6 +131,7 @@ const Register = () => {
                             localStorage.setItem("auth_token", res.data.token);
                             localStorage.setItem("auth_name", res.data.username);
                             localStorage.setItem("auth_email", res.data.email);
+                            localStorage.setItem("auth_phone", res.data.phone); // Store phone number
                             localStorage.setItem("role", res.data.role);
                             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
 
@@ -196,8 +200,8 @@ const Register = () => {
     return (
         <motion.div
             className="flex items-center justify-center min-h-screen p-5 pt-24 relative overflow-hidden
-                       bg-gradient-to-br from-white to-gray-100
-                       dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
+                         bg-gradient-to-br from-white to-gray-100
+                         dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900"
             variants={pageVariants}
             initial="hidden"
             animate="visible"
@@ -212,25 +216,25 @@ const Register = () => {
 
             <motion.div
                 className="mt-20 p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-md relative z-10
-                           bg-white border border-gray-200
-                           dark:bg-gray-900 dark:border-gray-700 dark:shadow-2xl"
+                         bg-white border border-gray-200
+                         dark:bg-gray-900 dark:border-gray-700 dark:shadow-2xl"
                 variants={formVariants}
                 initial="hidden"
                 animate="visible"
             >
                 <h1 className="text-4xl font-extrabold text-center mb-6 drop-shadow-md
-                           text-indigo-600 dark:text-lime-400">
+                             text-indigo-600 dark:text-lime-400">
                     Join Us Today!
                 </h1>
                 <p className="text-center mb-8 text-lg
-                          text-gray-600 dark:text-gray-400">
+                           text-gray-600 dark:text-gray-400">
                     Create your account to unlock exclusive features.
                 </p>
                 <form onSubmit={registerSubmit} className="flex flex-col space-y-6">
                     {/* Name Input */}
                     <motion.div className="relative" variants={inputVariants}>
                         <User className="absolute left-4 top-1/2 -translate-y-1/2
-                                       text-gray-400 dark:text-gray-500" size={20} />
+                                         text-gray-400 dark:text-gray-500" size={20} />
                         <input
                             type="text"
                             name="name"
@@ -239,8 +243,8 @@ const Register = () => {
                             onChange={handleInput}
                             value={registerInput.name}
                             className="pl-12 pr-4 py-3 rounded-lg w-full focus:outline-none focus:ring-2 transition-colors
-                                       bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
-                                       dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
+                                         bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
+                                         dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
                             required
                         />
                         {error.name && <small className="text-red-600 dark:text-red-400 mt-1 block">{error.name[0]}</small>}
@@ -249,7 +253,7 @@ const Register = () => {
                     {/* Email Input */}
                     <motion.div className="relative" variants={inputVariants}>
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2
-                                       text-gray-400 dark:text-gray-500" size={20} />
+                                         text-gray-400 dark:text-gray-500" size={20} />
                         <input
                             type="email"
                             name="email"
@@ -258,17 +262,36 @@ const Register = () => {
                             onChange={handleInput}
                             value={registerInput.email}
                             className="pl-12 pr-4 py-3 rounded-lg w-full focus:outline-none focus:ring-2 transition-colors
-                                       bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
-                                       dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
+                                         bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
+                                         dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
                             required
                         />
                         {error.email && <small className="text-red-600 dark:text-red-400 mt-1 block">{error.email[0]}</small>}
                     </motion.div>
 
+                    {/* Phone Number Input */}
+                    <motion.div className="relative" variants={inputVariants}>
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2
+                                         text-gray-400 dark:text-gray-500" size={20} />
+                        <input
+                            type="tel"
+                            name="phone"
+                            placeholder="Phone Number"
+                            aria-label="Phone Number"
+                            onChange={handleInput}
+                            value={registerInput.phone}
+                            className="pl-12 pr-4 py-3 rounded-lg w-full focus:outline-none focus:ring-2 transition-colors
+                                         bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
+                                         dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
+                            required
+                        />
+                        {error.phone && <small className="text-red-600 dark:text-red-400 mt-1 block">{error.phone[0]}</small>}
+                    </motion.div>
+
                     {/* Password Field with Toggle Icon */}
                     <motion.div className="relative" variants={inputVariants}>
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2
-                                      text-gray-400 dark:text-gray-500" size={20} />
+                                         text-gray-400 dark:text-gray-500" size={20} />
                         <input
                             type={showPassword ? "text" : "password"}
                             name="password"
@@ -277,15 +300,15 @@ const Register = () => {
                             onChange={handleInput}
                             value={registerInput.password}
                             className="pl-12 pr-12 py-3 rounded-lg w-full focus:outline-none focus:ring-2 transition-colors
-                                       bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
-                                       dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
+                                         bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
+                                         dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
                             required
                         />
                         <button
                             type="button"
                             onClick={togglePasswordVisibility}
                             className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors focus:outline-none
-                                       text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400"
+                                         text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-400"
                             aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -296,7 +319,7 @@ const Register = () => {
                     {/* Confirm Password Field (also with Lock icon for consistency) */}
                     <motion.div className="relative" variants={inputVariants}>
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2
-                                      text-gray-400 dark:text-gray-500" size={20} />
+                                         text-gray-400 dark:text-gray-500" size={20} />
                         <input
                             type="password"
                             name="password_confirmation"
@@ -305,8 +328,8 @@ const Register = () => {
                             onChange={handleInput}
                             value={registerInput.password_confirmation}
                             className="pl-12 pr-4 py-3 rounded-lg w-full focus:outline-none focus:ring-2 transition-colors
-                                       bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
-                                       dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
+                                         bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500
+                                         dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:ring-blue-600"
                             required
                         />
                         {error.password_confirmation && <small className="text-red-600 dark:text-red-400 mt-1 block">{error.password_confirmation[0]}</small>}
@@ -319,8 +342,8 @@ const Register = () => {
                     <motion.button
                         type="submit"
                         className="flex items-center justify-center font-bold py-3 rounded-lg w-full focus:outline-none focus:ring-2 active:scale-98 shadow-lg
-                                   bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500
-                                   dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700 dark:focus:ring-blue-500"
+                                         bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500
+                                         dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700 dark:focus:ring-blue-500"
                         disabled={loading}
                         variants={buttonVariants}
                         whileHover="hover"
@@ -337,11 +360,11 @@ const Register = () => {
                 {/* OR divider */}
                 <div className="flex items-center my-6">
                     <div className="flex-grow border-t
-                                    border-gray-300 dark:border-gray-700"></div>
+                                     border-gray-300 dark:border-gray-700"></div>
                     <span className="mx-4
-                                    text-gray-500 dark:text-gray-500">OR</span>
+                                     text-gray-500 dark:text-gray-500">OR</span>
                     <div className="flex-grow border-t
-                                    border-gray-300 dark:border-gray-700"></div>
+                                     border-gray-300 dark:border-gray-700"></div>
                 </div>
 
                 {/* Google Sign-Up Button */}
@@ -357,11 +380,11 @@ const Register = () => {
 
                 {/* Login Link */}
                 <p className="text-center mt-6
-                             text-gray-600 dark:text-gray-400">
+                                     text-gray-600 dark:text-gray-400">
                     Already have an account?{" "}
                     <Link to="/login" className="font-semibold
-                                                   text-indigo-600 hover:underline
-                                                   dark:text-blue-400 dark:hover:underline">
+                                                 text-indigo-600 hover:underline
+                                                 dark:text-blue-400 dark:hover:underline">
                         Login here
                     </Link>
                 </p>

@@ -60,7 +60,6 @@ const TrackOrder = () => {
                 trackingHistory.push({
                     status: 'Order Placed',
                     date: order.created_at,
-                    // Use location name if it's a POS sale, otherwise default to order city or 'Online'
                     location: order.is_pos_sale && order.location_name ? order.location_name : (order.city || 'Online'),
                     description: `Order #${order.order_number} was placed successfully.`,
                     icon: 'Calendar',
@@ -72,7 +71,7 @@ const TrackOrder = () => {
                 if (isProcessingStatus && !order.shipped_at && !order.delivered_at && !order.cancelled_at) {
                     trackingHistory.push({
                         status: 'Processing',
-                        date: order.updated_at, // Using updated_at for processing time
+                        date: order.updated_at,
                         location: 'Warehouse/Processing Center',
                         description: `Your order is being processed and prepared for shipment.`,
                         icon: 'Clock',
@@ -131,7 +130,6 @@ const TrackOrder = () => {
                 // Sort history by date to ensure chronological order
                 trackingHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-                // Optional: Filter out immediate duplicates to ensure unique stages
                 const uniqueTrackingHistory = [];
                 const seenStatuses = new Set();
                 for (const event of trackingHistory) {
@@ -139,10 +137,9 @@ const TrackOrder = () => {
                         uniqueTrackingHistory.push(event);
                         seenStatuses.add(event.status);
                     } else {
-                        // If status seen, check if this is a later timestamp for the same status
                         const existingEventIndex = uniqueTrackingHistory.findIndex(e => e.status === event.status);
                         if (existingEventIndex !== -1 && new Date(event.date) > new Date(uniqueTrackingHistory[existingEventIndex].date)) {
-                            uniqueTrackingHistory[existingEventIndex] = event; // Replace with the newer event
+                            uniqueTrackingHistory[existingEventIndex] = event;
                         }
                     }
                 }
@@ -285,6 +282,7 @@ const TrackOrder = () => {
                         {loading ? <LoadingSpinner size="sm" /> : <Search className="w-5 h-5 mr-2" />}
                         <span>{loading ? 'Tracking...' : 'Track Order'}</span>
                     </button>
+                   
                     {/* Optional: Add a refresh button */}
                     <button
                         type="button"
@@ -367,7 +365,6 @@ const TrackOrder = () => {
                                         {orderTrackingData.is_pos_sale ? 'POS Sale' : 'Online Order'}
                                     </span>
                                 </p>
-                                {/* NEW: Location Purchased From - Only show if it's a POS sale and location data is available */}
                                 {orderTrackingData.is_pos_sale && orderTrackingData.location_name && (
                                     <p className="flex justify-between items-center">
                                         <span className="font-semibold text-gray-600 dark:text-gray-400">Purchased From:</span>

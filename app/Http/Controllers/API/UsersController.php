@@ -14,16 +14,10 @@ use Illuminate\Support\Facades\Log;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of all users.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function allUsers(): JsonResponse
     {
         try {
-            // Eager load the 'location' relationship to get location names if available
-            $users = User::with('location')->get(); // Assumes User model has a 'location' relationship
+            $users = User::with('location')->get();
             return response()->json([
                 'status' => 200,
                 'users' => $users,
@@ -43,7 +37,6 @@ class UsersController extends Controller
             // Get the authenticated user
             $authUser = Auth::user();
         
-            // Check if the authenticated user is authorized (only Super Admin role_as = 2)
             if (!$authUser || $authUser->role_as !== 2) {
                 return response()->json([
                     'status' => 403,
@@ -62,10 +55,10 @@ class UsersController extends Controller
             }
             if ($user->role_as === 1) {
                 $user->role_as = 0; // Set user role back to standard user
-                $user->location_id = null; // Important: Clear location_id if no longer an admin
+                $user->location_id = null;
                 $message = 'User is now a standard user';
             } else {
-                $user->role_as = 1; // Set user role to general admin (location_id will be null initially)
+                $user->role_as = 1;
                 $message = 'User is now an admin';
             }
         
@@ -86,7 +79,7 @@ class UsersController extends Controller
     }
     
     public function editUser($id): JsonResponse{
-        $user = User::with('location')->find($id); // Eager load location for frontend
+        $user = User::with('location')->find($id);
         if (!$user) {
             return response()->json([
                 'status' => 404,
@@ -99,15 +92,20 @@ class UsersController extends Controller
             ], 200);
         }
     }
-
+//Admin
     public function updateUser(Request $request, $id): JsonResponse
     {
         // Get the authenticated user
         $authUser = Auth::user();
-    
-        // Check if the authenticated user is authorized to update users
-        // Only Super Admin (role_as 2) or Admin (role_as 1) can access this endpoint.
-        if (!$authUser || !in_array($authUser->role_as, [1, 2])) {
+        // Store admins should not be able to make changes
+        if (!$authUser || ($authUser && $authUser->location_id !== NULL)) {
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Forbidden. You do not have permission',
+            ], 403);
+        }
+
+        if (!in_array($authUser->role_as, [1, 2])) {
             return response()->json([
                 'status' => 403,
                 'message' => 'Unauthorized. Only admins can perform this action.',
@@ -124,8 +122,6 @@ class UsersController extends Controller
             ], 404);
         }
 
-        // Prevent a user from changing their own role_as or location_id
-        // Super admin should ideally not edit their own role/location this way.
         if ($authUser->id === $user->id && $authUser->role_as !== 2) {
              return response()->json([
                 'status' => 403,
@@ -136,26 +132,22 @@ class UsersController extends Controller
         // Define validation rules
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id, // Email must be unique, exclude current user's ID
-            'password' => 'nullable|string|min:8', // Validate password only if provided
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
         ];
 
-        // Flag to track if role/location changes were attempted by a non-Super Admin
         $unauthorizedRoleLocationChangeAttempt = false;
 
         // Conditional validation and update logic for role_as and location_id
-        if ($authUser->role_as === 2) { // If authenticated user is a Super Admin
-            $rules['role_as'] = 'required|integer|in:0,1,2'; // Must be 0, 1, or 2
+        if ($authUser->role_as === 2) { 
+            $rules['role_as'] = 'required|integer|in:0,1,2'; 
             
-            // If the target user's role is being set to 'Admin' (1)
             if ($request->input('role_as') == 1) {
                 $rules['location_id'] = 'nullable|integer|exists:locations,id';
             } else {
-                // If role_as is 0 (normal user) or 2 (super admin), location_id MUST be null
-                $rules['location_id'] = 'nullable|in:null'; // Enforce null if present
+                $rules['location_id'] = 'nullable|in:null';
             }
-        } else { // If authenticated user is NOT a Super Admin (e.g., role_as 1 - general admin)
-            // Check if they are attempting to change role_as or location_id
+        } else { 
             if ($request->has('role_as') && $request->input('role_as') != $user->role_as) {
                 $unauthorizedRoleLocationChangeAttempt = true;
             }
@@ -163,7 +155,6 @@ class UsersController extends Controller
                 $unauthorizedRoleLocationChangeAttempt = true;
             }
 
-            // If an unauthorized attempt was made, return a 403 immediately
             if ($unauthorizedRoleLocationChangeAttempt) {
                 Log::warning("Unauthorized attempt by Admin ID {$authUser->id} to change role_as or location_id for User ID {$id}.");
                 return response()->json([
@@ -198,7 +189,7 @@ class UsersController extends Controller
             $user->role_as = $request->input('role_as');
             
             // Handle location_id based on selected role
-            if ($user->role_as == 1) { // If setting to Admin role
+            if ($user->role_as == 1) { 
                 // If a location_id is provided, use it; otherwise, set to null for general admin
                 $user->location_id = $request->filled('location_id') ? $request->input('location_id') : null;
             } else { // If setting to Normal User (0) or Super Admin (2)
@@ -212,6 +203,62 @@ class UsersController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'User updated successfully',
+        ], 200);
+    }
+    //User
+    public function UserUpdate(Request $request, $id): JsonResponse
+    {
+        // Get the authenticated user
+        $authUser = Auth::user();
+    
+        // Check if the authenticated user is authorized to update users
+        // Only Super Admin (role_as 2) or Admin (role_as 1) can access this endpoint.
+        if (!$authUser) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Unauthorized. Login required.',
+            ], 403);
+        }
+
+        // Find the user to be updated
+        $user = User::find($id);
+    
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User not found',
+            ], 404);
+        }
+        
+        // Define validation rules
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id, 
+            'phone' => ['required', 'string', 'max:20', 'regex:/^\+?(\d[\d\s-]+\d)$/'],
+        ];
+    
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), $rules);
+    
+        if ($validator->fails()) {
+            Log::warning("User update validation failed for ID {$id}: ", $validator->errors()->toArray());
+            return response()->json([
+                'status' => 422,
+                'errors' => $validator->messages(),
+            ], 422);
+        }
+    
+        // Update user details
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+    
+    
+        $user->save();
+        
+        return response()->json([
+            'status' => 200,
+            'message' => 'Details updated successfully',
         ], 200);
     }
             
@@ -284,9 +331,6 @@ public function changePassword(Request $request, $id)
             ], 404);
         }
 
-        // Ensure the authenticated user is authorized to change this password
-        // This is a critical security check. The current authenticated user must be the owner of the profile.
-        // If using Laravel Sanctum, Auth::id() will give the ID of the logged-in user.
         if (Auth::id() != $user->id) {
             Log::warning("Unauthorized password change attempt. Authenticated user ID: " . Auth::id() . ", Target user ID: {$id}");
             return response()->json([

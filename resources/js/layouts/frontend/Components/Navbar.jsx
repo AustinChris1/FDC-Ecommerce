@@ -15,20 +15,18 @@ import {
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Load from './Load';
-import NewDropdownMenu from './Dropdown'; // Keep this for "Help" dropdown
+import NewDropdownMenu from './Dropdown';
 
 import { useCart } from './CartContext';
 
-import fdcLogo from '../assets/fdcLogo.png'; // Light logo for dark background
-import fdcLogoBlack from '../assets/fdcLogoBlack.png'; // Dark logo for light background
+import fdcLogo from '../assets/fdcLogo.png';
+import fdcLogoBlack from '../assets/fdcLogoBlack.png';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    // category state is no longer needed in Navbar if SubNavbar handles it
-    // const [category, setCategory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +35,6 @@ const Navbar = () => {
 
     // Dark mode state and effect
     const [darkMode, setDarkMode] = useState(() => {
-        // Prioritize "dark" from localStorage, then system preference, then default to dark
         if (localStorage.getItem("theme") === "light") {
             return false;
         }
@@ -83,7 +80,6 @@ const Navbar = () => {
         }
     }, [location.pathname]);
 
-    // Removed category fetch from Navbar as SubNavbar will handle it
 
     const logout = async (e) => {
         e.preventDefault();
@@ -233,7 +229,7 @@ const Navbar = () => {
                 {/* Logo */}
                 <Link to="/" onClick={() => handleNavigation('/')} className="flex-shrink-0">
                     <img
-                        src={darkMode ? fdcLogo : fdcLogoBlack} // Conditional rendering for logos
+                        src={darkMode ? fdcLogo : fdcLogoBlack}
                         alt="FirstSmart Mart"
                         className={`${darkMode ? 'h-14 lg:h-14 w-auto sm:h-14' : 'h-14 w-24 sm:h-14'}`}
                     />

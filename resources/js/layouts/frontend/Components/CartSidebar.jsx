@@ -1,4 +1,3 @@
-// src/Components/CartSidebar.jsx
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';

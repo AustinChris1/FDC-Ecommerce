@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Location; // Import Location model
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -25,12 +25,11 @@ class OrderController extends Controller
     {
         $isPosSale = boolval($request->input('is_pos'));
 
-        // 1. Define validation rules based on whether it's a POS sale or an online order
         $rules = [
             'items' => 'required|array',
             'items.*.id' => 'required|integer|exists:products,id',
             'items.*.name' => 'required|string|max:255',
-            'items.*.qty' => 'required|integer|min:1', // This is the quantity being ordered
+            'items.*.qty' => 'required|integer|min:1', 
             'items.*.price' => 'required|numeric|min:0',
 
             'grand_total' => 'required|numeric|min:0',
@@ -38,16 +37,14 @@ class OrderController extends Controller
         ];
 
         if ($isPosSale) {
-            // POS-specific validations
             $rules['customer_name'] = 'nullable|string|max:255';
             $rules['customer_email'] = 'nullable|email|max:255';
             $rules['customer_phone'] = 'nullable|string|max:20';
             $rules['discount_amount'] = 'nullable|numeric|min:0';
             $rules['amount_paid'] = 'nullable|numeric|min:0';
             $rules['payment_method'] = 'required|string|in:cash,card_pos,bank_transfer';
-            $rules['location_id'] = 'required|integer|exists:locations,id'; // NEW: Location ID for POS sales
+            $rules['location_id'] = 'required|integer|exists:locations,id';
         } else {
-            // Online-specific validations
             $rules['user_info.fullName'] = 'required|string|max:255';
             $rules['user_info.email'] = 'required|email|max:255';
             $rules['user_info.phone'] = 'required|string|max:20';
@@ -72,7 +69,7 @@ class OrderController extends Controller
             ], 400);
         }
 
-        DB::beginTransaction(); // Start database transaction
+        DB::beginTransaction();
         try {
             Log::info('Order Data Received (Full Request):', $request->all());
             $user = Auth::user();
@@ -86,7 +83,7 @@ class OrderController extends Controller
             $status = 'pending';
             $paystackReference = null;
             $amountPaid = floatval($request->input('amount_paid', 0.00));
-            $locationId = $isPosSale ? $request->input('location_id') : null; // Get location_id for POS sales
+            $locationId = $isPosSale ? $request->input('location_id') : null;
 
             if ($isPosSale) {
                 if ($request->payment_method === 'cash' || $request->payment_method === 'card_pos') {
@@ -128,22 +125,18 @@ class OrderController extends Controller
                 'status' => $status,
                 'items_json' => json_encode($request->items),
                 'is_pos_sale' => $isPosSale,
-                'location_id' => $locationId, // Store the location_id for POS sales
+                'location_id' => $locationId,
             ];
 
-            Log::debug('Order Data for Eloquent Create:', $orderData);
+            // Log::debug('Order Data for Eloquent Create:', $orderData);
 
             // 2. Create the Order record
             $order = Order::create($orderData);
 
-            // Eager load the location relationship for the newly created order
-            // This ensures the 'location' data is available when the order is returned to the frontend
             $order->load('location');
 
             // 3. Reduce quantity of products based on sale type
             foreach ($request->items as $item) {
-                // Use lockForUpdate to prevent race conditions during inventory updates
-                // Eager load locations to use the accessor for total_overall_quantity
                 $product = Product::with('locations')->lockForUpdate()->find($item['id']);
 
                 if (!$product) {
@@ -153,44 +146,37 @@ class OrderController extends Controller
                 $quantityRequested = $item['qty'];
 
                 if ($isPosSale) {
-                    // POS Sale: ONLY reduce from specific location's quantity_in_store
                     $productLocation = $product->locations()->where('location_id', $locationId)->first();
 
-                    // Validate stock at specific location
                     if (!$productLocation || $productLocation->pivot->quantity_in_store < $quantityRequested) {
                         throw new \Exception("Insufficient stock at store for product '{$product->name}'. Available at store: " . ($productLocation->pivot->quantity_in_store ?? 0) . ", Requested: {$quantityRequested}.");
                     }
 
-                    // Decrement stock at specific location
                     $product->locations()->updateExistingPivot($locationId, [
                         'quantity_in_store' => $productLocation->pivot->quantity_in_store - $quantityRequested
                     ]);
 
-                    // IMPORTANT: For POS sales, we DO NOT touch the product->qty (online/master stock).
-                    // This ensures POS sales are separate from online inventory.
 
                 } else {
                     // Online Sale: Only reduce from product.qty (online stock)
                     if ($product->qty < $quantityRequested) {
                         throw new \Exception("Not enough online stock for product '{$product->name}'. Available: {$product->qty}, Requested: {$quantityRequested}.");
                     }
-                    $product->decrement('qty', $quantityRequested); // Use decrement for atomic update
+                    $product->decrement('qty', $quantityRequested); 
                 }
             }
 
-            DB::commit(); // Commit the transaction
+            DB::commit();
 
-            // Return the server-generated order_number and Paystack reference
-            // IMPORTANT: Return the full order object so the frontend has all details for the receipt
             return response()->json([
                 'status' => 200,
                 'message' => 'Order initiated successfully!',
                 'order_number' => $order->order_number,
                 'paystack_reference' => $order->paystack_reference,
-                'order' => $order // <--- THIS IS THE CRUCIAL ADDITION
+                'order' => $order
             ], 200);
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback on error
+            DB::rollBack();
             Log::error('Order creation failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString(), 'request_data' => $request->all()]);
             return response()->json([
                 'status' => 500,
@@ -199,11 +185,11 @@ class OrderController extends Controller
         }
     }
 
-    // 🔔 Telegram Notification Sender (can also move this to a service class later)
+    // 🔔 Telegram Notification Sender
     protected function sendTelegramNotificationToAdmin($order)
     {
-        $botToken = env('TELEGRAM_BOT_TOKEN'); // Add this to your .env
-        $chatId = env('TELEGRAM_ADMIN_CHAT_ID'); // Add this to your .env
+        $botToken = env('TELEGRAM_BOT_TOKEN'); 
+        $chatId = env('TELEGRAM_ADMIN_CHAT_ID');
 
         $message = "✅ *New Completed Order*\n"
             . "*Order No:* {$order->order_number}\n"
@@ -214,7 +200,6 @@ class OrderController extends Controller
             . "*Payment:* {$order->payment_method}\n"
             . "*Status:* {$order->status}\n";
 
-        // Add POS sale and location info if applicable
         if ($order->is_pos_sale) {
             $message .= "*Sale Type:* POS Sale\n";
             if ($order->location) {
@@ -241,7 +226,6 @@ class OrderController extends Controller
 
     public function updateOrder($orderNumber, Request $request)
     {
-        // 1. Find the order, eager load location
         $order = Order::where('order_number', $orderNumber)->with('location')->first();
 
         if (!$order) {
@@ -252,7 +236,6 @@ class OrderController extends Controller
         }
 
         // 2. Define validation rules.
-        // Adjust validation based on whether it's a POS sale or online order
         $rules = [
             'items' => 'required|array|min:1',
             'items.*.id' => 'required|integer|exists:products,id',
@@ -264,20 +247,20 @@ class OrderController extends Controller
             'status' => 'required|string',
             'subtotal' => 'nullable|numeric|min:0',
             'discount_amount' => 'nullable|numeric|min:0',
-            'is_pos_sale' => 'boolean', // Allow updating is_pos_sale (though less common after creation)
-            'location_id' => 'nullable|integer|exists:locations,id', // Allow updating location_id
+            'is_pos_sale' => 'boolean',
+            'location_id' => 'nullable|integer|exists:locations,id',
         ];
 
         if ($request->input('is_pos_sale')) {
-            $rules['full_name'] = 'nullable|string|max:255'; // For POS, customer_name maps to full_name
+            $rules['full_name'] = 'nullable|string|max:255';
             $rules['email'] = 'nullable|email|max:255';
             $rules['phone'] = 'nullable|string|max:20';
-            $rules['shipping_address1'] = 'nullable|string|max:255'; // Should be null for POS
+            $rules['shipping_address1'] = 'nullable|string|max:255';
             $rules['shipping_address2'] = 'nullable|string|max:255';
             $rules['city'] = 'nullable|string|max:255';
             $rules['state'] = 'nullable|string|max:255';
             $rules['zip_code'] = 'nullable|string|max:20';
-            $rules['shipping_cost'] = 'nullable|numeric|min:0'; // Should be 0 for POS
+            $rules['shipping_cost'] = 'nullable|numeric|min:0';
         } else {
             // Online-specific fields
             $rules['full_name'] = 'required|string|max:255';
@@ -302,7 +285,6 @@ class OrderController extends Controller
             ], 400);
         }
 
-        // 3. Check if order status allows updates
         $finalizedStatuses = ['completed', 'shipped', 'cancelled', 'payment_canceled', 'delivered', 'payment_failed'];
         if (in_array($order->status, $finalizedStatuses) && $request->input('status') !== $order->status) {
             return response()->json([
@@ -314,9 +296,8 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $oldPaymentMethod = $order->payment_method;
-            $oldStatus = $order->status; // Store old status to check for changes
+            $oldStatus = $order->status;
 
-            // Update individual order details to match database columns
             $order->full_name = $request->input('full_name');
             $order->email = $request->input('email');
             $order->phone = $request->input('phone');
@@ -333,8 +314,8 @@ class OrderController extends Controller
             $order->shipping_cost = $request->input('shipping_cost', $order->shipping_cost);
             $order->grand_total = $request->input('grand_total');
             $order->payment_method = $request->input('payment_method');
-            $order->is_pos_sale = $request->input('is_pos_sale'); // Update is_pos_sale
-            $order->location_id = $request->input('location_id'); // Update location_id
+            $order->is_pos_sale = $request->input('is_pos_sale');
+            $order->location_id = $request->input('location_id');
 
             // Handle Paystack reference if payment method changes
             if ($oldPaymentMethod === 'paystack' && $request->input('payment_method') === 'bank_transfer') {
@@ -347,7 +328,7 @@ class OrderController extends Controller
 
             $newStatus = $request->input('status');
             if ($newStatus !== $oldStatus) {
-                $order->status = $newStatus; // Update the status
+                $order->status = $newStatus;
 
                 switch ($newStatus) {
                     case 'shipped':
@@ -399,7 +380,6 @@ class OrderController extends Controller
             if (($newStatusLower === 'completed' || $newStatusLower === 'pending_confirmation' || $newStatusLower === 'shipped' || $newStatusLower === 'pending_delivery' || $newStatusLower === 'cancelled' || $newStatusLower === 'payment_canceled' || $newStatusLower === 'payment_failed' || $newStatusLower === 'processing') && $newStatusLower !== $oldStatusLower) {
                 if ($order->email) {
                     try {
-                        // Re-fetch order with location to ensure the Mailable has access to it
                         $order->load('location');
                         Mail::to($order->email)->send(new OrderStatusNotification($order));
                         Log::info("Order status email sent to {$order->email} for order {$order->order_number}. New status: {$order->status}");
@@ -411,10 +391,9 @@ class OrderController extends Controller
                 }
             }
 
-            // Send Telegram notification to admin (isolated in its own try-catch)
+            // Send Telegram notification to admin
             if (($newStatusLower === 'completed' || $newStatusLower === 'pending_confirmation' || $newStatusLower === 'shipped' || $newStatusLower === 'pending_delivery') && $newStatusLower !== $oldStatusLower) {
                 try {
-                    // Re-fetch order with location to ensure the Telegram sender has access to it
                     $order->load('location');
                     $this->sendTelegramNotificationToAdmin($order);
                     Log::info("Telegram notification sent for order {$order->order_number}. Status: {$order->status}");
@@ -424,8 +403,8 @@ class OrderController extends Controller
             }
 
             // Prepare response including location details
-            $responseOrder = $order->toArray(); // Get all attributes
-            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale; // Ensure boolean
+            $responseOrder = $order->toArray(); 
+            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale;
             $responseOrder['location_name'] = $order->location ? $order->location->name : null;
             $responseOrder['location_address'] = $order->location ? $order->location->address : null;
             $responseOrder['location_phone'] = $order->location ? $order->location->phone : null;
@@ -449,7 +428,6 @@ class OrderController extends Controller
 
     public function updateStatus($identifier, Request $request)
     {
-        // 1. Validate incoming request data
         $validator = Validator::make($request->all(), [
             'status' => 'required|string|max:255',
             'payment_method' => 'nullable|string|max:255',
@@ -465,10 +443,9 @@ class OrderController extends Controller
         }
 
         try {
-            // Find the order by order_number OR paystack_reference, eager load location
             $order = Order::where('order_number', $identifier)
                 ->orWhere('paystack_reference', $identifier)
-                ->with('location') // Eager load location for response
+                ->with('location')
                 ->first();
 
             if (!$order) {
@@ -537,7 +514,6 @@ class OrderController extends Controller
             if (($newStatusLower === 'completed' || $newStatusLower === 'pending_confirmation' || $newStatusLower === 'shipped' || $newStatusLower === 'pending_delivery' || $newStatusLower === 'cancelled' || $newStatusLower === 'payment_canceled' || $newStatusLower === 'payment_failed' || $newStatusLower === 'processing') && $newStatusLower !== $oldStatusLower) {
                 if ($order->email) {
                     try {
-                        // Re-fetch order with location to ensure the Mailable has access to it
                         $order->load('location');
                         Mail::to($order->email)->send(new OrderStatusNotification($order));
                         Log::info("Order status email sent to {$order->email} for order {$order->order_number}. New status: {$order->status}");
@@ -549,10 +525,9 @@ class OrderController extends Controller
                 }
             }
 
-            // Send Telegram notification to admin (isolated in its own try-catch)
+            // Send Telegram notification to admin
             if (($newStatusLower === 'completed' || $newStatusLower === 'pending_confirmation' || $newStatusLower === 'shipped' || $newStatusLower === 'pending_delivery') && $newStatusLower !== $oldStatusLower) {
                 try {
-                    // Re-fetch order with location to ensure the Telegram sender has access to it
                     $order->load('location');
                     $this->sendTelegramNotificationToAdmin($order);
                     Log::info("Telegram notification sent for order {$order->order_number}. Status: {$order->status}");
@@ -561,9 +536,8 @@ class OrderController extends Controller
                 }
             }
 
-            // Prepare response including location details
-            $responseOrder = $order->toArray(); // Get all attributes
-            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale; // Ensure boolean
+            $responseOrder = $order->toArray();
+            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale;
             $responseOrder['location_name'] = $order->location ? $order->location->name : null;
             $responseOrder['location_address'] = $order->location ? $order->location->address : null;
             $responseOrder['location_phone'] = $order->location ? $order->location->phone : null;
@@ -586,7 +560,6 @@ class OrderController extends Controller
     public function viewOrders()
     {
         try {
-            // Eager load the 'location' relationship for all orders
             $orders = Order::with('location')->orderBy('created_at', 'desc')->get();
 
             if ($orders->isEmpty()) {
@@ -597,7 +570,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            // Manually append location details and is_pos_sale to each order
             $formattedOrders = $orders->map(function ($order) {
                 $orderArray = $order->toArray();
                 $orderArray['is_pos_sale'] = (bool) $order->is_pos_sale; // Ensure boolean
@@ -627,7 +599,6 @@ class OrderController extends Controller
     public function viewOrderDetails($order_number)
     {
         try {
-            // Find the order by order_number, eager load location
             $order = Order::where('order_number', $order_number)->with('location')->first();
 
             if (!$order) {
@@ -637,9 +608,8 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            // Prepare response including location details
-            $responseOrder = $order->toArray(); // Get all attributes
-            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale; // Ensure boolean
+            $responseOrder = $order->toArray();
+            $responseOrder['is_pos_sale'] = (bool) $order->is_pos_sale;
             $responseOrder['location_name'] = $order->location ? $order->location->name : null;
             $responseOrder['location_address'] = $order->location ? $order->location->address : null;
             $responseOrder['location_phone'] = $order->location ? $order->location->phone : null;
@@ -660,13 +630,11 @@ class OrderController extends Controller
         }
     }
 
-    // Your existing trackOrder function (moved to the correct alphabetical position for clarity)
     public function trackOrder(string $orderNumber): JsonResponse
     {
         try {
-            // Eager load the 'location' relationship
             $order = Order::where('order_number', $orderNumber)
-                          ->with('location') // Eager load the associated location
+                          ->with('location')
                           ->first();
 
             if (!$order) {
@@ -676,7 +644,6 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            // Prepare the response data, including location details
             $responseOrder = [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -700,12 +667,11 @@ class OrderController extends Controller
                 'out_for_delivery_at' => $order->out_for_delivery_at,
                 'delivered_at' => $order->delivered_at,
                 'cancelled_at' => $order->cancelled_at,
-                'is_pos_sale' => (bool) $order->is_pos_sale, // Ensure it's a boolean
-                'items_json' => $order->items_json, // Already cast to array by model
+                'is_pos_sale' => (bool) $order->is_pos_sale,
+                'items_json' => $order->items_json,
                 'created_at' => $order->created_at,
                 'updated_at' => $order->updated_at,
-                // --- NEW: Include location details if available ---
-                'location_id' => $order->location_id, // Include the ID
+                'location_id' => $order->location_id,
                 'location_name' => $order->location ? $order->location->name : null,
                 'location_address' => $order->location ? $order->location->address : null,
                 'location_phone' => $order->location ? $order->location->phone : null,

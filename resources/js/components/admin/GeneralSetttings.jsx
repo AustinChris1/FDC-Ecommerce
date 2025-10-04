@@ -15,7 +15,8 @@ import {
     Phone,
     MapPin,
     Truck,
-    BellRing, // NEW ICON for notifications
+    BellRing,
+    Banknote
 } from 'lucide-react';
 
 const GeneralSettings = () => {
@@ -27,15 +28,17 @@ const GeneralSettings = () => {
         site_email: '',
         site_phone: '',
         site_address: '',
+        bank_name: '',
+        acct_name: '',
+        acct_no: '',
         facebook_url: '',
         twitter_url: '',
         instagram_url: '',
         site_logo: null,
         current_site_logo_path: '',
         shipping_fee: 0,
-        // NEW STATE FOR NOTIFICATIONS
         site_notification_message: '',
-        site_notification_active: false, // Boolean state
+        site_notification_active: false,
     });
     const [error, setError] = useState({});
     const [logoPreview, setLogoPreview] = useState(null);
@@ -51,15 +54,17 @@ const GeneralSettings = () => {
                         site_email: fetchedSettings.site_email || '',
                         site_phone: fetchedSettings.site_phone || '',
                         site_address: fetchedSettings.site_address || '',
+                        bank_name: fetchedSettings.bank_name || '',
+                        acct_name: fetchedSettings.acct_name || '',
+                        acct_no: fetchedSettings.acct_no || '',
                         facebook_url: fetchedSettings.facebook_url || '',
                         twitter_url: fetchedSettings.twitter_url || '',
                         instagram_url: fetchedSettings.instagram_url || '',
                         site_logo: null,
                         current_site_logo_path: fetchedSettings.site_logo_path || '',
                         shipping_fee: fetchedSettings.shipping_fee || 0,
-                        // Populate new notification states
                         site_notification_message: fetchedSettings.site_notification_message || '',
-                        site_notification_active: fetchedSettings.site_notification_active, // This will be boolean from backend
+                        site_notification_active: fetchedSettings.site_notification_active, 
                     });
                     if (fetchedSettings.site_logo_path) {
                         setLogoPreview(fetchedSettings.site_logo_path);
@@ -79,7 +84,6 @@ const GeneralSettings = () => {
 
     const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
-        // Handle checkbox for boolean state
         const newValue = type === 'checkbox' ? checked : (type === 'number' ? parseFloat(value) : value);
 
         setSettingsInput(prev => ({
@@ -117,14 +121,16 @@ const GeneralSettings = () => {
         formData.append('site_email', settingsInput.site_email || '');
         formData.append('site_phone', settingsInput.site_phone || '');
         formData.append('site_address', settingsInput.site_address || '');
+        formData.append('bank_name', settingsInput.bank_name || '');
+        formData.append('acct_name', settingsInput.acct_name || '');
+        formData.append('acct_no', settingsInput.acct_no || '');
         formData.append('facebook_url', settingsInput.facebook_url || '');
         formData.append('twitter_url', settingsInput.twitter_url || '');
         formData.append('instagram_url', settingsInput.instagram_url || '');
         formData.append('shipping_fee', settingsInput.shipping_fee.toString());
 
-        // NEW: Append notification settings
         formData.append('site_notification_message', settingsInput.site_notification_message || '');
-        formData.append('site_notification_active', settingsInput.site_notification_active ? '1' : '0'); // Send '1' or '0' for boolean
+        formData.append('site_notification_active', settingsInput.site_notification_active ? '1' : '0'); 
 
         if (settingsInput.site_logo) {
             formData.append('site_logo', settingsInput.site_logo);
@@ -257,6 +263,51 @@ const GeneralSettings = () => {
                     </div>
                 </div>
 
+                {/* Bank Information */}
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center border-b border-gray-200 pb-3">
+                    <Banknote className="w-6 h-6 mr-3 text-blue-600" /> Bank Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    <div className="mb-5">
+                        <label htmlFor="bank_name" className="block text-gray-700 text-sm font-medium mb-2">Bank Name</label>
+                        <input
+                            onChange={handleInput}
+                            value={settingsInput.bank_name || ''}
+                            type="text"
+                            id="bank_name"
+                            name="bank_name"
+                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                        />
+                        <small className="text-red-500 text-sm mt-1 block">{error.bank_name ? error.bank_name[0] : ''}</small>
+                    </div>
+                    <div className="mb-5">
+                        <label htmlFor="acct_name" className="block text-gray-700 text-sm font-medium mb-2">Account Name</label>
+                        <input
+                            onChange={handleInput}
+                            value={settingsInput.acct_name || ''}
+                            type="text"
+                            id="acct_name"
+                            name="acct_name"
+                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                        />
+                        <small className="text-red-500 text-sm mt-1 block">{error.acct_name ? error.acct_name[0] : ''}</small>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    <div className="mb-5">
+                        <label htmlFor="acct_no" className="block text-gray-700 text-sm font-medium mb-2">Account Number</label>
+                        <input
+                            onChange={handleInput}
+                            value={settingsInput.acct_no || ''}
+                            type="number"
+                            id="acct_no"
+                            name="acct_no"
+                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-200"
+                        />
+                        <small className="text-red-500 text-sm mt-1 block">{error.acct_no ? error.acct_no[0] : ''}</small>
+                    </div>
+                </div>
+
                 {/* Shipping Fee Section */}
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center border-t border-gray-200 pt-6">
                     <Truck className="w-6 h-6 mr-3 text-emerald-600" /> Shipping Settings
@@ -277,7 +328,7 @@ const GeneralSettings = () => {
                     <small className="text-red-500 text-sm mt-1 block">{error.shipping_fee ? error.shipping_fee[0] : ''}</small>
                 </div>
 
-                {/* Site Notification Section (NEW) */}
+                {/* Site Notification Section */}
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center border-t border-gray-200 pt-6">
                     <BellRing className="w-6 h-6 mr-3 text-yellow-600" /> Site Notification
                 </h2>

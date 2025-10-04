@@ -16,7 +16,7 @@ import {
     Info,
     ReceiptText,
     ArrowRight,
-    ArrowLeft, // Add ArrowLeft for back button
+    ArrowLeft,
 } from 'lucide-react';
 import { PaystackButton } from 'react-paystack';
 
@@ -38,45 +38,20 @@ const Checkout = () => {
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
     const [zipCode, setZipCode] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('paystack'); // Default to Paystack
+    const [paymentMethod, setPaymentMethod] = useState('paystack');
 
-    // These will now be populated by the backend after successful order initiation
     const [orderNumber, setOrderNumber] = useState('');
     const [paystackReference, setPaystackReference] = useState('');
-    // State to hold the order total for the persisted order, to check against cart total
     const [persistedOrderTotal, setPersistedOrderTotal] = useState(0);
-    // State to hold the payment method of the persisted order for comparison
     const [persistedPaymentMethod, setPersistedPaymentMethod] = useState('');
-    // NEW STATE: To store the current order status fetched from backend or a default
-    const [currentOrderStatus, setCurrentOrderStatus] = useState('pending_payment'); // Default initial status
-
-    useEffect(() => {
-        setLoading(true);
-        axios.get('/api/settings/general')
-            .then(res => {
-                if (res.status === 200) {
-                    setSiteSettings(res.data.settings);
-                } else {
-                    toast.error(res.data.message || "Failed to load site settings.");
-                }
-            })
-            .catch(err => {
-                toast.error("Network error or server issue. Could not load site settings.");
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+    const [currentOrderStatus, setCurrentOrderStatus] = useState('pending_payment');
 
     const paystack_key = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-    // --- Fetch Site Settings on Component Mount (duplicate from above, can be merged) ---
-    // This fetches the shipping fee and other general settings
-    // I'm keeping your existing structure, but note this useEffect is redundant if the above does the same.
     useEffect(() => {
         setLoading(true);
         setErrorSettings(false);
-        axios.get(`/api/settings/general`) // Fetch from API endpoint
+        axios.get(`/api/settings/general`)
             .then(res => {
                 if (res.status === 200 && res.data.settings) {
                     setSiteSettings(res.data.settings);
@@ -98,30 +73,36 @@ const Checkout = () => {
     const shippingCost = useMemo(() => {
         return parseFloat(siteSettings?.shipping_fee ?? 0);
     }, [siteSettings]);
+    const bank_name = useMemo(() => {
+        return siteSettings?.bank_name ?? '';
+    }, [siteSettings]);
+    const acct_name = useMemo(() => {
+        return siteSettings?.acct_name ?? '';
+    }, [siteSettings]);
+    const acct_no = useMemo(() => {
+        return parseFloat(siteSettings?.acct_no ?? 0);
+    }, [siteSettings]);
 
     const grandTotal = useMemo(() => {
         return parseFloat(totalCartPrice) + shippingCost;
     }, [totalCartPrice, shippingCost]); 
 
-    // --- Persist and Load Order Details from localStorage ---
     useEffect(() => {
         document.title = "Checkout - First Digits";
 
-        // Load authenticated user's name and email if available
         const authName = localStorage.getItem('auth_name');
         const authEmail = localStorage.getItem('auth_email');
         if (authName) setFullName(authName);
         if (authEmail) setEmail(authEmail);
 
-        // Redirect if cart is empty, unless we are resuming an order
+        // Redirect if cart is empty
         if (cartItems.length === 0 && !localStorage.getItem('checkout_order_number')) {
-            setLoading(false); // Ensure loading state is false if redirecting
+            setLoading(false);
             toast.info("Your cart is empty. Please add items before checking out.");
             navigate('/shop');
-            return; // Exit early
+            return;
         }
 
-        // Attempt to load existing order details from localStorage
         const storedOrderNumber = localStorage.getItem('checkout_order_number');
         const storedPaystackReference = localStorage.getItem('checkout_paystack_reference');
         const storedOrderTotal = parseFloat(localStorage.getItem('checkout_order_total'));
@@ -137,12 +118,11 @@ const Checkout = () => {
             setPersistedPaymentMethod(storedPaymentMethod);
             setCurrentOrderStatus(storedOrderStatus || 'pending_payment');
 
-            // Check if cart total or payment method has changed from the persisted order
             if (totalCartPrice === storedOrderTotal && paymentMethod === storedPaymentMethod) {
                 setCurrentStep(2);
                 toast.info("Resumed previous checkout session.");
             } else {
-                setCurrentStep(1); // If inconsistent, stay on step 1 for review/update
+                setCurrentStep(1);
                 if (totalCartPrice !== storedOrderTotal) {
                     toast.warn("Your cart items have changed. Please review details.");
                 } else if (storedPaymentMethod !== paymentMethod) {
@@ -155,13 +135,11 @@ const Checkout = () => {
         setLoading(false);
     }, [cartItems, navigate, grandTotal, paymentMethod, totalCartPrice]);
 
-    // Effect to save order details to localStorage whenever they change
     useEffect(() => {
         if (orderNumber) {
             localStorage.setItem('checkout_order_number', orderNumber);
             localStorage.setItem('checkout_order_total', totalCartPrice.toString());
             localStorage.setItem('checkout_payment_method', paymentMethod);
-            // NEW: Persist the current order status
             localStorage.setItem('checkout_order_status', currentOrderStatus);
             if (paystackReference) {
                 localStorage.setItem('checkout_paystack_reference', paystackReference);
@@ -169,7 +147,6 @@ const Checkout = () => {
         }
     }, [orderNumber, paystackReference, totalCartPrice, paymentMethod, currentOrderStatus]);
 
-    // Function to fetch order details from the backend
     const fetchOrderDetails = useCallback(async (orderNum) => {
         if (!orderNum) return;
         try {
@@ -180,7 +157,6 @@ const Checkout = () => {
                 withCredentials: true,
             });
             if (res.data.status === 200 && res.data.order) {
-                // Update state with fetched order details
                 const fetchedOrder = res.data.order;
                 setFullName(fetchedOrder.full_name || '');
                 setEmail(fetchedOrder.email || '');
@@ -193,13 +169,12 @@ const Checkout = () => {
                 setPaymentMethod(fetchedOrder.payment_method || 'paystack');
                 setOrderNumber(fetchedOrder.order_number);
                 setPaystackReference(fetchedOrder.paystack_reference || fetchedOrder.order_number);
-                setPersistedOrderTotal(fetchedOrder.grand_total); // Use grand_total for persistence
+                setPersistedOrderTotal(fetchedOrder.grand_total);
                 setPersistedPaymentMethod(fetchedOrder.payment_method);
-                setCurrentOrderStatus(fetchedOrder.status); // Set the dynamic status
+                setCurrentOrderStatus(fetchedOrder.status);
                 toast.info("Order details loaded from server.");
             } else {
                 toast.error(res.data.message || "Failed to load existing order details.");
-                // Clear local storage if order not found on backend
                 localStorage.removeItem('checkout_order_number');
                 localStorage.removeItem('checkout_paystack_reference');
                 localStorage.removeItem('checkout_order_total');
@@ -209,7 +184,6 @@ const Checkout = () => {
         } catch (error) {
             console.error("Error fetching order details:", error.response?.data || error);
             toast.error("Failed to fetch order details from server.");
-            // Clear local storage on error
             localStorage.removeItem('checkout_order_number');
             localStorage.removeItem('checkout_paystack_reference');
             localStorage.removeItem('checkout_order_total');
@@ -229,7 +203,6 @@ const Checkout = () => {
     }, [orderNumber, fetchOrderDetails, isSubmitting]);
 
 
-    // Updated: getOrderPayload now uses the dynamic `currentOrderStatus`
     const getOrderPayload = useCallback((method) => ({
         user_info: { fullName, email, phone },
         shipping_address: { address1, address2, city, state, zipCode },
@@ -309,12 +282,12 @@ const Checkout = () => {
 
             if (res.data.status === 200 && res.data.order_number) {
                 toast.success("Order updated successfully. Proceeding to payment...");
-                setOrderNumber(res.data.order_number); // Should be the same
+                setOrderNumber(res.data.order_number); 
                 setCurrentOrderStatus(res.data.updated_order_status || currentOrderStatus); // Update status from response
                 if (method === 'paystack') {
                     setPaystackReference(res.data.paystack_reference || res.data.order_number);
                 } else {
-                    setPaystackReference(''); // Clear if switching to bank transfer
+                    setPaystackReference('');
                 }
                 return res.data;
             } else {
@@ -347,14 +320,12 @@ const Checkout = () => {
     const handlePaystackSuccess = useCallback(async (res) => {
         if (res.status === 'success' && res.transaction && orderNumber) {
             try {
-                // Ensure the payment reference from Paystack matches the one from our initiated order
                 if (res.reference !== paystackReference) {
                     toast.error("Payment reference mismatch. Please contact support.");
                     setIsSubmitting(false);
                     return;
                 }
 
-                // IMPORTANT: This is where the status changes based on payment success
                 const newStatus = 'completed';
                 const updateRes = await axios.post(`/api/orders/update-status/${orderNumber}`, {
                     status: newStatus,
@@ -413,7 +384,7 @@ const Checkout = () => {
             );
         }
         setIsSubmitting(false);
-    }, [clearCart, navigate, orderNumber, paystackReference, setCurrentOrderStatus]); // Added setCurrentOrderStatus
+    }, [clearCart, navigate, orderNumber, paystackReference, setCurrentOrderStatus]);
 
     // Handles Paystack payment modal closing
     const handlePaystackClose = useCallback(async () => {
@@ -429,28 +400,27 @@ const Checkout = () => {
             try {
                 await axios.post(`/api/orders/update-status/${orderNumber}`, {
                     status: 'cancelled',
-                    payment_method: 'paystack', // Still relevant context
+                    payment_method: 'paystack',
                 }, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
                         'Content-Type': 'application/json',
                     }
                 });
-                setCurrentOrderStatus('cancelled'); // Update frontend state
+                setCurrentOrderStatus('cancelled');
             } catch (error) {
                 console.error("Error updating status to payment_canceled:", error);
             }
         }
 
-        // Clear stored reference and generate a new one
         const newRef = `FDC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         setPaystackReference(newRef);
         localStorage.setItem('checkout_paystack_reference', newRef);
 
         setIsSubmitting(false);
-    }, [orderNumber, setCurrentOrderStatus]); // Added orderNumber, setCurrentOrderStatus
+    }, [orderNumber, setCurrentOrderStatus]);
 
-    // Configuration for PaystackButton (using useMemo for optimization)
+    // Configuration for PaystackButton
     const paystackConfig = useMemo(() => ({
         email: email?.trim() || '',
         amount: parseInt(grandTotal) * 100, // Amount in kobo
@@ -468,10 +438,6 @@ const Checkout = () => {
     }), [email, grandTotal, fullName, phone, cartItems, orderNumber, paystackReference, handlePaystackSuccess, handlePaystackClose]);
 
 
-    /**
-     * Handles the "Next" button click for Step 1 (Shipping).
-     * Validates inputs and initiates/updates the order with the backend.
-     */
     const handleNextStep = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -498,11 +464,10 @@ const Checkout = () => {
             }
         }
         // Condition 2: Existing order, but cart total or payment method has changed
-        // Also consider if basic shipping details changed for an existing order
         else if (
             totalCartPrice !== persistedOrderTotal ||
             paymentMethod !== persistedPaymentMethod ||
-            false // Placeholder for additional checks if needed
+            false
         ) {
             const orderRes = await updateExistingOrder(paymentMethod);
             if (orderRes) {
@@ -540,10 +505,9 @@ const Checkout = () => {
         }
         try {
             console.log('Confirming bank transfer for order:', orderNumber);
-            // IMPORTANT: This is where the status changes for bank transfer
-            const newStatus = 'pending_confirmation'; // or 'processing_bank_transfer_payment'
+            const newStatus = 'pending_confirmation'; 
             const res = await axios.post(`/api/orders/update-status/${orderNumber}`, {
-                status: newStatus, // Send the new status
+                status: newStatus, 
                 payment_method: 'bank_transfer',
             }, {
                 headers: {
@@ -565,9 +529,9 @@ const Checkout = () => {
                 localStorage.removeItem('checkout_paystack_reference');
                 localStorage.removeItem('checkout_order_total');
                 localStorage.removeItem('checkout_payment_method');
-                localStorage.removeItem('checkout_order_status'); // Clear persisted status
+                localStorage.removeItem('checkout_order_status');
                 localStorage.setItem('lastPaymentMethod', 'bank_transfer');
-                setCurrentOrderStatus(newStatus); // Update frontend state
+                setCurrentOrderStatus(newStatus); 
                 navigate(`/order-confirmation/${orderNumber}`);
             } else {
                 toast.error(
@@ -738,21 +702,20 @@ const Checkout = () => {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.3 }}
-                                    className="flex flex-col items-center justify-center" // Added flex for centering loader
+                                    className="flex flex-col items-center justify-center" 
                                 >
                                     <p className="text-gray-600 mb-6 dark:text-gray-300">Click the button below to pay securely with Paystack.</p>
 
-                                    {/* Conditional Rendering: Show Loader if submitting, otherwise show Paystack Button */}
                                     {isSubmitting ? (
                                         <div className="flex items-center justify-center py-4 text-blue-700 dark:text-white">
-                                            <Load className="w-8 h-8 animate-spin text-blue-500 mr-3 dark:text-blue-400" /> {/* Larger loader icon */}
+                                            <Load className="w-8 h-8 animate-spin text-blue-500 mr-3 dark:text-blue-400" /> 
                                             <span className="text-xl font-bold">Redirecting to Paystack...</span>
                                         </div>
                                     ) : (
                                         <PaystackButton
                                             className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-bold text-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3 dark:from-blue-600 dark:to-indigo-700"
                                             {...paystackConfig}
-                                            disabled={!orderNumber || !paystackReference} // Only disable if order data is missing, not by isSubmitting
+                                            disabled={!orderNumber || !paystackReference} 
                                         >
                                             <CreditCard className="w-6 h-6" />
                                             <span>Pay Now with Paystack</span>
@@ -773,9 +736,9 @@ const Checkout = () => {
                                             Your order will be processed upon confirmation of payment.
                                         </p>
                                         <div className="space-y-2 text-gray-700 dark:text-gray-200">
-                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Bank Name:</span> Zenith Bank</p>
-                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Name:</span> FirstSmart Mart Limited</p>
-                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Number:</span> 1310110966</p>
+                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Bank Name:</span> {bank_name}</p>
+                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Name:</span> {acct_name}</p>
+                                            <p><span className="font-semibold text-gray-500 dark:text-gray-400">Account Number:</span> {acct_no}</p>
                                             <p className="flex items-center"><span className="font-semibold text-gray-500 mr-2 dark:text-gray-400">Order Number:</span> <ReceiptText className="w-5 h-5 mr-1" /> <span className="font-bold text-lg text-yellow-600 dark:text-yellow-300">{orderNumber}</span></p>
                                             <p><span className="font-semibold text-gray-500 dark:text-gray-400">Amount:</span> ₦{grandTotal.toLocaleString()}</p>
                                         </div>
@@ -818,7 +781,7 @@ const Checkout = () => {
                     )}
                 </AnimatePresence>
 
-                {/* Order Summary (Always Visible) */}
+                {/* Order Summary */}
                 <motion.div className="lg:w-1/3 bg-white rounded-xl shadow-2xl p-6 sm:p-8 lg:p-10 border border-gray-200 flex flex-col dark:bg-gray-900 dark:border-gray-800">
                     <h2 className="text-3xl font-bold mb-8 text-indigo-700 dark:text-cyan-400 flex items-center space-x-3">
                         <ShoppingCart className="w-8 h-8" />

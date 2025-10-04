@@ -1,4 +1,3 @@
-// components/ProductCardBox.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -24,7 +23,7 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
                        dark:text-gray-50 text-gray-800
                        dark:border-gray-700 border-gray-200
                        hover:border-lime-500 transition-colors duration-300 relative overflow-hidden
-                       h-[320px] sm:h-[350px] md:h-[380px] lg:h-[400px]" // Adjusted responsive fixed heights
+                       h-[320px] sm:h-[350px] md:h-[380px] lg:h-[400px]"
             variants={itemVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
@@ -37,7 +36,7 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
             </h3>
 
             {/* Changed flex-grow to a fixed height to better control image area */}
-            <div className="grid grid-cols-2 gap-3 h-[calc(100%-80px)]"> {/* Adjusted height to account for title and link area */}
+            <div className="grid grid-cols-2 gap-3 h-[calc(100%-80px)]"> 
                 {products.slice(0, 4).map((product, index) => (
                     <Link
                         to={`/collections/${product.category?.link || 'default-category'}/${product.link}`}
@@ -46,12 +45,12 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
                                    dark:border-gray-700 border-gray-200
                                    hover:border-lime-600 transition-colors duration-300"
                     >
-                        {/* Removed aspect-w/h and used flexbox for image sizing within its container */}
-                        <div className="w-full h-full flex items-center justify-center dark:bg-gray-950 bg-gray-50"> {/* Added bg-gray-800 for placeholders */}
+
+                        <div className="w-full h-full flex items-center justify-center dark:bg-gray-950 bg-gray-50">
                             <img
-                                src={product.image || `https://placehold.co/150x150/2d3748/cbd5e0?text=${product.name.substring(0, Math.min(product.name.length, 10))}`} // Adjusted placeholder text length
+                                src={product.image || `https://placehold.co/150x150/2d3748/cbd5e0?text=${product.name.substring(0, Math.min(product.name.length, 10))}`}
                                 alt={product.name}
-                                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 ease-in-out" // Changed object-cover to object-contain
+                                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 ease-in-out"
                                 onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/150x150/2d3748/cbd5e0?text=${product.name.substring(0, Math.min(product.name.length, 10))}`; }}
                             />
                         </div>
@@ -62,7 +61,7 @@ const ProductCardBox = ({ title, products, linkHref, linkText = "Shop now", inVi
                 ))}
             </div>
 
-            <div className="mt-4 text-left"> {/* Slightly reduced margin-top */}
+            <div className="mt-4 text-left">
                 <Link
                     to={linkHref}
                     className="dark:text-lime-400 text-lime-700

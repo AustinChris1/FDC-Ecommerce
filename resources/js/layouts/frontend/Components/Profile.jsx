@@ -137,7 +137,7 @@ const UserProfile = () => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/users/update/${userInput.id}`, {
+            const response = await fetch(`${API_BASE_URL}/user/update/${userInput.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -334,7 +334,7 @@ const UserProfile = () => {
             </motion.h1>
 
             {/* Personal Information Form */}
-            <form onSubmit={handleUpdateProfile} className="relative z-10 max-w-xl mx-auto mb-8">
+            <form className="relative z-10 max-w-xl mx-auto mb-8">
                 <motion.div variants={cardVariants} className="bg-white rounded-xl shadow-xl p-6 sm:p-8 lg:p-10 border border-gray-200 dark:bg-gray-900 dark:shadow-2xl dark:border-gray-800">
                     <div className="flex justify-between items-center mb-6 sm:mb-8">
                         <h2 className="text-3xl font-bold text-blue-600 dark:text-lime-400 flex items-center space-x-3">
@@ -355,7 +355,8 @@ const UserProfile = () => {
                             </motion.button>
                         ) : (
                             <motion.button
-                                type="submit"
+                                type="button"
+                                onClick={handleUpdateProfile}
                                 disabled={isUpdatingProfile}
                                 className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-700"
                                 variants={buttonVariants}
@@ -425,7 +426,7 @@ const UserProfile = () => {
             </form>
 
             {/* Change Password Form */}
-            <form onSubmit={handleUpdatePassword} className="relative z-10 max-w-xl mx-auto">
+            <form className="relative z-10 max-w-xl mx-auto">
                 <motion.div variants={cardVariants} className="bg-white rounded-xl shadow-xl p-6 sm:p-8 lg:p-10 border border-gray-200 mt-8 dark:bg-gray-900 dark:shadow-2xl dark:border-gray-800">
                     <div className="flex justify-between items-center mb-6 sm:mb-8">
                         <h2 className="text-3xl font-bold text-blue-600 dark:text-lime-400 flex items-center space-x-3">
@@ -446,7 +447,8 @@ const UserProfile = () => {
                             </motion.button>
                         ) : (
                             <motion.button
-                                type="submit"
+                                type="button"
+                                onClick={handleUpdatePassword}
                                 disabled={isUpdatingPassword}
                                 className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-700"
                                 variants={buttonVariants}
@@ -504,7 +506,6 @@ const UserProfile = () => {
                                 type="button"
                                 onClick={() => {
                                     setIsEditingPassword(false);
-                                    // Clear password fields if canceled
                                     setUserInput(prev => ({
                                         ...prev,
                                         current_password: '',

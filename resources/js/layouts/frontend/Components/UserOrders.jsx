@@ -34,51 +34,36 @@ const UserOrders = () => {
     const userEmail = localStorage.getItem('auth_email');
     const authToken = localStorage.getItem('auth_token');
 
-    // useCallback to memoize the fetchOrders function
     const fetchOrders = useCallback(async () => {
         if (!userEmail || !authToken) {
             toast.error("You must be logged in to view your orders.");
             setLoading(false);
             setError("Authentication required. Please log in to view your orders.");
-            navigate('/login'); // Redirect to login if not authenticated
+            navigate('/login');
             return;
         }
 
         setLoading(true);
-        setError(null); // Clear previous errors
+        setError(null);
         try {
-            // IMPORTANT NOTE FOR OPTIMIZATION AND SECURITY:
-            // Fetching ALL orders and then filtering on the client-side (as currently done)
-            // is inefficient and potentially insecure if 'allOrders' contains sensitive data
-            // for other users.
-            //
-            // RECOMMENDATION: Implement a backend endpoint like '/api/user/orders'
-            // that returns ONLY the orders for the authenticated user.
-            // This would significantly improve performance and security.
             const res = await axios.get('/api/allOrders', {
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
-                    'Accept': 'application/json' // Ensure JSON response is requested
+                    'Accept': 'application/json'
                 }
             });
 
             if (res.status === 200 && Array.isArray(res.data.orders)) {
                 const fetchedOrders = res.data.orders;
 
-                // Filter orders by the authenticated user's email
-                // This client-side filtering should ideally be done on the backend.
                 let filtered = fetchedOrders.filter(
                     order => order.email && order.email.toLowerCase() === userEmail.toLowerCase()
                 );
 
-                // Sort orders by creation date in descending order (newest first)
                 filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-                // Deduplicate orders based on order_number and grand_total
-                // This helps in case of duplicate entries from the backend for the same order
                 const uniqueOrdersMap = new Map();
                 filtered.forEach(order => {
-                    // Using order_number and grand_total as a composite key for uniqueness
                     const key = `${order.order_number}-${order.grand_total}`;
                     if (!uniqueOrdersMap.has(key)) {
                         uniqueOrdersMap.set(key, order);
@@ -92,9 +77,8 @@ const UserOrders = () => {
                     toast.info("No orders found for your account.");
                 }
             } else {
-                // Handle cases where status is 200 but data structure is unexpected
                 toast.warn(res.data.message || "No orders found or unexpected data format.");
-                setUserOrders([]); // Ensure orders are cleared
+                setUserOrders([]);
             }
         } catch (err) {
             console.error("Error fetching orders:", err.response?.data || err.message || err);
@@ -102,7 +86,7 @@ const UserOrders = () => {
             if (err.response) {
                 if (err.response.status === 401 || err.response.status === 403) {
                     errorMessage = "Authentication failed. Please log in again.";
-                    navigate('/login'); // Redirect to login on auth failure
+                    navigate('/login');
                 } else {
                     errorMessage = err.response.data?.message || `Server error: ${err.response.status}`;
                 }
@@ -111,19 +95,17 @@ const UserOrders = () => {
             }
             toast.error(errorMessage);
             setError(errorMessage);
-            setUserOrders([]); // Clear orders on error
+            setUserOrders([]);
         } finally {
             setLoading(false);
         }
-    }, [userEmail, authToken, navigate]); // Dependencies for useCallback
+    }, [userEmail, authToken, navigate]);
 
-    // useEffect to fetch orders on component mount and when fetchOrders changes
     useEffect(() => {
         document.title = "My Orders - First Digits";
         fetchOrders();
     }, [fetchOrders]);
 
-    // Memoize pagination calculations for performance
     const { currentOrders, pageCount } = useMemo(() => {
         const offset = currentPage * itemsPerPage;
         const current = userOrders.slice(offset, offset + itemsPerPage);
@@ -131,12 +113,10 @@ const UserOrders = () => {
         return { currentOrders: current, pageCount: count };
     }, [userOrders, currentPage, itemsPerPage]);
 
-    // Handler for page change in pagination
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
     };
 
-    // Helper function to determine status badge color
     const getStatusColor = (status) => {
         switch (status) {
             case 'completed': return 'bg-green-600 text-white';

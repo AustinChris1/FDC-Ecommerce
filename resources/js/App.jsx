@@ -35,7 +35,7 @@ import SubNavbar from './layouts/frontend/Components/SubNavbar';
 import Stores from './layouts/frontend/Components/Stores';
 import ForgotPassword from './layouts/frontend/auth/ForgotPassword';
 import ResetPassword from './layouts/frontend/auth/ResetPassword';
-import AnimatedBackground from './layouts/frontend/Components/AnimatedBackground'; // Import the new component
+import AnimatedBackground from './layouts/frontend/Components/AnimatedBackground';
 
 
 const Master = lazy(() => import('./layouts/admin/Master'));
@@ -68,7 +68,6 @@ axios.interceptors.request.use(function (config) {
     return config;
 });
 
-// Home component from the initial app
 function Home() {
     return (
         <>
@@ -171,7 +170,6 @@ function App() {
                     <CartProvider>
                         <WishlistProvider>
                             <ScrollToTop />
-                            {/* Global loading spinner */}
                             {appLoading ? (
                                 <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 z-[9999]">
                                     <LoadingSpinner />

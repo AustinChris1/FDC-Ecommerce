@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;    // Import for file deletion
-use Illuminate\Support\Facades\Storage; // Import for file storage
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 
 
@@ -16,12 +18,21 @@ class CategoryController extends Controller
     //Add
     public function store(Request $request)
     {
+        // Store admins should not be able to make changes
+        $user = Auth::user();
+        if (!$user || ($user && $user->location_id !== NULL)) {
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Forbidden. You do not have permission',
+            ], 403);
+        }
+
         // Add image validation
         $validator = Validator::make($request->all(), [
             'meta_title' => 'required|string|max:255',
-            'link' => 'required|string|max:255|unique:categories,link', // Ensure link is unique
+            'link' => 'required|string|max:255|unique:categories,link',
             'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image validation: optional, image file, allowed types, max 2MB
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8196',
         ]);
 
         if ($validator->fails()) {
@@ -45,9 +56,9 @@ class CategoryController extends Controller
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '.' . $extension;
-            // Store image in 'public' disk under 'uploads/categories' directory
-            $path = $file->storeAs('uploads/categories', $filename, 'public');
-            $category->image = 'uploads/categories/' . $filename; // Save relative path to DB
+            $destinationPath = 'uploads/categories';
+            $file->move(public_path($destinationPath), $filename);
+            $category->image = $destinationPath . "/" . $filename;
         }
 
         $category->save();
@@ -67,7 +78,7 @@ class CategoryController extends Controller
             'category' => $category,
         ], 200);
     }
-//Fetch for edit
+    //Fetch for edit
     public function edit($id)
     {
         $category = Category::find($id);
@@ -76,22 +87,30 @@ class CategoryController extends Controller
                 'status' => 404,
                 'message' => 'Category not found',
             ], 404);
-        }else{
-        return response()->json([
-            'status' => 200,
-            'category' => $category,
-        ], 200);
-    }
+        } else {
+            return response()->json([
+                'status' => 200,
+                'category' => $category,
+            ], 200);
+        }
     }
     // Update method for editing an existing category
     public function update(Request $request, $id)
     {
-        // Add image validation
+        // Store admins should not be able to make changes
+        $user = Auth::user();
+        if (!$user || ($user && $user->location_id !== NULL)) {
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Forbidden. You do not have permission',
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'meta_title' => 'required|string|max:255',
-            'link' => 'required|string|max:255|unique:categories,link,' . $id, // Unique link except for current category
+            'link' => 'required|string|max:255|unique:categories,link,' . $id,
             'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image validation
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -104,7 +123,6 @@ class CategoryController extends Controller
         $category = Category::find($id);
 
         if ($category) {
-            // Update category fields
             $category->meta_title = $request->input('meta_title');
             $category->link = $request->input('link');
             $category->description = $request->input('description');
@@ -113,12 +131,9 @@ class CategoryController extends Controller
             $category->name = $request->input('name');
             $category->status = $request->input('status') == true ? 1 : 0;
 
-            // Handle image update/deletion using your preferred method
             if ($request->hasFile('image')) {
-                // Get the old image path
-                $oldImagePath = $category->image; 
-                
-                // If an old image exists, delete it
+                $oldImagePath = $category->image;
+
                 if ($oldImagePath && File::exists(public_path($oldImagePath))) {
                     File::delete(public_path($oldImagePath));
                 }
@@ -127,33 +142,27 @@ class CategoryController extends Controller
                 $file = $request->file('image');
                 $extension = $file->getClientOriginalExtension();
                 $filename = time() . '.' . $extension;
-                $destinationPath = 'uploads/categories'; // Your desired destination folder in public directory
-                $file->move(public_path($destinationPath), $filename); // Move to public path
-                $category->image = $destinationPath . "/" . $filename; // Save relative path to DB
-
+                $destinationPath = 'uploads/categories';
+                $file->move(public_path($destinationPath), $filename);
+                $category->image = $destinationPath . "/" . $filename;
             } elseif ($request->input('image') === 'REMOVE_LOGO') {
-                // If frontend sends 'REMOVE_LOGO' signal (for explicit deletion without new upload)
                 $oldImagePath = $category->image;
                 if ($oldImagePath && File::exists(public_path($oldImagePath))) {
                     File::delete(public_path($oldImagePath));
                 }
-                $category->image = null; // Set image path to null in DB
+                $category->image = null;
             }
-            // If no new image is uploaded and 'REMOVE_LOGO' signal is not sent,
-            // the existing $category->image value will be retained by default.
 
             $category->save();
 
-            // Optionally return new logo path if updated
             $response = [
                 'status' => 200,
                 'message' => 'Category updated successfully',
             ];
             if ($request->hasFile('image')) {
-                $response['new_logo_path'] = $category->image; // Return the new image path
+                $response['new_logo_path'] = $category->image;
             }
             return response()->json($response);
-
         } else {
             return response()->json([
                 'status' => 404,
@@ -162,9 +171,18 @@ class CategoryController extends Controller
         }
     }
 
-//Delete
+    //Delete
     public function destroy($id)
     {
+        // Store admins should not be able to make changes
+        $user = Auth::user();
+        if (!$user || ($user && $user->location_id !== NULL)) {
+            return new JsonResponse([
+                'status' => 403,
+                'message' => 'Forbidden. You do not have permission',
+            ], 403);
+        }
+
         $category = Category::find($id);
         if ($category) {
             $category->delete();
@@ -188,5 +206,4 @@ class CategoryController extends Controller
             'category' => $category,
         ], 200);
     }
-    
 }

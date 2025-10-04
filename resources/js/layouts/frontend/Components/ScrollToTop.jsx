@@ -8,7 +8,7 @@ const ScrollToTop = () => {
     const handleScroll = () => {
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 100); // Adjust the delay if necessary
+      }, 100); 
     };
 
     handleScroll();

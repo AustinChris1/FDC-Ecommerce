@@ -15,10 +15,14 @@ const ProductShowcase = () => {
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState("All"); // For the main product grid
+    const [selectedCategory, setSelectedCategory] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
     const { addToCart } = useCart();
+
+    // New state for recently viewed products
+    const [recentlyViewedList, setRecentlyViewedList] = useState([]);
+    const [isRecentlyViewedAvailable, setIsRecentlyViewedAvailable] = useState(false);
 
     // useInView hooks for section animations
     const { ref: categoriesRef, inView: categoriesInView } = useInView({
@@ -50,7 +54,6 @@ const ProductShowcase = () => {
         threshold: 0.05,
     });
 
-
     // --- Data Fetching ---
     useEffect(() => {
         const fetchData = async () => {
@@ -59,7 +62,6 @@ const ProductShowcase = () => {
                 // Fetch Categories
                 const categoryRes = await axios.get(`/api/getCategory`);
                 if (categoryRes.data.status === 200) {
-                    // Prepend "All" category
                     setCategories([{ id: "All", name: "All", link: "all" }, ...categoryRes.data.category]);
                 } else {
                     console.error("Backend error fetching categories:", categoryRes.data.message);
@@ -70,7 +72,6 @@ const ProductShowcase = () => {
                 if (productsRes.data.status === 200) {
                     const productsFromApi = productsRes.data.products;
 
-                    // Fetch reviews for each product concurrently
                     const productsWithReviewPromises = productsFromApi.map(async (product) => {
                         let averageRating = 0;
                         let reviewCount = 0;
@@ -85,17 +86,12 @@ const ProductShowcase = () => {
                             }
                         } catch (reviewError) {
                             console.warn(`Could not fetch reviews for product ${product.name} (ID: ${product.id}):`, reviewError);
-                            // It's okay if reviews fail, product should still load
                         }
 
-                        // Use actual 'is_new_arrival', 'is_flash_sale' directly from your backend.
-                        // Ensure date fields are properly parsed.
                         const flashSaleEndsAt = product.flash_sale_ends_at ? new Date(product.flash_sale_ends_at) : null;
                         const flashSaleStartsAt = product.flash_sale_starts_at ? new Date(product.flash_sale_starts_at) : null;
                         const now = new Date();
 
-                        // A product is on flash sale if is_flash_sale is true AND
-                        // the current time is between flash_sale_starts_at and flash_sale_ends_at
                         const isCurrentlyFlashSale = product.is_flash_sale && flashSaleStartsAt && flashSaleEndsAt &&
                             now >= flashSaleStartsAt && now <= flashSaleEndsAt;
 
@@ -103,22 +99,18 @@ const ProductShowcase = () => {
                             ...product,
                             rating: parseFloat(averageRating),
                             num_reviews: reviewCount,
-                            // Directly use the booleans from the backend
                             is_new_arrival: product.is_new_arrival || false,
                             is_flash_sale: isCurrentlyFlashSale || false,
-                            // Ensure these fields are passed through
                             flash_sale_price: product.flash_sale_price,
                             flash_sale_starts_at: product.flash_sale_starts_at,
                             flash_sale_ends_at: product.flash_sale_ends_at,
-                            // Keep original price for reference
                             original_price: product.original_price,
-                            selling_price: product.selling_price // This might be the regular price when not on flash sale
+                            selling_price: product.selling_price
                         };
                     });
 
                     const productsWithReviews = await Promise.all(productsWithReviewPromises);
                     setProducts(productsWithReviews);
-
                 } else {
                     console.error("Backend error fetching products:", productsRes.data.message);
                 }
@@ -129,23 +121,39 @@ const ProductShowcase = () => {
             }
         };
         fetchData();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
+
+    // Recently viewed
+    useEffect(() => {
+        const storedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+        if (storedItems.length > 0 && products.length > 0) {
+            const recentlyViewedProducts = storedItems.map(storedItem =>
+                products.find(p => p.id === storedItem.id)
+            ).filter(Boolean); // Filter out any products that might not exist in the full list
+
+            setRecentlyViewedList(recentlyViewedProducts);
+            setIsRecentlyViewedAvailable(recentlyViewedProducts.length > 0);
+        } else {
+            setRecentlyViewedList([]);
+            setIsRecentlyViewedAvailable(false);
+        }
+    }, [products]); // Re-run this effect whenever the main `products` state changes
 
     // --- Product Filtering and Sorting for Sections (Memoized for performance) ---
     const flashSaleProducts = useMemo(() =>
         products.filter(p =>
             p.is_flash_sale &&
             p.flash_sale_ends_at &&
-            new Date(p.flash_sale_ends_at) > new Date() && // Ensure sale is still active
+            new Date(p.flash_sale_ends_at) > new Date() &&
             p.qty > 0
-        ).sort((a, b) => new Date(a.flash_sale_ends_at).getTime() - new Date(b.flash_sale_ends_at).getTime()) // Sort by earliest end date
-        .slice(0, 8),
+        ).sort((a, b) => new Date(a.flash_sale_ends_at).getTime() - new Date(b.flash_sale_ends_at).getTime())
+            .slice(0, 8),
         [products]
     );
 
     const newArrivalsProducts = useMemo(() =>
         products.filter(p => p.is_new_arrival && p.qty > 0)
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by latest creation date
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
             .slice(0, 8),
         [products]
     );
@@ -157,6 +165,7 @@ const ProductShowcase = () => {
         [products]
     );
 
+    // The original `featuredProducts` list remains, but will only be used as a fallback
     const featuredProducts = useMemo(() =>
         products.filter(p => p.featured === 1 && p.qty > 0)
             .slice(0, 8),
@@ -177,13 +186,11 @@ const ProductShowcase = () => {
         return activeSales.length > 0 ? Math.min(...activeSales) : null;
     }, [flashSaleProducts]);
 
-
     // --- Pagination Logic for main Product Grid ---
     const filteredProducts = useMemo(() => {
         if (selectedCategory === "All") {
             return products;
         }
-        // Assuming category_id from product matches category.id
         return products.filter(prod => prod.category_id === selectedCategory);
     }, [products, selectedCategory]);
 
@@ -200,7 +207,7 @@ const ProductShowcase = () => {
     const handleAddToCart = (product) => {
         const quantity = 1;
 
-        if (product.status == 1 || product.qty <= 0) {
+        if (product.status === 1 || product.qty <= 0) {
             toast.error(`${product.name} is currently out of stock or unavailable.`);
             return;
         }
@@ -224,11 +231,10 @@ const ProductShowcase = () => {
             className="py-16 md:py-24 dark:bg-gray-950 bg-gray-50 dark:text-white text-gray-900 relative overflow-hidden"
             style={{
                 backgroundImage: `radial-gradient(at 20% 0%, rgba(20,20,50,0.4) 0%, transparent 50%),
-                                  radial-gradient(at 80% 100%, rgba(50,20,20,0.4) 0%, transparent 50%)`,
+                                     radial-gradient(at 80% 100%, rgba(50,20,20,0.4) 0%, transparent 50%)`,
                 backgroundBlendMode: 'overlay',
             }}
         >
-            {/* Subtle background abstract shapes/glows - colors adjusted for light mode too */}
             <motion.div
                 className="absolute inset-0 pointer-events-none z-0"
                 initial={{ opacity: 0 }}
@@ -257,7 +263,6 @@ const ProductShowcase = () => {
                             <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
                                 Incredible deals available for a limited time.
                             </p>
-                            {/* Use dynamic target date from the earliest ending flash sale product */}
                             {globalFlashSaleEndDate && (
                                 <div className="mt-8">
                                     <CountdownTimer targetDate={globalFlashSaleEndDate} />
@@ -279,7 +284,6 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={flashSaleInView}
                                         customDelay={i * 0.08}
-                                        // Pass flash sale specific props
                                         isFlashSale={product.is_flash_sale}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
@@ -377,8 +381,51 @@ const ProductShowcase = () => {
                     </>
                 )}
 
-                {/* --- Section: Featured Products (from is_featured=1 in DB) --- */}
-                {featuredProducts.length > 0 && (
+                {/* --- Section: Recently Viewed Products (Dynamic) --- */}
+                {isRecentlyViewedAvailable && (
+                    <>
+                        <motion.div
+                            ref={featuredProductsRef}
+                            className="text-center mb-12 md:mb-16"
+                            variants={sectionTitleVariants}
+                            initial="hidden"
+                            animate={featuredProductsInView ? "visible" : "hidden"}
+                        >
+                            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight dark:text-pink-400 text-pink-700">
+                                <span className="dark:text-white text-gray-900">Recently</span> Viewed
+                            </h2>
+                            <p className="text-lg md:text-xl dark:text-gray-300 text-gray-700 max-w-2xl mx-auto">
+                                Based on your recent browsing activity.
+                            </p>
+                        </motion.div>
+
+                        {loading ? (
+                            <div className="text-center py-20 flex flex-col items-center justify-center">
+                                <Loader2 className="w-12 h-12 animate-spin dark:text-pink-400 text-pink-700 mb-4" />
+                                <p className="text-xl dark:text-gray-400 text-gray-600">Curating top picks...</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-20">
+                                {recentlyViewedList.map((product, i) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        handleAddToCart={handleAddToCart}
+                                        inView={featuredProductsInView}
+                                        customDelay={i * 0.08}
+                                        isFlashSale={product.is_flash_sale}
+                                        flashSalePrice={product.flash_sale_price}
+                                        flashSaleEndsAt={product.flash_sale_ends_at}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                        <hr className="my-16 dark:border-gray-800 border-gray-200" />
+                    </>
+                )}
+
+                {/* --- Section: Featured Products (Fallback - only shows if no recently viewed products) --- */}
+                {featuredProducts.length > 0 && !isRecentlyViewedAvailable && (
                     <>
                         <motion.div
                             ref={featuredProductsRef}
@@ -490,7 +537,7 @@ const ProductShowcase = () => {
                             <motion.div
                                 key={category.id}
                                 className="dark:bg-gray-800 bg-gray-100 rounded-xl overflow-hidden shadow-2xl group relative cursor-pointer transform hover:scale-105 transition-transform duration-300 ease-out border border-transparent dark:hover:border-blue-600 hover:border-blue-400 aspect-square flex flex-col justify-end"
-                                variants={sectionTitleVariants} // Re-using for simpler animation, or you can create a new one
+                                variants={sectionTitleVariants}
                                 initial="hidden"
                                 animate={categoriesInView ? "visible" : "hidden"}
                                 custom={i}
@@ -540,9 +587,7 @@ const ProductShowcase = () => {
 
                     {/* Category Filter Tabs */}
                     <motion.div
-                        className="flex flex-wrap justify-center gap-3 mb-12"
-                        initial="hidden"
-                        animate={allProductsInView ? "visible" : "hidden"}
+                        className="flex flex-nowrap md:justify-center overflow-x-auto gap-3 mb-12 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent pb-4" animate={allProductsInView ? "visible" : "hidden"}
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
@@ -552,80 +597,58 @@ const ProductShowcase = () => {
                             <motion.button
                                 key={cat.id}
                                 onClick={() => { setSelectedCategory(cat.id); setCurrentPage(1); }}
-                                className={`px-5 py-2 text-sm rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-md
+                                className={`px-5 py-2 text-sm rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-md flex-none
                                 ${selectedCategory === cat.id
                                         ? 'dark:bg-blue-600 dark:text-white dark:shadow-blue-500/50 bg-blue-500 text-white shadow-blue-300/50'
                                         : 'dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                                 variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
                             >
-                                {cat.name}
+                                <span className="truncate">
+                                    {cat.name}
+                                </span>
                             </motion.button>
                         ))}
                     </motion.div>
-
-                    {/* Product Grid */}
-                    {loading ? (
-                        <div className="text-center py-20 flex flex-col items-center justify-center">
-                            <Loader2 className="w-12 h-12 animate-spin dark:text-lime-400 text-lime-700 mb-4" />
-                            <p className="text-xl dark:text-gray-400 text-gray-600">Fetching products...</p>
+                    {currentProducts.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            {currentProducts.map((product, i) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    handleAddToCart={handleAddToCart}
+                                    inView={allProductsInView}
+                                    customDelay={i * 0.08}
+                                    isFlashSale={product.is_flash_sale}
+                                    flashSalePrice={product.flash_sale_price}
+                                    flashSaleEndsAt={product.flash_sale_ends_at}
+                                />
+                            ))}
                         </div>
                     ) : (
-                        <>
-                            {currentProducts.length > 0 ? (
-                                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                                    {currentProducts.map((product, i) => (
-                                        <ProductCard
-                                            key={product.id}
-                                            product={product}
-                                            handleAddToCart={handleAddToCart}
-                                            inView={allProductsInView}
-                                            customDelay={i * 0.08}
-                                            isFlashSale={product.is_flash_sale}
-                                            flashSalePrice={product.flash_sale_price}
-                                            flashSaleEndsAt={product.flash_sale_ends_at}
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 dark:text-gray-400 text-gray-600 text-xl">
-                                    No products found for the selected category.
-                                </div>
-                            )}
+                        <div className="text-center py-20">
+                            <p className="text-xl dark:text-gray-400 text-gray-600">No products found for this category.</p>
+                        </div>
+                    )
+                    }
 
-                            {/* Pagination Controls */}
-                            {totalPages > 1 && (
-                                <div className="flex justify-center items-center space-x-2 mt-12">
-                                    <button
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                        className="px-4 py-2 rounded-lg dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:dark:bg-gray-600 hover:bg-gray-300 transition-colors"
-                                    >
-                                        Previous
-                                    </button>
-                                    {[...Array(totalPages)].map((_, index) => (
-                                        <button
-                                            key={index + 1}
-                                            onClick={() => handlePageChange(index + 1)}
-                                            className={`px-4 py-2 rounded-lg font-semibold transition-colors
-                                            ${currentPage === index + 1
-                                                    ? 'dark:bg-lime-600 bg-lime-500 dark:text-white text-white'
-                                                    : 'dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 hover:dark:bg-gray-600 hover:bg-gray-300'
-                                                }`}
-                                        >
-                                            {index + 1}
-                                        </button>
-                                    ))}
-                                    <button
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                        className="px-4 py-2 rounded-lg dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:dark:bg-gray-600 hover:bg-gray-300 transition-colors"
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            )}
-                        </>
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center mt-12 gap-2">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                                <button
+                                    key={pageNumber}
+                                    onClick={() => handlePageChange(pageNumber)}
+                                    className={`w-10 h-10 rounded-full font-bold transition-all duration-300
+                                        ${pageNumber === currentPage
+                                            ? 'dark:bg-blue-600 dark:text-white bg-blue-500 text-white shadow-lg'
+                                            : 'dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        }`}
+                                >
+                                    {pageNumber}
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>

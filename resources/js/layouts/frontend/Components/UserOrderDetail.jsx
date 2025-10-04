@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import Load from './Load'; // Using the user's provided Load component
+import Load from './Load';
 import {
     ShoppingCart,
     User,
@@ -23,11 +23,11 @@ import {
     Ban,
     Truck,
     Hourglass,
-    Download // Added Download icon
+    Download
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import html2canvas from 'html2canvas'; // Using direct import as requested
-import jsPDF from 'jspdf';             // Using direct import as requested
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 
 const UserOrderDetail = () => {
@@ -37,16 +37,14 @@ const UserOrderDetail = () => {
     const [loading, setLoading] = useState(true);
     const [order, setOrder] = useState(null);
     const [error, setError] = useState(null);
-    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false); // State for PDF download loading
-    const contentRef = useRef(null); // Ref to the content that will be converted to PDF
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false); 
+    const contentRef = useRef(null);
 
     const userEmail = localStorage.getItem('auth_email');
-    // const userLoggedInId = localStorage.getItem('auth_id'); // Not directly used for authorization here, email is primary
     const authToken = localStorage.getItem('auth_token');
 
-    // Define API_URL using environment variables
     const API_URL = import.meta.env.PROD
-        ? 'https://spx.firstdigit.com.ng/api' // your Laravel backend domain or subdomain
+        ? 'https://spx.firstdigit.com.ng/api'
         : 'http://localhost:8000/api';
 
     const fetchOrderDetails = useCallback(async () => {
@@ -56,22 +54,22 @@ const UserOrderDetail = () => {
             setLoading(false);
             return;
         }
-        if (!userEmail || !authToken) { // Check for authToken too
+        if (!userEmail || !authToken) {
             toast.error("You must be logged in to view order details.");
             setError("Authentication required.");
             setLoading(false);
-            navigate('/login'); // Redirect to login if not authenticated
+            navigate('/login');
             return;
         }
 
         setLoading(true);
         setError(null);
         try {
-            const res = await axios.get(`${API_URL}/orders/view/${orderNumber}`, { // Use API_URL here
+            const res = await axios.get(`${API_URL}/orders/view/${orderNumber}`, { 
                 headers: {
-                    'Authorization': `Bearer ${authToken}`, // Use authToken
+                    'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json' // Request JSON response
+                    'Accept': 'application/json'
                 },
                 withCredentials: true,
             });
@@ -79,9 +77,6 @@ const UserOrderDetail = () => {
             if (res.data.status === 200 && res.data.order) {
                 const fetchedOrder = res.data.order;
 
-                // Authorization check: Ensure the order belongs to the logged-in user's email
-                // For POS sales, the order might not have a customer email if it was a walk-in,
-                // but for a user to view it, their email must match.
                 const isAuthorized = fetchedOrder.email && fetchedOrder.email.toLowerCase() === userEmail.toLowerCase();
 
                 if (isAuthorized) {
@@ -89,7 +84,7 @@ const UserOrderDetail = () => {
                 } else {
                     toast.error("You are not authorized to view this order.");
                     setError("Unauthorized access. This order does not belong to your account.");
-                    navigate('/user/orders'); // Redirect back to user orders
+                    navigate('/user/orders');
                 }
             } else if (res.data.status === 404) {
                 toast.error(res.data.message || "Order not found.");
@@ -116,7 +111,7 @@ const UserOrderDetail = () => {
         } finally {
             setLoading(false);
         }
-    }, [orderNumber, userEmail, authToken, navigate, API_URL]); // Added authToken and API_URL to dependencies
+    }, [orderNumber, userEmail, authToken, navigate, API_URL]);
 
     useEffect(() => {
         document.title = `Order Details: ${orderNumber || 'Loading...'}`;
@@ -135,10 +130,7 @@ const UserOrderDetail = () => {
 
         const element = contentRef.current;
 
-        // Clone the element and apply specific styles to the clone for PDF generation
-        // This prevents flickering on the actual page and ensures consistent styling in PDF
         const clonedElement = element.cloneNode(true);
-        // Apply light background styles to the cloned element and its children
         clonedElement.style.backgroundColor = '#FFFFFF'; // White background for the entire receipt
         clonedElement.style.color = '#333333'; // Dark text color for the entire receipt
         clonedElement.style.padding = '1.5rem';
@@ -150,8 +142,6 @@ const UserOrderDetail = () => {
         clonedElement.style.left = '-9999px';
         clonedElement.style.top = '-9999px';
 
-        // Override specific Tailwind-like classes for light theme in the cloned element
-        // This ensures the PDF always has a light background regardless of current theme
         clonedElement.querySelectorAll('.dark\\:bg-gray-950').forEach(el => el.style.backgroundColor = '#FFFFFF');
         clonedElement.querySelectorAll('.dark\\:bg-gray-900').forEach(el => el.style.backgroundColor = '#F8F8F8');
         clonedElement.querySelectorAll('.dark\\:bg-gray-850').forEach(el => el.style.backgroundColor = '#F2F2F2');
@@ -225,7 +215,6 @@ const UserOrderDetail = () => {
             toast.error("Failed to generate PDF receipt. Please try again.");
         } finally {
             setIsDownloadingPdf(false);
-            // Remove the cloned element from the DOM
             if (clonedElement.parentNode) {
                 clonedElement.parentNode.removeChild(clonedElement);
             }

@@ -2,12 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import {
-    Truck,           // For fast shipping
-    ShieldCheck,     // For secure payments/guarantee
-    Headphones,      // For support
-    Award,           // For quality/excellence
-    RefreshCcw,      // For easy returns
-    Zap              // For innovative/fast tech
+    Truck,
+    ShieldCheck,
+    Headphones,
+    Award,
+    RefreshCcw,
+    Zap
 } from 'lucide-react';
 
 const propositions = [
@@ -15,54 +15,51 @@ const propositions = [
         icon: Truck,
         title: 'Blazing Fast Shipping',
         description: 'Get your tech delivered to your doorstep at lightning speed, worldwide.',
-        color: 'text-sky-500 dark:text-cyan-400', // Light mode: sky-500, Dark mode: cyan-400
+        color: 'text-sky-500 dark:text-cyan-400',
     },
     {
         icon: ShieldCheck,
         title: 'Secure & Seamless Payments',
         description: 'Shop with confidence using our encrypted and trusted payment gateways.',
-        color: 'text-green-500 dark:text-lime-400', // Light mode: green-500, Dark mode: lime-400
+        color: 'text-green-500 dark:text-lime-400',
     },
     {
         icon: Headphones,
         title: '24/7 Premium Support',
         description: 'Our dedicated team is always here to assist you, day or night.',
-        color: 'text-indigo-500 dark:text-blue-400', // Light mode: indigo-500, Dark mode: blue-400
+        color: 'text-indigo-500 dark:text-blue-400',
     },
     {
         icon: Award,
         title: 'Uncompromising Quality',
         description: 'Every product is rigorously tested to meet the highest standards of excellence.',
-        color: 'text-amber-500 dark:text-yellow-400', // Light mode: amber-500, Dark mode: yellow-400
+        color: 'text-amber-500 dark:text-yellow-400',
     },
     {
         icon: RefreshCcw,
         title: 'Hassle-Free Returns',
         description: 'Not satisfied? Our easy return policy ensures a smooth experience.',
-        color: 'text-fuchsia-500 dark:text-purple-400', // Light mode: fuchsia-500, Dark mode: purple-400
+        color: 'text-fuchsia-500 dark:text-purple-400',
     },
     {
         icon: Zap,
         title: 'Cutting-Edge Selection',
         description: 'Stay ahead with our constantly updated inventory of the latest innovations.',
-        color: 'text-orange-500 dark:text-orange-400', // Light mode: orange-500, Dark mode: orange-400 (kept similar as orange works well)
+        color: 'text-orange-500 dark:text-orange-400',
     },
 ];
 
 const ValueProposition = () => {
-    // For scroll-based animation
     const { ref, inView } = useInView({
-        triggerOnce: true, // Only animate once when it enters view
-        threshold: 0.1,    // Trigger when 10% of the component is visible
+        triggerOnce: true,
+        threshold: 0.1,
     });
 
-    // Framer Motion variants for section title
     const sectionTitleVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
     };
 
-    // Framer Motion variants for individual proposition cards
     const cardVariants = {
         hidden: { opacity: 0, scale: 0.9, y: 30 },
         visible: (i) => ({
@@ -70,7 +67,7 @@ const ValueProposition = () => {
             scale: 1,
             y: 0,
             transition: {
-                delay: i * 0.15, // Staggered animation for each card
+                delay: i * 0.15,
                 duration: 0.6,
                 ease: 'easeOut',
             },
@@ -79,7 +76,7 @@ const ValueProposition = () => {
 
     return (
         <section
-            ref={ref} // Attach the ref for intersection observer
+            ref={ref}
             className="py-16 md:py-24 bg-gray-50 text-gray-900 relative overflow-hidden border-t border-gray-200 dark:bg-gray-950 dark:text-white dark:border-gray-800"
         >
             {/* Subtle background abstract shapes/glows */}

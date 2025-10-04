@@ -3,27 +3,23 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, ArrowRight, Sparkles, Gift, Flame, Package, Wallet, Tag, Cloud, Zap, Percent, ShoppingCart, Truck, CreditCard, Star } from 'lucide-react'; // Added more icons
 
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-creative';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-// Import required modules
 import { EffectCreative, Autoplay, Pagination, Navigation } from 'swiper/modules';
 
-// --- Global Animation Variants (Adjusted for faster, more impactful entry) ---
 
 const contentContainerVariants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.08, // Even faster stagger for immediate impact
-            delayChildren: 0.1, // Minimal delay for quick reveal
+            staggerChildren: 0.08,
+            delayChildren: 0.1,
         }
     }
 };
@@ -37,8 +33,8 @@ const slideItemVariants = {
         filter: 'blur(0px)',
         rotateX: 0,
         transition: {
-            duration: 0.7, // Slightly longer for more impact, but still quick
-            ease: [0.22, 1, 0.36, 1], // More aggressive "easeOutExpo" like curve
+            duration: 0.7,
+            ease: [0.22, 1, 0.36, 1],
         }
     }
 };
@@ -52,16 +48,14 @@ const slides = [
         subtitle: "Grab jaw-dropping discounts on electronics, fashion, and more before they vanish!",
         buttonText: "Ignite Savings",
         buttonLink: "/flash-sales",
-        buttonIcon: <Flame className="w-5 h-5 mr-2" />, // More thematic icon for the button
-        icon: <Zap className="w-8 h-8 mr-3 text-yellow-300 transform rotate-[-10deg]" />, // Larger, slightly rotated lead icon
-        // --- UPDATED BACKGROUND IMAGE ---
+        buttonIcon: <Flame className="w-5 h-5 mr-2" />,
+        icon: <Zap className="w-8 h-8 mr-3 text-yellow-300 transform rotate-[-10deg]" />,
         backgroundImage: 'https://plus.unsplash.com/premium_photo-1661682801696-e499fa39ac0e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aGFwcHklMjBibGFjayUyMHBlcnNvbnxlbnwwfHwwfHx8MA%3D%3D',
-        // Removed explicit bgColor as it's not used when backgroundImage is present
         uniqueAnimationProps: {
             preTitle: { y: -50, opacity: 0, scale: 0.8 },
-            title: { rotateX: -90, opacity: 0, scale: 0.5, transformOrigin: 'bottom' }, // More dramatic 3D rotation
-            subtitle: { x: -100, opacity: 0, skewX: -20 }, // Skewed entry
-            button: { y: 150, opacity: 0, scale: 0.7, rotateZ: 30 }, // Larger movement, slight rotation
+            title: { rotateX: -90, opacity: 0, scale: 0.5, transformOrigin: 'bottom' },
+            subtitle: { x: -100, opacity: 0, skewX: -20 },
+            button: { y: 150, opacity: 0, scale: 0.7, rotateZ: 30 },
         },
         backgroundElements: (
             <>
@@ -86,7 +80,7 @@ const slides = [
                     animate={{ opacity: [0, 1, 0], y: [-20, 0, 20] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.2, ease: "easeInOut" }}
                 >
-                    <Percent className="w-8 h-8 sm:w-10 sm:h-10" /> {/* Responsive icon size */}
+                    <Percent className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
                     className="absolute bottom-[25%] left-[20%] text-yellow-400/70"
@@ -94,7 +88,7 @@ const slides = [
                     animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5], rotate: [0, 180] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
                 >
-                    <Tag className="w-10 h-10 sm:w-12 sm:h-12" /> {/* Responsive icon size */}
+                    <Tag className="w-10 h-10 sm:w-12 sm:h-12" />
                 </motion.div>
                 <motion.div
                     className="absolute top-[35%] right-[5%] text-orange-400/70"
@@ -102,7 +96,7 @@ const slides = [
                     animate={{ opacity: [0, 1, 0], x: [20, 0, -20] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 0.8, ease: "easeInOut" }}
                 >
-                    <Star className="w-8 h-8 sm:w-10 sm:h-10" /> {/* Responsive icon size */}
+                    <Star className="w-8 h-8 sm:w-10 sm:h-10" />
                 </motion.div>
                 <motion.div
                     className="absolute top-[5%] right-[25%] text-red-500/60"
@@ -110,7 +104,7 @@ const slides = [
                     animate={{ opacity: [0, 0.8, 0], scale: [0.7, 1.1, 0.7], rotate: [0, 90, 180] }}
                     transition={{ duration: 2.5, repeat: Infinity, delay: 0.3, ease: "easeInOut" }}
                 >
-                    <Zap className="w-6 h-6 sm:w-8 sm:h-8" /> {/* Responsive icon size */}
+                    <Zap className="w-6 h-6 sm:w-8 sm:h-8" />
                 </motion.div>
                 <motion.div
                     className="absolute bottom-[10%] left-[40%] text-yellow-500/60"
@@ -118,7 +112,7 @@ const slides = [
                     animate={{ opacity: [0, 0.8, 0], y: [-30, 0, 30] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 0.6, ease: "easeInOut" }}
                 >
-                    <Flame className="w-7 h-7 sm:w-9 sm:h-9" /> {/* Responsive icon size */}
+                    <Flame className="w-7 h-7 sm:w-9 sm:h-9" />
                 </motion.div>
             </>
         ),
@@ -208,13 +202,13 @@ const slides = [
             <>
                 {/* Speed lines effect */}
                 <motion.div
-                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] bg-cyan-400/15" // Responsive height
+                    className="absolute top-0 left-0 w-full h-[30px] sm:h-[60px] bg-cyan-400/15"
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["-100%", "100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 />
                 <motion.div
-                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] bg-indigo-400/15" // Responsive height
+                    className="absolute bottom-0 right-0 w-full h-[30px] sm:h-[60px] bg-indigo-400/15"
                     style={{ filter: 'blur(40px)' }}
                     animate={{ x: ["100%", "-100%"] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear", delay: 1 }}
@@ -362,11 +356,6 @@ const HeroSlider = () => {
                                     }}
                                 ></div>
 
-                                {/* Layer 2: Gradient Overlay with Brand Colors (Dominant color layer) */}
-                                {/* The original component had `slide.bgColor` but no `bgColor` in the slide data.
-                                    Assuming it was intended to use a dynamic class based on the slide.
-                                    For now, I'll add a placeholder gradient if `slide.bgColor` isn't defined.
-                                */}
                                 <div className={`absolute inset-0 z-10 bg-gradient-to-br ${slide.bgColor || 'from-gray-800/70 to-black/70'}`}></div>
 
                                 {/* Layer 3: Dynamic & Thematic Background Elements */}

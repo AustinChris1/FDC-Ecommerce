@@ -20,8 +20,6 @@ class WishlistController extends Controller
                 'message' => 'Unauthorized. Please log in.',
             ], 401);
         }
-
-        // Eager load the 'product' relationship, and nested within that, the 'category' relationship
         $wishlistItems = Auth::user()->wishlists()->with('product.category')->get();
 
         return response()->json([
@@ -49,8 +47,8 @@ class WishlistController extends Controller
 
         // Check if the product is already in the wishlist
         $existingWishlistItem = Wishlist::where('user_id', $user_id)
-                                         ->where('product_id', $product_id)
-                                         ->first();
+            ->where('product_id', $product_id)
+            ->first();
 
         if ($existingWishlistItem) {
             return response()->json([
@@ -86,8 +84,8 @@ class WishlistController extends Controller
         $user_id = Auth::id();
 
         $deletedCount = Wishlist::where('user_id', $user_id)
-                                 ->where('product_id', $product_id)
-                                 ->delete();
+            ->where('product_id', $product_id)
+            ->delete();
 
         if ($deletedCount > 0) {
             return response()->json([
