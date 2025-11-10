@@ -1,1 +1,0 @@
-import{a as t,r as e}from"./main-9L8j6t2k.js";const a=()=>{const{pathname:o}=t();return e.useEffect(()=>{(()=>{setTimeout(()=>{window.scrollTo({top:0,behavior:"smooth"})},100)})()},[o]),null};export{a as default};

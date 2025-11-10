@@ -131,7 +131,7 @@ const Stores = () => {
 
     return (
         <motion.div
-            className="min-h-screen p-4 mt-28 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800
+            className="min-h-screen p-4 mt-24 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-200 text-gray-800
                        dark:from-gray-900 dark:to-gray-950 dark:text-gray-200"
             variants={containerVariants}
             initial="hidden"

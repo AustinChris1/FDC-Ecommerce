@@ -144,8 +144,9 @@ class ProductController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $products = Product::with(['category', 'locations'])->get();
-
+            $products = Product::with(['category', 'locations'])
+                ->paginate(50); 
+    
             return new JsonResponse([
                 'status' => 200,
                 'products' => $products,
@@ -158,7 +159,6 @@ class ProductController extends Controller
             ], 500);
         }
     }
-
     public function newArrivals()
     {
         $newArrivals = Product::where('is_new_arrival', true)

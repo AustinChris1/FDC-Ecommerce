@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // Import AnimatePresence
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag, Loader2, Timer } from 'lucide-react';
-import StarRating from '../../Outer/StarRating'; // Assuming this path is correct
+import StarRating from '../../Outer/StarRating';
 
 // Helper to format currency
 const formatCurrency = (amount) => {
@@ -10,22 +10,34 @@ const formatCurrency = (amount) => {
 };
 
 const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
-    const [isHovered, setIsHovered] = useState(false); // State to track hover
+    const [isHovered, setIsHovered] = useState(false);
 
     const discountPercentage = product.original_price && parseFloat(product.original_price) > parseFloat(product.selling_price)
         ? Math.round(((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100)
         : 0;
 
-    const outOfStock = product.qty <= 0 || product.status === 1; // Assuming status 1 means inactive/out of stock
+    const outOfStock = product.qty <= 0 || product.status === 1;
     const limitedStock = product.qty > 0 && product.qty <= 5;
+
+    const getCategoryLink = () => {
+        if (product.category && product.category.link) {
+            return product.category.link;
+        }
+        if (product.link) {
+            return product.link;
+        }
+        return 'shop';
+    };
+
+    const categoryLink = getCategoryLink();
+    const productLink = product.link || product.product_link || '';
 
     return (
         <motion.div
             className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg dark:shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-gray-200 dark:border-transparent hover:border-blue-400 dark:hover:border-lime-600 flex flex-col"
-            // Adjusted max-width and height for smaller cards
             style={{ maxWidth: '280px', maxHeight: '400px' }}
             variants={{
-                hidden: { opacity: 0, scale: 0.9, y: 30 }, // Slightly smaller initial scale
+                hidden: { opacity: 0, scale: 0.9, y: 30 },
                 visible: (i) => ({
                     opacity: 1,
                     scale: 1,
@@ -36,18 +48,18 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
             custom={customDelay}
-            onMouseEnter={() => setIsHovered(true)} // Set hover state to true
-            onMouseLeave={() => setIsHovered(false)} // Set hover state to false
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
-            <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} className="block">
+            <Link to={`/collections/${categoryLink}/${productLink}`} className="block">
                 <div className="relative pt-[70%] overflow-hidden">
                     {/* Primary Image */}
                     <motion.img
                         src={product.image || `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, 15)}`}
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-500 ease-out"
-                        initial={false} // Prevent initial animation on render
-                        animate={{ opacity: isHovered && product.image2 ? 0 : 1 }} // Fade out primary image on hover if image2 exists
+                        initial={false}
+                        animate={{ opacity: isHovered && product.image2 ? 0 : 1 }}
                         onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, 15)}`; }}
                     />
 
@@ -58,9 +70,9 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                                 src={product.image2}
                                 alt={`${product.name} - alternate view`}
                                 className="absolute inset-0 w-full h-full object-cover"
-                                initial={{ y: '100%' }} // Start from bottom
-                                animate={{ y: '0%' }} // Slide up to position
-                                exit={{ y: '100%' }} // Slide down on exit
+                                initial={{ y: '100%' }}
+                                animate={{ y: '0%' }}
+                                exit={{ y: '100%' }}
                                 transition={{ duration: 0.4, ease: 'easeOut' }}
                             />
                         )}
@@ -85,7 +97,7 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
             </Link>
 
             <div className="p-3 flex flex-col flex-grow">
-                <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} className="block">
+                <Link to={`/collections/${categoryLink}/${productLink}`} className="block">
                     <h3 className="text-sm font-bold mb-1 text-gray-800 group-hover:text-blue-600 dark:text-white dark:group-hover:text-lime-400 transition-colors duration-300 line-clamp-2">
                         {product.name}
                     </h3>
@@ -94,7 +106,7 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                     </p>
                     {product.rating !== undefined && product.num_reviews !== undefined && (
                         <div className="mb-2 flex items-center">
-                            <StarRating rating={parseFloat(product.rating)} iconSize={14} /> {/* Slightly reduced icon size */}
+                            <StarRating rating={parseFloat(product.rating)} iconSize={14} />
                             <span className="text-gray-500 text-xs ml-1 dark:text-gray-400">({product.num_reviews})</span>
                         </div>
                     )}
@@ -107,7 +119,7 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                                 {formatCurrency(product.original_price)}
                             </p>
                         )}
-                        <p className={`text-base font-bold ${limitedStock ? 'text-red-500 dark:text-red-400' : 'text-blue-600 dark:text-cyan-400'}`}> {/* Adjusted text size */}
+                        <p className={`text-base font-bold ${limitedStock ? 'text-red-500 dark:text-red-400' : 'text-blue-600 dark:text-cyan-400'}`}>
                             {formatCurrency(product.selling_price)}
                         </p>
                     </div>
@@ -131,4 +143,5 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
         </motion.div>
     );
 };
+
 export default ProductCard;

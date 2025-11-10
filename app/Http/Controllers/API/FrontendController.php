@@ -7,55 +7,84 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 
 class FrontendController extends Controller
 {
-    // Fetch active categories
     public function category()
     {
-        $categories = Category::where('status', '0')->get();
+        // Cache categories for 1 hour
+        $categories = Cache::remember('active_categories', 3600, function () {
+            return Category::where('status', '0')->get();
+        });
+
         return response()->json([
             'status' => 200,
             'category' => $categories
         ]);
     }
+
     public function allProducts(): JsonResponse
     {
-        $products = Product::with('category')
-            ->where('status', '0')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Cache all products for 10 minutes
+        $data = Cache::remember('all_products_with_reviews', 600, function () {
+            $products = Product::with(['category', 'reviews'])
+                ->where('status', '0')
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-        $categories = Category::all();
+            $categories = Category::all();
+
+            return [
+                'products' => $products,
+                'categories' => $categories,
+            ];
+        });
 
         return new JsonResponse([
             'status' => 200,
-            'products' => $products,
-            'categories' => $categories,
+            'products' => $data['products'],
+            'categories' => $data['categories'],
         ]);
     }
 
     public function fetchProducts($category_link, $product_link): JsonResponse
     {
-        $category = Category::where('link', $category_link)->where('status', '0')->first();
+        // Cache individual product pages for 30 minutes
+        $cacheKey = "product_{$category_link}_{$product_link}";
+        
+        $data = Cache::remember($cacheKey, 1800, function () use ($category_link, $product_link) {
+            $category = Category::where('link', $category_link)
+                ->where('status', '0')
+                ->first();
 
-        if (!$category) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'Category not found or inactive.',
-            ], 404);
-        }
+            if (!$category) {
+                return null;
+            }
 
-        $product = Product::where('category_id', $category->id)
-            ->where('link', $product_link)
-            ->where('status', '0')
-            ->with('category')
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->first();
+            $product = Product::where('category_id', $category->id)
+                ->where('link', $product_link)
+                ->where('status', '0')
+                ->with(['category', 'reviews.user'])
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->first();
 
-        if (!$product) {
+            if (!$product) {
+                return null;
+            }
+
+            return [
+                'product' => $product,
+                'category' => $category,
+            ];
+        });
+
+        if (!$data) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Product not found in this category or is inactive.',
@@ -64,98 +93,99 @@ class FrontendController extends Controller
 
         return response()->json([
             'status' => 200,
-            'product' => $product,
-            'category' => $category,
+            'product' => $data['product'],
+            'category' => $data['category'],
         ]);
     }
 
-    // Fetch products based on filters
     public function products(Request $request): JsonResponse
     {
         Log::info('ProductController@products: Incoming request params:', $request->all());
-        $query = Product::where('status', '0')
-            ->with('category')
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews');
+        
+        // Generate cache key based on request parameters
+        $cacheKey = 'products_' . md5(json_encode($request->all()));
+        
+        // Cache filtered/sorted products for 5 minutes
+        $data = Cache::remember($cacheKey, 300, function () use ($request) {
+            $query = Product::where('status', '0')
+                ->with('category')
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews');
 
-        $categories = Category::all();
+            $categories = Category::all();
 
-        // Filter by category if provided
-        if ($request->has('category') && $request->input('category') !== 'All') {
-            $categoryName = $request->input('category');
-            $query->whereHas('category', function ($q) use ($categoryName) {
-                $q->where('name', $categoryName);
-            });
-            Log::info("Filtering by category: {$categoryName}");
-        }
-
-        // Filter by brand if provided
-        if ($request->has('brand')) {
-            $brand = $request->input('brand');
-            $query->where('brand', $brand);
-            Log::info("Filtering by brand: {$brand}");
-        }
-
-        // Filter by price range
-        if ($request->has('min_price') && $request->has('max_price')) {
-            $minPrice = (float) $request->input('min_price');
-            $maxPrice = (float) $request->input('max_price');
-
-            if (!is_numeric($minPrice) || !is_numeric($maxPrice) || $minPrice > $maxPrice) {
-                Log::warning("Invalid price range provided: min={$minPrice}, max={$maxPrice}");
-            } else {
-                $query->whereBetween('selling_price', [$minPrice, $maxPrice]);
-                Log::info("Applying price filter: min={$minPrice}, max={$maxPrice}");
+            // Filter by category
+            if ($request->has('category') && $request->input('category') !== 'All') {
+                $categoryName = $request->input('category');
+                $query->whereHas('category', function ($q) use ($categoryName) {
+                    $q->where('name', $categoryName);
+                });
             }
-        }
 
-        // Sorting products
-        $sortOption = $request->input('sort', 'created_at_desc');
-        Log::info("Sorting by: {$sortOption}");
+            // Filter by brand
+            if ($request->has('brand')) {
+                $brand = $request->input('brand');
+                $query->where('brand', $brand);
+            }
 
-        switch ($sortOption) {
-            case 'popular':
-                $query->orderBy('popular', 'desc')->orderBy('created_at', 'desc');
-                break;
-            case 'featured':
-                $query->orderBy('featured', 'desc')->orderBy('created_at', 'desc');
-                break;
-            case 'alphaAsc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'alphaDesc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'priceAsc':
-                $query->orderBy(DB::raw('CAST(selling_price AS DECIMAL(10, 2))'), 'asc');
-                break;
-            case 'priceDesc':
-                $query->orderBy(DB::raw('CAST(selling_price AS DECIMAL(10, 2))'), 'desc');
-                break;
-            case 'ratingDesc':
+            // Filter by price range
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $minPrice = (float) $request->input('min_price');
+                $maxPrice = (float) $request->input('max_price');
 
-                $query->orderBy('reviews_avg_rating', 'desc')->orderBy('created_at', 'desc');
-                break;
-            case 'dateAsc':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'dateDesc':
-            default:
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
+                if (is_numeric($minPrice) && is_numeric($maxPrice) && $minPrice <= $maxPrice) {
+                    $query->whereBetween('selling_price', [$minPrice, $maxPrice]);
+                }
+            }
 
-        // Paginate the results
-        $perPage = $request->input('itemsPerPage', 12);
-        $products = $query->paginate($perPage);
+            // Sorting
+            $sortOption = $request->input('sort', 'dateDesc');
 
-        // --- Final Debugging Log ---
-        Log::info('ProductController@products: Final product count for page:', ['count' => $products->count(), 'total' => $products->total(), 'currentPage' => $products->currentPage(), 'lastPage' => $products->lastPage()]);
+            switch ($sortOption) {
+                case 'popular':
+                    $query->orderBy('popular', 'desc')->orderBy('created_at', 'desc');
+                    break;
+                case 'featured':
+                    $query->orderBy('featured', 'desc')->orderBy('created_at', 'desc');
+                    break;
+                case 'alphaAsc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'alphaDesc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'priceAsc':
+                    $query->orderByRaw('CAST(selling_price AS DECIMAL(10, 2)) ASC');
+                    break;
+                case 'priceDesc':
+                    $query->orderByRaw('CAST(selling_price AS DECIMAL(10, 2)) DESC');
+                    break;
+                case 'ratingDesc':
+                    $query->orderBy('reviews_avg_rating', 'desc')
+                          ->orderBy('created_at', 'desc');
+                    break;
+                case 'dateAsc':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'dateDesc':
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+
+            $perPage = $request->input('itemsPerPage', 12);
+            $products = $query->paginate($perPage);
+
+            return [
+                'products' => $products,
+                'categories' => $categories
+            ];
+        });
 
         return new JsonResponse([
             'status' => 200,
-            'products' => $products,
-            'categories' => $categories
+            'products' => $data['products'],
+            'categories' => $data['categories']
         ]);
     }
 
@@ -170,8 +200,11 @@ class FrontendController extends Controller
             ], 400);
         }
 
-        $products = Product::with('category')
+        // Don't cache search results as they're user-specific
+        $products = Product::with(['category', 'reviews'])
             ->where('status', '0')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->where(function ($query) use ($searchTerm) {
                 $query->where('name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('brand', 'LIKE', "%{$searchTerm}%")
@@ -195,24 +228,40 @@ class FrontendController extends Controller
             'message' => 'No products found matching your search.'
         ]);
     }
+
     public function productsByCategory($categoryLink)
     {
-        // Find the category by its link
-        $category = Category::where('link', $categoryLink)->first();
+        // Cache category products for 15 minutes
+        $cacheKey = "category_products_{$categoryLink}";
+        
+        $data = Cache::remember($cacheKey, 900, function () use ($categoryLink) {
+            $category = Category::where('link', $categoryLink)->first();
 
-        // Check if the category exists and is not hidden
-        if (!$category || $category->status == 1) {
+            if (!$category || $category->status == 1) {
+                return null;
+            }
+
+            $products = Product::where('category_id', $category->id)
+                ->where('status', 0)
+                ->with('reviews')
+                ->withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->get();
+
+            return [
+                'category' => $category,
+                'products' => $products,
+            ];
+        });
+
+        if (!$data) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Category not found or is inactive',
             ], 404);
         }
 
-        $products = Product::where('category_id', $category->id)
-            ->where('status', 0)
-            ->get();
-
-        if ($products->isEmpty()) {
+        if ($data['products']->isEmpty()) {
             return response()->json([
                 'status' => 404,
                 'message' => 'No products found in this category',
@@ -221,8 +270,8 @@ class FrontendController extends Controller
 
         return response()->json([
             'status' => 200,
-            'products' => $products,
-            'category' => $category,
+            'products' => $data['products'],
+            'category' => $data['category'],
         ]);
     }
 }

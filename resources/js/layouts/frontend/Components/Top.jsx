@@ -3,7 +3,6 @@ import HeroSlider from './HeroSection';
 import ProductCardBox from './ProductCardBox';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
-import { toast } from 'react-toastify';
 import { useInView } from 'react-intersection-observer';
 import { useCart } from './CartContext';
 import Load from './Load';
@@ -13,6 +12,7 @@ const Top = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
     const [lastViewedCategoryLink, setLastViewedCategoryLink] = useState(null);
+    const [lastViewedCategoryName, setLastViewedCategoryName] = useState('');
     const [similarProducts, setSimilarProducts] = useState([]);
     const [similarProductsLoading, setSimilarProductsLoading] = useState(false);
 
@@ -25,43 +25,44 @@ const Top = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Single request now includes reviews data
                 const productsRes = await axios.get(`/api/allProducts`);
+                
                 if (productsRes.data.status === 200) {
                     const productsFromApi = productsRes.data.products;
 
-                    const productsWithReviewPromises = productsFromApi.map(async (product) => {
-                        let averageRating = 0;
-                        let reviewCount = 0;
-                        try {
-                            const reviewRes = await axios.get(`/api/products/${product.id}/reviews`);
-                            if (reviewRes.data.status === 200 && Array.isArray(reviewRes.data.reviews)) {
-                                reviewCount = reviewRes.data.reviews.length;
-                                if (reviewCount > 0) {
-                                    const totalRating = reviewRes.data.reviews.reduce((sum, review) => sum + parseFloat(review.rating), 0);
-                                    averageRating = (totalRating / reviewCount).toFixed(1);
-                                }
-                            }
-                        } catch (reviewError) {
-                            console.warn(`Could not fetch reviews for product ${product.name} (ID: ${product.id}):`, reviewError);
-                        }
-
-                        const flashSaleEndsAt = product.flash_sale_ends_at ? new Date(product.flash_sale_ends_at) : null;
-                        const flashSaleStartsAt = product.flash_sale_starts_at ? new Date(product.flash_sale_starts_at) : null;
+                    // Process products with already-loaded review data
+                    const processedProducts = productsFromApi.map((product) => {
+                        const flashSaleEndsAt = product.flash_sale_ends_at 
+                            ? new Date(product.flash_sale_ends_at) 
+                            : null;
+                        const flashSaleStartsAt = product.flash_sale_starts_at 
+                            ? new Date(product.flash_sale_starts_at) 
+                            : null;
                         const now = new Date();
 
-                        const isCurrentlyFlashSale = product.is_flash_sale && flashSaleStartsAt && flashSaleEndsAt &&
-                            now >= flashSaleStartsAt && now <= flashSaleEndsAt;
+                        const isCurrentlyFlashSale = 
+                            product.is_flash_sale && 
+                            flashSaleStartsAt && 
+                            flashSaleEndsAt &&
+                            now >= flashSaleStartsAt && 
+                            now <= flashSaleEndsAt;
 
                         // Calculate discount percentage
                         let discountPercentage = 0;
-                        if (product.original_price && product.selling_price && parseFloat(product.original_price) > parseFloat(product.selling_price)) {
-                            discountPercentage = ((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100;
+                        if (product.original_price && product.selling_price && 
+                            parseFloat(product.original_price) > parseFloat(product.selling_price)) {
+                            discountPercentage = (
+                                (parseFloat(product.original_price) - parseFloat(product.selling_price)) / 
+                                parseFloat(product.original_price)
+                            ) * 100;
                         }
 
                         return {
                             ...product,
-                            rating: parseFloat(averageRating),
-                            num_reviews: reviewCount,
+                            // Use the ratings already provided by backend
+                            rating: parseFloat(product.reviews_avg_rating || 0),
+                            num_reviews: product.reviews_count || 0,
                             is_new_arrival: product.is_new_arrival || false,
                             is_flash_sale: isCurrentlyFlashSale || false,
                             flash_sale_price: product.flash_sale_price,
@@ -75,16 +76,12 @@ const Top = () => {
                         };
                     });
 
-                    const productsWithReviews = await Promise.all(productsWithReviewPromises);
-                    setProducts(productsWithReviews);
-
+                    setProducts(processedProducts);
                 } else {
-                    toast.error("Unable to fetch products.");
                     console.error("Backend error fetching products:", productsRes.data.message);
                 }
             } catch (error) {
                 console.error("Network or server error during data fetch:", error);
-                toast.error("Failed to load data. Please try again.");
             } finally {
                 setLoading(false);
             }
@@ -92,13 +89,18 @@ const Top = () => {
         fetchData();
     }, []);
 
-
-
     useEffect(() => {
         const recentlyViewedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+        console.log("Recently viewed items from localStorage:", recentlyViewedItems);
         if (recentlyViewedItems.length > 0) {
             const lastViewedItem = recentlyViewedItems[0];
-            setLastViewedCategoryLink(lastViewedItem.category_link);
+            // Ensure category_link exists and is valid
+            if (lastViewedItem.category_link) {
+                setLastViewedCategoryLink(lastViewedItem.category_link);
+                // Format the category name for display
+                const formattedName = lastViewedItem.category_link.replace(/-/g, ' ');
+                setLastViewedCategoryName(formattedName);
+            }
         }
     }, []);
 
@@ -110,18 +112,20 @@ const Top = () => {
                     const res = await axios.get(`/api/products-by-category/${lastViewedCategoryLink}`);
                     if (res.data.status === 200) {
                         const allSimilar = res.data.products;
-                        const filteredSimilar = allSimilar.filter(p => {
-                            const recentlyViewedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
-                            const lastViewedProductId = recentlyViewedItems.length > 0 ? recentlyViewedItems[0].id : null;
-                            return p.id !== lastViewedProductId;
-                        });
-                        const randomSimilar = filteredSimilar.sort(() => 0.5 - Math.random()).slice(0, 4);
+                        const recentlyViewedItems = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+                        const lastViewedProductId = recentlyViewedItems.length > 0 
+                            ? recentlyViewedItems[0].id 
+                            : null;
+                        
+                        const filteredSimilar = allSimilar.filter(p => p.id !== lastViewedProductId);
+                        const randomSimilar = filteredSimilar
+                            .sort(() => 0.5 - Math.random())
+                            .slice(0, 4);
                         setSimilarProducts(randomSimilar);
-                    } else {
-                        toast.error("Unable to fetch similar products.");
                     }
                 } catch (error) {
                     console.error("Failed to fetch similar products:", error);
+                    setSimilarProducts([]); // Reset on error
                 } finally {
                     setSimilarProductsLoading(false);
                 }
@@ -149,12 +153,18 @@ const Top = () => {
     );
 
     const todaysPopularProducts = useMemo(() =>
-        products.filter(p => p.popular && p.qty > 0).sort((a, b) => b.num_reviews - a.num_reviews).slice(0, 4),
+        products
+            .filter(p => p.popular && p.qty > 0)
+            .sort((a, b) => b.num_reviews - a.num_reviews)
+            .slice(0, 4),
         [products]
     );
 
     const topBrandsProducts = useMemo(() =>
-        products.filter(p => p.featured && p.qty > 0).sort(() => 0.5 - Math.random()).slice(0, 4),
+        products
+            .filter(p => p.featured && p.qty > 0)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 4),
         [products]
     );
 
@@ -174,63 +184,64 @@ const Top = () => {
                     <div className="col-span-full flex justify-center items-center h-[300px]">
                         <Load />
                     </div>
-                ) : (<>
-                    {similarProducts.length > 0 && (
-                        <ProductCardBox
-                            title={`Because you viewed ${lastViewedCategoryLink.replace(/-/g, ' ')}`}
-                            products={similarProducts}
-                            linkHref={`/category/${lastViewedCategoryLink}`}
-                            inView={heroSectionInView}
-                            customDelay={0.0}
-                        />
-                    )}
-                    {everydayPricesProducts.length > 0 && (
-                        <ProductCardBox
-                            title="Everyday Great Prices"
-                            products={everydayPricesProducts}
-                            linkHref="/shop"
-                            inView={heroSectionInView}
-                            customDelay={0.1}
-                        />
-                    )}
-                    {flashSaleProducts.length > 0 && (
-                        <ProductCardBox
-                            title="Flash Sale Products"
-                            products={flashSaleProducts}
-                            linkHref="/flash-sales"
-                            inView={heroSectionInView}
-                            customDelay={0.2}
-                        />
-                    )}
-                    {todaysPopularProducts.length > 0 && (
-                        <ProductCardBox
-                            title="Popular Products Today"
-                            products={todaysPopularProducts}
-                            linkHref="/trending"
-                            inView={heroSectionInView}
-                            customDelay={0.3}
-                        />
-                    )}
-                    {todaysBigDealsProducts.length > 0 && (
-                        <ProductCardBox
-                            title="Today's Big Deals"
-                            products={todaysBigDealsProducts}
-                            linkHref="/"
-                            inView={heroSectionInView}
-                            customDelay={0.4}
-                        />
-                    )}
-                    {topBrandsProducts.length > 0 && (
-                        <ProductCardBox
-                            title="Deals on Top Brands"
-                            products={topBrandsProducts}
-                            linkHref="/collections/top-brands"
-                            inView={heroSectionInView}
-                            customDelay={0.5}
-                        />
-                    )}
-
-                </>
+                ) : (
+                    <>
+                        {/* Only show "Because you viewed" section if we have valid similar products and category info */}
+                        {similarProducts.length > 0 && lastViewedCategoryName && (
+                            <ProductCardBox
+                                title={`Because you viewed ${lastViewedCategoryName}`}
+                                products={similarProducts}
+                                linkHref={`/collections/${lastViewedCategoryLink}`}
+                                inView={heroSectionInView}
+                                customDelay={0.0}
+                            />
+                        )}
+                        {everydayPricesProducts.length > 0 && (
+                            <ProductCardBox
+                                title="Everyday Great Prices"
+                                products={everydayPricesProducts}
+                                linkHref="/shop"
+                                inView={heroSectionInView}
+                                customDelay={0.1}
+                            />
+                        )}
+                        {flashSaleProducts.length > 0 && (
+                            <ProductCardBox
+                                title="Flash Sale Products"
+                                products={flashSaleProducts}
+                                linkHref="/flash-sales"
+                                inView={heroSectionInView}
+                                customDelay={0.2}
+                            />
+                        )}
+                        {todaysPopularProducts.length > 0 && (
+                            <ProductCardBox
+                                title="Popular Products Today"
+                                products={todaysPopularProducts}
+                                linkHref="/trending"
+                                inView={heroSectionInView}
+                                customDelay={0.3}
+                            />
+                        )}
+                        {todaysBigDealsProducts.length > 0 && (
+                            <ProductCardBox
+                                title="Today's Big Deals"
+                                products={todaysBigDealsProducts}
+                                linkHref="/"
+                                inView={heroSectionInView}
+                                customDelay={0.4}
+                            />
+                        )}
+                        {topBrandsProducts.length > 0 && (
+                            <ProductCardBox
+                                title="Deals on Top Brands"
+                                products={topBrandsProducts}
+                                linkHref="/collections/top-brands"
+                                inView={heroSectionInView}
+                                customDelay={0.5}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </div>

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import Load from '../Components/Load';
 import LoadingSpinner from '../Components/Loader';
-import { ArrowRight, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../Components/CartContext';
 
 const Collections = () => {
@@ -17,38 +16,70 @@ const Collections = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- Pagination State ---
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(12);
     const { addToCart } = useCart();
 
-    // --- Data Fetching: Fetch all products and categories once ---
+    // Prevent duplicate requests
+    const isFetchingRef = useRef(false);
+    const abortControllerRef = useRef(null);
+
     useEffect(() => {
         const fetchCategoriesAndProducts = async () => {
+            // Prevent duplicate requests
+            if (isFetchingRef.current) {
+                console.log('Already fetching, skipping duplicate request');
+                return;
+            }
+
+            // Cancel any pending request
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+
+            isFetchingRef.current = true;
             setLoading(true);
             setError(null);
+
+            // Create new abort controller
+            abortControllerRef.current = new AbortController();
+
             try {
-                const productsRes = await axios.get(`/api/allProducts`);
+                const productsRes = await axios.get('/api/allProducts', {
+                    signal: abortControllerRef.current.signal
+                });
+
                 if (productsRes.data.status === 200) {
                     setProducts(productsRes.data.products);
                     setCategories(productsRes.data.categories);
                 } else {
-                    toast.error(productsRes.data.message || 'Unable to fetch products');
                     setError(productsRes.data.message || 'Failed to load products.');
                 }
             } catch (err) {
-                console.error("Error fetching products and categories:", err);
-                toast.error('Something went wrong fetching data.');
-                setError('Could not load products. Please try again later.');
+                if (axios.isCancel(err)) {
+                    console.log('Request cancelled');
+                } else {
+                    console.error("Error fetching products and categories:", err);
+                    setError('Could not load products. Please try again later.');
+                }
             } finally {
                 setLoading(false);
+                isFetchingRef.current = false;
             }
         };
 
         fetchCategoriesAndProducts();
-    }, []);
 
-    // --- Filtering Products and Setting Page Title based on URL parameter ---
+        // Cleanup function
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+            isFetchingRef.current = false;
+        };
+    }, []); // Only run once on mount
+
+    // Filtering Products based on URL parameter
     useEffect(() => {
         if (!loading && products.length > 0 && categories.length > 0) {
             const currentCategory = categories.find(cat => cat.link === categoryLink);
@@ -63,14 +94,14 @@ const Collections = () => {
                 setSelectedCategoryName('Category Not Found');
                 document.title = 'Category Not Found - Shop';
             }
-            setCurrentPage(1); // Reset to first page whenever filtered products change
+            setCurrentPage(1);
         } else if (!loading && products.length === 0 && categories.length === 0) {
             setSelectedCategoryName('No Categories or Products Available');
             document.title = 'No Data - Shop';
         }
     }, [categoryLink, products, categories, loading]);
 
-    // --- Pagination Logic ---
+    // Pagination Logic
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -111,7 +142,7 @@ const Collections = () => {
     const cardHoverVariants = {
         hover: {
             scale: 1.04,
-            boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.2)", // Softer shadow for light mode
+            boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.2)",
             transition: {
                 duration: 0.3,
                 ease: "easeInOut",
@@ -148,9 +179,9 @@ const Collections = () => {
             initial="hidden"
             animate="visible"
         >
-            <div className="mt-24"></div> {/* Spacer for Navbar */}
+            <div className="mt-24"></div>
 
-            {/* Breadcrumb - Always visible */}
+            {/* Breadcrumb */}
             <motion.nav
                 className="text-gray-500 text-sm mb-5 dark:text-gray-400"
                 initial={{ opacity: 0, y: -10 }}
@@ -170,7 +201,7 @@ const Collections = () => {
                 </ul>
             </motion.nav>
 
-            {/* Page Title - Always visible */}
+            {/* Page Title */}
             <motion.h1
                 className="text-3xl font-bold text-center mb-8 mt-8 text-blue-700 dark:text-blue-400"
                 initial={{ opacity: 0, y: 10 }}
@@ -203,7 +234,6 @@ const Collections = () => {
                                     e.preventDefault();
                                     e.stopPropagation();
 
-                                    // Check product availability
                                     if (product.status !== 0 || product.qty <= 0) {
                                         toast.error("This product is currently out of stock.");
                                         return;
@@ -258,7 +288,7 @@ const Collections = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* --- Pagination Controls --- */}
+                    {/* Pagination Controls */}
                     {totalPages > 1 && (
                         <div className="flex justify-center items-center space-x-2 mt-12 mb-8">
                             <motion.button

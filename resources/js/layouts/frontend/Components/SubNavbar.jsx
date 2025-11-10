@@ -26,12 +26,12 @@ const SubNavbar = () => {
                     setCategories(formattedCategories);
                 } else {
                     console.error("Unable to fetch categories for SubNavbar.");
-                    toast.error(res.data.message || "Failed to load categories.");
+                    // toast.error(res.data.message || "Failed to load categories.");
                 }
             })
             .catch(err => {
                 console.error("Network or server error fetching categories for SubNavbar:", err);
-                toast.error("Network error. Could not load categories.");
+                // toast.error("Network error. Could not load categories.");
             })
             .finally(() => {
                 setLoading(false);

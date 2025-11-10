@@ -1,41 +1,38 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { motion, AnimatePresence, useInView } from 'framer-motion'; // Added useInView
-import LoadingSpinner from '../Components/Loader'; // Assuming this component exists
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import LoadingSpinner from '../Components/Loader'; 
 import { toast } from 'react-toastify';
 import { ChevronDown, SlidersHorizontal, ArrowLeft, ArrowRight, X, ShoppingCart, Eye, ShoppingBag, Loader2, Timer } from 'lucide-react'; // Added icons for better UI
+import StarRating from './StarRating'; 
+import { useCart } from '../Components/CartContext';
 
-// Import the StarRating component and useCart hook
-import StarRating from './StarRating'; // Assuming StarRating component exists
-import { useCart } from '../Components/CartContext'; // Assuming CartContext is set up
-
-// Helper to format currency (moved here for reusability)
 const formatCurrency = (amount) => {
     return `₦${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
-// --- ProductCard Component (Extracted and Enhanced) ---
+// --- ProductCard Component ---
 const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
-    const [isHovered, setIsHovered] = useState(false); // State to track hover
+    const [isHovered, setIsHovered] = useState(false);
     const ref = React.useRef(null);
-    const inView = useInView(ref, { once: true, amount: 0.2 }); // Animate when 20% in view
+    const inView = useInView(ref, { once: true, amount: 0.2 });
 
     const discountPercentage = product.original_price && parseFloat(product.original_price) > parseFloat(product.selling_price)
         ? Math.round(((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100)
         : 0;
 
-    // Assuming product.qty for stock and product.status for active/inactive (0 for active, 1 for inactive)
-    const outOfStock = (product.quantity <= 0) || (product.status === 1); // Using product.quantity as per ViewProducts
+
+    const outOfStock = (product.quantity <= 0) || (product.status === 1); 
     const limitedStock = product.quantity > 0 && product.quantity <= 5;
 
     return (
         <motion.div
-            ref={ref} // Attach ref for useInView
+            ref={ref} 
             className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg dark:shadow-2xl group relative transform hover:scale-103 transition-transform duration-300 ease-out border border-gray-200 dark:border-transparent hover:border-blue-400 dark:hover:border-lime-600 flex flex-col"
-            style={{ maxWidth: '280px', maxHeight: '400px' }} // Adjusted max-width and height for smaller cards
+            style={{ maxWidth: '280px', maxHeight: '400px' }}
             variants={{
-                hidden: { opacity: 0, scale: 0.9, y: 30 }, // Slightly smaller initial scale
+                hidden: { opacity: 0, scale: 0.9, y: 30 },
                 visible: (i) => ({
                     opacity: 1,
                     scale: 1,
@@ -46,8 +43,8 @@ const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
             custom={customDelay}
-            onMouseEnter={() => setIsHovered(true)} // Set hover state to true
-            onMouseLeave={() => setIsHovered(false)} // Set hover state to false
+            onMouseEnter={() => setIsHovered(true)} 
+            onMouseLeave={() => setIsHovered(false)}
         >
             <Link to={`/collections/${product.category?.link || 'default-category'}/${product.link}`} className="block">
                 <div className="relative pt-[70%] overflow-hidden">
@@ -56,8 +53,8 @@ const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
                         src={product.image ? `/${product.image}` : `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, Math.min(product.name.length, 15))}`}
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-500 ease-out"
-                        initial={false} // Prevent initial animation on render
-                        animate={{ opacity: isHovered && product.image2 ? 0 : 1 }} // Fade out primary image on hover if image2 exists
+                        initial={false} 
+                        animate={{ opacity: isHovered && product.image2 ? 0 : 1 }}
                         onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/300x210/D1D5DB/4B5563?text=${product.name.substring(0, Math.min(product.name.length, 15))}`; }}
                     />
 
@@ -65,7 +62,7 @@ const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
                     <AnimatePresence>
                         {isHovered && product.image2 && (
                             <motion.img
-                                src={`/${product.image2}`} // Assuming image2 is also local
+                                src={`/${product.image2}`}
                                 alt={`${product.name} - alternate view`}
                                 className="absolute inset-0 w-full h-full object-cover"
                                 initial={{ y: '100%' }} // Start from bottom
@@ -102,7 +99,6 @@ const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
                     <p className="text-gray-500 mb-2 text-xs line-clamp-2 min-h-[2rem] dark:text-gray-400">
                         {product.description || 'No description available.'}
                     </p>
-                    {/* Use product.average_rating if available, otherwise fallback to product.rating */}
                     {(product.average_rating !== undefined || product.rating !== undefined) && (
                         <div className="mb-2 flex items-center">
                             <StarRating rating={parseFloat(product.average_rating || product.rating || 0)} iconSize={14} /> {/* Slightly reduced icon size */}
@@ -147,39 +143,38 @@ const ProductCard = ({ product, handleAddToCart, customDelay = 0 }) => {
 // --- End ProductCard Component ---
 
 
-const itemsPerPageOptions = [4, 8, 12, 16, 20]; // Added more options
+const itemsPerPageOptions = [4, 8, 12, 16, 20]; 
 const sortingOptions = [
     { value: 'alphaAsc', label: 'Alphabetically, A-Z' },
     { value: 'alphaDesc', label: 'Alphabetically, Z-A' },
     { value: 'featured', label: 'Featured' },
-    { value: 'popular', label: 'Popular' }, // Corrected 'Popular' to 'popular' for consistency
+    { value: 'popular', label: 'Popular' },
     { value: 'priceAsc', label: 'Price, low to high' },
     { value: 'priceDesc', label: 'Price, high to low' },
-    { value: 'ratingDesc', label: 'Average Rating, high to low' }, // NEW: Added rating sorting
+    { value: 'ratingDesc', label: 'Average Rating, high to low' },
     { value: 'dateAsc', label: 'Date, old to new' },
     { value: 'dateDesc', label: 'Date, new to old' }
 ];
 
 const Store = () => {
     const navigate = useNavigate();
-    const { addToCart } = useCart(); // Destructure addToCart from useCart hook
+    const { addToCart } = useCart(); 
 
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [maxPriceFilter, setMaxPriceFilter] = useState(0); // Initialize to 0, will be updated by maxPossiblePrice
-    const [maxPossiblePrice, setMaxPossiblePrice] = useState(50000); // Dynamic max for slider, based on all products
+    const [maxPriceFilter, setMaxPriceFilter] = useState(0); 
+    const [maxPossiblePrice, setMaxPossiblePrice] = useState(50000);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(8); // Increased default items per page
-    const [sortOption, setSortOption] = useState('dateDesc'); // Changed default sort to dateDesc for 'new to old'
+    const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [sortOption, setSortOption] = useState('dateDesc');
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for mobile sidebar
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    // Function to handle adding a product to the cart (passed to ProductCard)
+    // Function to handle adding a product to the cart
     const handleAddToCartInStore = (product) => {
-        // Check product stock before adding to cart
         if (product.quantity <= 0 || product.status === 1) {
             toast.error("This product is currently out of stock or unavailable.");
             return;
@@ -199,7 +194,7 @@ const Store = () => {
                 if (categoryRes.data.status === 200) {
                     setCategories([{ name: "All", link: "all" }, ...categoryRes.data.category]);
                 } else {
-                    toast.error("Failed to fetch categories.");
+                    // toast.error("Failed to fetch categories.");
                 }
 
                 // Fetch all products to determine the true maximum price for the slider
@@ -209,34 +204,30 @@ const Store = () => {
                     const allPrices = allProductsRes.data.products.map(p => parseFloat(p.selling_price || 0));
                     highestOverallPrice = Math.max(...allPrices);
                 }
-                // Set maxPossiblePrice to be slightly higher than the highest overall product price, rounded up
-                const newMax = Math.ceil((highestOverallPrice + 1000) / 1000) * 1000; // Round up to nearest 1000
-                const finalMaxPossiblePrice = Math.max(newMax, 50000); // Ensure a reasonable minimum max
+                const newMax = Math.ceil((highestOverallPrice + 1000) / 1000) * 1000; 
+                const finalMaxPossiblePrice = Math.max(newMax, 50000); 
                 setMaxPossiblePrice(finalMaxPossiblePrice);
-                // Set maxPriceFilter initially to the highest possible price to show all products
                 setMaxPriceFilter(finalMaxPossiblePrice);
 
             } catch (err) {
                 console.error("Error fetching initial data (categories/max price):", err.response?.data || err.message);
-                toast.error("Network error fetching initial data.");
-                // Fallback to default max price if API fails
+                // toast.error("Network error fetching initial data.");
                 setMaxPossiblePrice(50000);
                 setMaxPriceFilter(50000);
             }
         };
         fetchInitialData();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     // Memoized function to fetch products based on filters and pagination
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
-            // Now, fetch products for the current view with filters
-            const res = await axios.get(`/api/getProducts`, { // Using /api/products as per backend changes
+            const res = await axios.get(`/api/getProducts`, { 
                 params: {
-                    category: selectedCategory === 'All' ? null : selectedCategory, // Send null for 'All' category
-                    min_price: 0, // Always send 0 for min_price with single slider
-                    max_price: maxPriceFilter, // Use the single slider's value as max_price
+                    category: selectedCategory === 'All' ? null : selectedCategory,
+                    min_price: 0, 
+                    max_price: maxPriceFilter,
                     sort: sortOption,
                     itemsPerPage: itemsPerPage,
                     page: currentPage,
@@ -247,19 +238,19 @@ const Store = () => {
                 setProducts(res.data.products.data);
                 setTotalPages(res.data.products.last_page);
             } else if (res.data.status === 404) {
-                setProducts([]); // Clear products if 404
+                setProducts([]);
                 setTotalPages(1);
                 toast.info(res.data.message || "No products found for this selection.");
             } else {
                 setProducts([]);
                 setTotalPages(1);
-                toast.error(res.data.message || "An error occurred while fetching products.");
+                // toast.error(res.data.message || "An error occurred while fetching products.");
             }
         } catch (err) {
             console.error("Error fetching products:", err.response?.data || err.message);
             setProducts([]);
             setTotalPages(1);
-            toast.error('Failed to fetch products. Please try again.');
+            // toast.error('Failed to fetch products. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -267,11 +258,10 @@ const Store = () => {
 
     // Effect to trigger product fetch when filters or pagination change
     useEffect(() => {
-        // Only fetch products if maxPossiblePrice has been determined (initial data loaded)
-        if (maxPossiblePrice > 0 || maxPriceFilter > 0) { // Check if initial price data is set
+        if (maxPossiblePrice > 0 || maxPriceFilter > 0) {
             fetchProducts();
         }
-    }, [fetchProducts, maxPossiblePrice]); // Dependency on fetchProducts memoized function and maxPossiblePrice
+    }, [fetchProducts, maxPossiblePrice]); 
 
     const handleCategorySelect = (category) => {
         setSelectedCategory(category.name);
@@ -317,7 +307,7 @@ const Store = () => {
 
             {/* Sidebar (Desktop and Mobile Overlay) */}
             <AnimatePresence>
-                {(isSidebarOpen || window.innerWidth >= 1024) && ( // Show on desktop, or if mobile sidebar is open
+                {(isSidebarOpen || window.innerWidth >= 1024) && ( 
                     <motion.div
                         initial={window.innerWidth < 1024 ? { x: '-100%' } : {}}
                         animate={window.innerWidth < 1024 ? { x: 0 } : {}}
@@ -368,7 +358,7 @@ const Store = () => {
                                 <input
                                     type="range"
                                     min="0"
-                                    max={maxPossiblePrice} // Dynamic max
+                                    max={maxPossiblePrice}
                                     value={maxPriceFilter}
                                     onChange={handleMaxPriceFilterChange}
                                     className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-600

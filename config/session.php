@@ -18,8 +18,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
-
+    'driver' => env('SESSION_DRIVER', 'file'), // Should be 'file' not 'files'
     /*
     |--------------------------------------------------------------------------
     | Session Lifetime
@@ -129,7 +128,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
 
     /*
@@ -199,8 +198,8 @@ return [
     |
     */
 
-'same_site' => 'none', // Set to 'none' for cross-site cookies
-'secure' => env('SESSION_SECURE_COOKIE', true), // Should be 'true' in production
+    'same_site' => 'none', // Set to 'none' for cross-site cookies
+    'secure' => env('SESSION_SECURE_COOKIE', true), // Should be 'true' in production
 
     /*
     |--------------------------------------------------------------------------

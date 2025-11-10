@@ -33,7 +33,7 @@ const TrendingProducts = () => {
                 }
             } catch (err) {
                 console.error("Error fetching trending products:", err);
-                toast.error('Something went wrong fetching trending data.');
+                // toast.error('Something went wrong fetching trending data.');
                 setError('Could not load trending products. Please try again later.');
             } finally {
                 setLoading(false);

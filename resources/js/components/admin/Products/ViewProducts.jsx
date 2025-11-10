@@ -57,19 +57,21 @@ const ViewProducts = () => {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` } // Ensure auth token is sent
         })
             .then(res => {
-                if (res.data.status === 200 && Array.isArray(res.data.products)) { // Ensure products is an array
-                    setProducts(res.data.products);
+                if (res.data.status === 200) {
+                    // Handle both paginated and non-paginated responses
+                    const productsData = res.data.products.data || res.data.products;
+                    if (Array.isArray(productsData)) {
+                        setProducts(productsData);
+                    } else {
+                        toast.error("Failed to fetch products or data format is incorrect.");
+                        setProducts([]);
+                    }
                 } else {
                     toast.error(res.data.message || "Failed to fetch products or data format is incorrect.");
                     setProducts([]); // Ensure products is always an array
                 }
             })
-            .catch(err => {
-                console.error("Error fetching products:", err);
-                toast.error("Network error or server issue. Could not load products.");
-                setProducts([]); // Ensure products is always an array on error
-            })
-            .finally(() => {
+                        .finally(() => {
                 setLoading(false);
             });
     }, []);

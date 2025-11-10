@@ -37,7 +37,6 @@ import ForgotPassword from './layouts/frontend/auth/ForgotPassword';
 import ResetPassword from './layouts/frontend/auth/ResetPassword';
 import AnimatedBackground from './layouts/frontend/Components/AnimatedBackground';
 
-
 const Master = lazy(() => import('./layouts/admin/Master'));
 const Register = lazy(() => import('./layouts/frontend/auth/Register'));
 const Login = lazy(() => import('./layouts/frontend/auth/Login'));
@@ -55,7 +54,6 @@ const NotFound = lazy(() => import('./layouts/frontend/Components/404'));
 const Forbidden = lazy(() => import('./layouts/frontend/Components/403'));
 const ScrollToTop = lazy(() => import('./layouts/frontend/Components/ScrollToTop'));
 
-
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.defaults.baseURL = '/';
@@ -67,7 +65,13 @@ axios.interceptors.request.use(function (config) {
     config.headers.Authorization = token ? `Bearer ${token}` : '';
     return config;
 });
-
+axios.interceptors.response.use(null, error => {
+    if (error.response?.status === 429) {
+      console.warn('Rate limit hit — backing off...');
+    }
+    return Promise.reject(error);
+  });
+  
 function Home() {
     return (
         <>
@@ -109,16 +113,16 @@ function Layout() {
                 />
                 <Route path="/" element={<Home />} />
                 <Route path="/outlets" element={<Stores />} />
-                <Route path='/track-order' element={<TrackOrder />} />
-                <Route path='/flash-sales' element={<FlashSale />} />
-                <Route path='order-confirmation/:orderNumber' element={<OrderConfirmation />} />
-                <Route path='/user/orders' element={<UserOrders />} />
+                <Route path="/track-order" element={<TrackOrder />} />
+                <Route path="/flash-sales" element={<FlashSale />} />
+                <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
+                <Route path="/user/orders" element={<UserOrders />} />
                 <Route path="/user/order/:orderNumber" element={<UserOrderDetail />} />
-                <Route path='/user/profile' element={<UserProfile />} />
+                <Route path="/user/profile" element={<UserProfile />} />
                 <Route path="/shop" element={<Store />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/trending" element={<TrendingProducts />} />
-                <Route path='/wishlist' element={<Wishlist />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/support/warranty" element={<Warranty />} />
@@ -138,7 +142,6 @@ function Layout() {
                 <Route path="*" element={<NotFound />} />
             </Routes>
             {!isAdminRoute && <Footer />}
-            {/* Render AnimatedBackground only on non-admin routes */}
             {!isAdminRoute && <AnimatedBackground />}
         </>
     );
@@ -147,20 +150,12 @@ function Layout() {
 function App() {
     const [appLoading, setAppLoading] = useState(true);
 
+    // Just simulate short initial load — no API tracking request
     useEffect(() => {
-        const trackVisitorAndPreload = async () => {
-            try {
-                await axios.post('/api/analytics/track');
-            } catch (error) {
-                console.error("Initial load error:", error);
-            } finally {
-                setTimeout(() => {
-                    setAppLoading(false);
-                }, 1000);
-            }
-        };
-
-        trackVisitorAndPreload();
+        const timeout = setTimeout(() => {
+            setAppLoading(false);
+        }, 800);
+        return () => clearTimeout(timeout);
     }, []);
 
     return (
@@ -177,8 +172,8 @@ function App() {
                             ) : (
                                 <Suspense fallback={<LoadingSpinner />}>
                                     <Layout />
-                                    <ScrollToTopButton/>
-                                    {/* <ChatSupportButton/> */}
+                                    <ScrollToTopButton />
+                                    {/* <ChatSupportButton /> */}
                                 </Suspense>
                             )}
                         </WishlistProvider>
