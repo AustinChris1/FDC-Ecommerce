@@ -545,6 +545,7 @@ class ProductController extends Controller
                 ->where('products.status', 0)
                 ->orderBy('products.name')
                 ->get();
+            Log::info("Auth details {$user}");
 
             return new JsonResponse([
                 'status' => 200,

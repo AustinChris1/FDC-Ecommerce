@@ -281,7 +281,7 @@ const Sales = () => {
             toast.error("As a general admin, you are not authorized to make sales without an assigned location.");
             return;
         }
-
+    
         if (!selectedLocationId) {
             toast.error("Please select a store location to process the sale.");
             return;
@@ -290,17 +290,34 @@ const Sales = () => {
             toast.error("Cart is empty. Please add products to proceed.");
             return;
         }
-
+    
         if (paymentMethod === 'cash' && parseFloat(amountPaid || 0) < grandTotal) {
             toast.error("Amount paid is less than the grand total.");
             return;
         }
-
+    
         setLoading(true);
         try {
+            // ⭐ Get the auth token and decode user info from localStorage
+            const authToken = localStorage.getItem('auth_token');
+            
+            // Get user data - you should already have this from your auth context/state
+            const userResponse = await axios.get('/api/user', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            
+            const cashierId = userResponse.data.user?.id;
+    
+            if (!cashierId) {
+                toast.error("Unable to identify cashier. Please log in again.");
+                setLoading(false);
+                return;
+            }
+    
             const saleData = {
                 is_pos: 1,
                 location_id: selectedLocationId,
+                cashier_id: cashierId, // ⭐ ADD THIS LINE
                 customer_name: customerInfo.name || null,
                 customer_email: customerInfo.email || null,
                 customer_phone: customerInfo.phone || null,
@@ -315,10 +332,11 @@ const Sales = () => {
                     name: item.name,
                 }))
             };
+            
             const res = await axios.post('/api/orders/place', saleData, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+                headers: { 'Authorization': `Bearer ${authToken}` }
             });
-
+    
             if (res.data.status === 200) {
                 toast.success("Sale processed successfully!");
                 setProcessedOrder({
@@ -335,7 +353,7 @@ const Sales = () => {
             setLoading(false);
         }
     };
-
+    
     const handleNewSale = () => {
         setProcessedOrder(null);
         setCart([]);
