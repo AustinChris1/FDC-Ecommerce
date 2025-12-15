@@ -9,6 +9,7 @@ import LoadingSpinner from './Loader';
 import { useCart } from './CartContext';
 import CountdownTimer from './hooks/CountdownTimer';
 import ProductCard from './hooks/ProductCard';
+import { getEffectivePrice, isFlashSaleActive, getDiscountPercentage, formatPrice } from '../utils/priceHelper';
 
 const ProductShowcase = () => {
     // --- State Management ---
@@ -88,19 +89,15 @@ const ProductShowcase = () => {
                             console.warn(`Could not fetch reviews for product ${product.name} (ID: ${product.id}):`, reviewError);
                         }
 
-                        const flashSaleEndsAt = product.flash_sale_ends_at ? new Date(product.flash_sale_ends_at) : null;
-                        const flashSaleStartsAt = product.flash_sale_starts_at ? new Date(product.flash_sale_starts_at) : null;
-                        const now = new Date();
-
-                        const isCurrentlyFlashSale = product.is_flash_sale && flashSaleStartsAt && flashSaleEndsAt &&
-                            now >= flashSaleStartsAt && now <= flashSaleEndsAt;
+                        // Use the price helper function to determine if flash sale is active
+                        const flashSaleActive = isFlashSaleActive(product);
 
                         return {
                             ...product,
                             rating: parseFloat(averageRating),
                             num_reviews: reviewCount,
                             is_new_arrival: product.is_new_arrival || false,
-                            is_flash_sale: isCurrentlyFlashSale || false,
+                            is_flash_sale: flashSaleActive, // Use helper function
                             flash_sale_price: product.flash_sale_price,
                             flash_sale_starts_at: product.flash_sale_starts_at,
                             flash_sale_ends_at: product.flash_sale_ends_at,
@@ -140,11 +137,10 @@ const ProductShowcase = () => {
     }, [products]); // Re-run this effect whenever the main `products` state changes
 
     // --- Product Filtering and Sorting for Sections (Memoized for performance) ---
+    // Updated to use isFlashSaleActive helper
     const flashSaleProducts = useMemo(() =>
         products.filter(p =>
-            p.is_flash_sale &&
-            p.flash_sale_ends_at &&
-            new Date(p.flash_sale_ends_at) > new Date() &&
+            isFlashSaleActive(p) && // Use helper function
             p.qty > 0
         ).sort((a, b) => new Date(a.flash_sale_ends_at).getTime() - new Date(b.flash_sale_ends_at).getTime())
             .slice(0, 8),
@@ -284,7 +280,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={flashSaleInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -327,7 +323,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={limitedStockInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -370,7 +366,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={popularProductsInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -413,7 +409,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={featuredProductsInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -456,7 +452,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={featuredProductsInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -499,7 +495,7 @@ const ProductShowcase = () => {
                                         handleAddToCart={handleAddToCart}
                                         inView={newArrivalsInView}
                                         customDelay={i * 0.08}
-                                        isFlashSale={product.is_flash_sale}
+                                        isFlashSale={isFlashSaleActive(product)}
                                         flashSalePrice={product.flash_sale_price}
                                         flashSaleEndsAt={product.flash_sale_ends_at}
                                     />
@@ -510,7 +506,7 @@ const ProductShowcase = () => {
                     </>
                 )}
 
-                {/* --- Section: Explore Our Top Categories (Now positioned at the bottom of the sections, before the main product grid) --- */}
+                {/* --- Section: Explore Our Top Categories --- */}
                 <motion.div
                     ref={categoriesRef}
                     className="text-center mb-12 md:mb-16"

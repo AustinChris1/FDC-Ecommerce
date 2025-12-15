@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useCart } from './CartContext';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { isFlashSaleActive } from '../utils/Pricehelper';
 
 const CartSidebar = () => {
     const navigate = useNavigate(); // Initialize useNavigate
@@ -89,72 +90,95 @@ const CartSidebar = () => {
                         {/* Cart Items List */}
                         {cartItems.length > 0 ? (
                             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                                {cartItems.map(item => (
-                                    <motion.div
-                                        key={item.id}
-                                        className="flex items-center rounded-lg shadow-sm p-4 mb-4 border
-                                                   bg-white border-gray-200
-                                                   dark:bg-gray-900 dark:shadow-md dark:border-gray-800"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.2 }}
-                                    >
-                                        <img
-                                            src={`/${item.image}`}
-                                            alt={item.name}
-                                            className="w-20 h-20 object-cover rounded-md mr-4 border border-gray-300 dark:border-gray-700"
-                                        />
-                                        <div className="flex-1">
-                                            <Link
-                                                to={`/collections/${item.category?.link || 'default-category'}/${item.link}`}
-                                                onClick={toggleCart}
-                                                className="text-lg font-semibold transition-colors
-                                                           text-gray-800 hover:text-blue-600
-                                                           dark:text-gray-100 dark:hover:text-cyan-400"
-                                            >
-                                                {item.name}
-                                            </Link>
-                                            <p className="font-bold mt-1 text-green-600 dark:text-lime-400">
-                                                ₦{(item.selling_price * item.quantity).toLocaleString()}
-                                            </p>
-                                            <div className="flex items-center mt-3 space-x-2">
-                                                <motion.button
-                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                    className="p-1 rounded-full transition-colors disabled:opacity-50
+                                {cartItems.map(item => {
+                                    const hasFlashSale = isFlashSaleActive(item);
+
+                                    return (
+                                        <motion.div
+                                            key={item.id}
+                                            className="flex items-center rounded-lg shadow-sm p-4 mb-4 border
+                       bg-white border-gray-200
+                       dark:bg-gray-900 dark:shadow-md dark:border-gray-800"
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <img
+                                                src={`/${item.image}`}
+                                                alt={item.name}
+                                                className="w-20 h-20 object-cover rounded-md mr-4 border border-gray-300 dark:border-gray-700"
+                                            />
+                                            <div className="flex-1">
+                                                <Link
+                                                    to={`/collections/${item.category?.link || 'default-category'}/${item.link}`}
+                                                    onClick={toggleCart}
+                                                    className="text-lg font-semibold transition-colors
+                               text-gray-800 hover:text-blue-600
+                               dark:text-gray-100 dark:hover:text-cyan-400"
+                                                >
+                                                    {item.name}
+                                                </Link>
+
+                                                {/* Flash Sale Badge */}
+                                                {hasFlashSale && (
+                                                    <span className="inline-block mt-1 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
+                                                        🔥 Flash Sale
+                                                    </span>
+                                                )}
+
+                                                <div className="flex items-baseline gap-2 mt-1">
+                                                    <p className="font-bold text-green-600 dark:text-lime-400">
+                                                        ₦{(item.selling_price * item.quantity).toLocaleString()}
+                                                    </p>
+
+                                                    {/* Show original price if flash sale is active */}
+                                                    {hasFlashSale && item.original_selling_price &&
+                                                        item.original_selling_price > item.selling_price && (
+                                                            <span className="text-xs text-gray-500 line-through">
+                                                                ₦{(item.original_selling_price * item.quantity).toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                </div>
+
+                                                <div className="flex items-center mt-3 space-x-2">
+                                                    <motion.button
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        className="p-1 rounded-full transition-colors disabled:opacity-50
                                                                bg-gray-200 text-gray-700 hover:bg-gray-300
                                                                dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                                                    disabled={item.quantity <= 1}
-                                                >
-                                                    <Minus className="w-4 h-4" />
-                                                </motion.button>
-                                                <span className="font-medium text-gray-800 dark:text-gray-100">
-                                                    {item.quantity}
-                                                </span>
-                                                <motion.button
-                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                    className="p-1 rounded-full transition-colors
+                                                        whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        <Minus className="w-4 h-4" />
+                                                    </motion.button>
+                                                    <span className="font-medium text-gray-800 dark:text-gray-100">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <motion.button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        className="p-1 rounded-full transition-colors
                                                                bg-gray-200 text-gray-700 hover:bg-gray-300
                                                                dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                                                >
-                                                    <Plus className="w-4 h-4" />
-                                                </motion.button>
-                                                <motion.button
-                                                    onClick={() => removeFromCart(item.id)}
-                                                    className="ml-auto p-2 rounded-full transition-colors
+                                                        whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </motion.button>
+                                                    <motion.button
+                                                        onClick={() => removeFromCart(item.id)}
+                                                        className="ml-auto p-2 rounded-full transition-colors
                                                                bg-red-600 text-white hover:bg-red-700
                                                                dark:bg-red-700 dark:text-white dark:hover:bg-red-600"
-                                                    aria-label="Remove item"
-                                                    whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-                                                >
-                                                    <Trash2 className="w-5 h-5" />
-                                                </motion.button>
+                                                        aria-label="Remove item"
+                                                        whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </motion.button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
+                                        </motion.div>
+                                    );
+                                })}
                             </div>
                         ) : (
                             <motion.div

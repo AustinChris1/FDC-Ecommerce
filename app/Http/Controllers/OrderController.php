@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -250,7 +251,7 @@ class OrderController extends Controller
     protected function sendEmailNotificationToAdmins($order)
     {
         try {
-            $admins = \App\Models\User::whereIn('role_as', [1, 2])->get();
+            $admins = User::whereIn('role_as', [1, 2])->get();
 
             if ($admins->isEmpty()) {
                 Log::warning("No admin users found to send order notification for order {$order->order_number}");
@@ -288,7 +289,7 @@ protected function sendPosNotificationToSuperAdmins($order, $cashier)
             Log::warning("No cashier information available for order {$order->order_number}");
         }
 
-        $superAdmins = \App\Models\User::where('role_as', 2)->get();
+        $superAdmins = User::where('role_as', 2)->get();
 
         if ($superAdmins->isEmpty()) {
             Log::warning("No super admin users found to send POS notification for order {$order->order_number}");

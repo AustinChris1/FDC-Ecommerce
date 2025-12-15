@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag, Loader2, Timer } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Loader2, Timer, Clock } from 'lucide-react';
 import StarRating from '../../Outer/StarRating';
-
-// Helper to format currency
-const formatCurrency = (amount) => {
-    return `₦${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-};
+import { getEffectivePrice, isFlashSaleActive, getDiscountPercentage, formatPrice } from '../../utils/priceHelper';
 
 const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const discountPercentage = product.original_price && parseFloat(product.original_price) > parseFloat(product.selling_price)
-        ? Math.round(((parseFloat(product.original_price) - parseFloat(product.selling_price)) / parseFloat(product.original_price)) * 100)
-        : 0;
+    // Use price helper functions for consistency
+    const effectivePrice = getEffectivePrice(product);
+    const isFlashSale = isFlashSaleActive(product);
+    const discountPercentage = getDiscountPercentage(product);
 
     const outOfStock = product.qty <= 0 || product.status === 1;
     const limitedStock = product.qty > 0 && product.qty <= 5;
@@ -78,20 +75,39 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                         )}
                     </AnimatePresence>
 
+                    {/* Flash Sale Badge */}
+                    {isFlashSale && (
+                        <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-red-600 dark:shadow-lg animate-pulse flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            FLASH SALE
+                        </span>
+                    )}
+
+                    {/* Discount Badge */}
                     {discountPercentage > 0 && (
                         <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-green-600 dark:shadow-lg">
                             -{discountPercentage}%
                         </span>
                     )}
+
+                    {/* Stock Status Badges */}
                     {outOfStock ? (
-                        <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-red-600 dark:shadow-lg">
+                        <span className="absolute bottom-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-red-600 dark:shadow-lg">
                             Out of Stock
                         </span>
                     ) : limitedStock && (
-                        <span className="absolute top-3 left-3 bg-orange-400 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-orange-500 dark:shadow-lg">
+                        <span className="absolute bottom-3 left-3 bg-orange-400 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-orange-500 dark:shadow-lg">
                             Limited Stock ({product.qty})
                         </span>
                     )}
+
+                    {/* New Arrival Badge */}
+                    {product.is_new_arrival && !isFlashSale && (
+                        <span className="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md dark:bg-blue-600 dark:shadow-lg">
+                            NEW
+                        </span>
+                    )}
+
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/50"></div>
                 </div>
             </Link>
@@ -114,14 +130,42 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
 
                 <div className="mt-auto pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div>
-                        {discountPercentage > 0 && (
+                        {/* Original Price (if there's a discount) */}
+                        {product.original_price && product.original_price > effectivePrice && (
                             <p className="text-xs text-gray-400 line-through dark:text-gray-500">
-                                {formatCurrency(product.original_price)}
+                                {formatPrice(product.original_price)}
                             </p>
                         )}
-                        <p className={`text-base font-bold ${limitedStock ? 'text-red-500 dark:text-red-400' : 'text-blue-600 dark:text-cyan-400'}`}>
-                            {formatCurrency(product.selling_price)}
-                        </p>
+                        
+                        {/* Effective Price (uses flash sale price if active, otherwise selling price) */}
+                        <div className="flex items-center gap-1">
+                            <p className={`text-base font-bold ${
+                                isFlashSale 
+                                    ? 'text-red-600 dark:text-red-400' 
+                                    : limitedStock 
+                                        ? 'text-orange-500 dark:text-orange-400' 
+                                        : 'text-blue-600 dark:text-cyan-400'
+                            }`}>
+                                {formatPrice(effectivePrice)}
+                            </p>
+                            
+                            {/* Flash Sale Indicator */}
+                            {isFlashSale && (
+                                <Timer className="w-3 h-3 text-red-600 dark:text-red-400 animate-pulse" />
+                            )}
+                        </div>
+
+                        {/* Flash Sale End Time */}
+                        {isFlashSale && product.flash_sale_ends_at && (
+                            <p className="text-[10px] text-red-500 dark:text-red-400 mt-0.5">
+                                Ends: {new Date(product.flash_sale_ends_at).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </p>
+                        )}
                     </div>
 
                     <button
@@ -129,7 +173,9 @@ const ProductCard = ({ product, handleAddToCart, inView, customDelay }) => {
                         className={`p-2 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center text-sm
                             ${outOfStock
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-70 dark:bg-gray-700 dark:text-gray-400'
-                                : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-md dark:bg-lime-600 dark:hover:bg-lime-700'
+                                : isFlashSale
+                                    ? 'bg-red-600 text-white hover:bg-red-700 active:scale-95 shadow-md dark:bg-red-600 dark:hover:bg-red-700'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-md dark:bg-lime-600 dark:hover:bg-lime-700'
                             }`}
                         disabled={outOfStock}
                         aria-label={`Add ${product.name} to cart`}

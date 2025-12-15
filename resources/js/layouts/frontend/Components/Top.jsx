@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { useInView } from 'react-intersection-observer';
 import { useCart } from './CartContext';
 import Load from './Load';
+import { isFlashSaleActive, getDiscountPercentage } from '../utils/priceHelper';
 
 const Top = () => {
     const [products, setProducts] = useState([]);
@@ -25,46 +26,24 @@ const Top = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Single request now includes reviews data
                 const productsRes = await axios.get(`/api/allProducts`);
                 
                 if (productsRes.data.status === 200) {
                     const productsFromApi = productsRes.data.products;
 
-                    // Process products with already-loaded review data
                     const processedProducts = productsFromApi.map((product) => {
-                        const flashSaleEndsAt = product.flash_sale_ends_at 
-                            ? new Date(product.flash_sale_ends_at) 
-                            : null;
-                        const flashSaleStartsAt = product.flash_sale_starts_at 
-                            ? new Date(product.flash_sale_starts_at) 
-                            : null;
-                        const now = new Date();
-
-                        const isCurrentlyFlashSale = 
-                            product.is_flash_sale && 
-                            flashSaleStartsAt && 
-                            flashSaleEndsAt &&
-                            now >= flashSaleStartsAt && 
-                            now <= flashSaleEndsAt;
-
-                        // Calculate discount percentage
-                        let discountPercentage = 0;
-                        if (product.original_price && product.selling_price && 
-                            parseFloat(product.original_price) > parseFloat(product.selling_price)) {
-                            discountPercentage = (
-                                (parseFloat(product.original_price) - parseFloat(product.selling_price)) / 
-                                parseFloat(product.original_price)
-                            ) * 100;
-                        }
+                        // Use the helper function to check flash sale status
+                        const isCurrentlyFlashSale = isFlashSaleActive(product);
+                        
+                        // Calculate discount percentage using helper
+                        const discountPercentage = getDiscountPercentage(product);
 
                         return {
                             ...product,
-                            // Use the ratings already provided by backend
                             rating: parseFloat(product.reviews_avg_rating || 0),
                             num_reviews: product.reviews_count || 0,
                             is_new_arrival: product.is_new_arrival || false,
-                            is_flash_sale: isCurrentlyFlashSale || false,
+                            is_flash_sale: isCurrentlyFlashSale,
                             flash_sale_price: product.flash_sale_price,
                             flash_sale_starts_at: product.flash_sale_starts_at,
                             flash_sale_ends_at: product.flash_sale_ends_at,
@@ -76,6 +55,7 @@ const Top = () => {
                         };
                     });
 
+                    console.log(`Processed ${processedProducts.filter(p => p.is_flash_sale).length} active flash sale products`);
                     setProducts(processedProducts);
                 } else {
                     console.error("Backend error fetching products:", productsRes.data.message);
@@ -94,10 +74,8 @@ const Top = () => {
         console.log("Recently viewed items from localStorage:", recentlyViewedItems);
         if (recentlyViewedItems.length > 0) {
             const lastViewedItem = recentlyViewedItems[0];
-            // Ensure category_link exists and is valid
             if (lastViewedItem.category_link) {
                 setLastViewedCategoryLink(lastViewedItem.category_link);
-                // Format the category name for display
                 const formattedName = lastViewedItem.category_link.replace(/-/g, ' ');
                 setLastViewedCategoryName(formattedName);
             }
@@ -125,7 +103,7 @@ const Top = () => {
                     }
                 } catch (error) {
                     console.error("Failed to fetch similar products:", error);
-                    setSimilarProducts([]); // Reset on error
+                    setSimilarProducts([]);
                 } finally {
                     setSimilarProductsLoading(false);
                 }
@@ -139,8 +117,11 @@ const Top = () => {
         [products]
     );
 
+    // Flash sale products - only show active ones
     const flashSaleProducts = useMemo(() =>
-        products.filter(p => p.is_flash_sale && p.qty > 0).sort(() => 0.5 - Math.random()).slice(0, 4),
+        products.filter(p => p.is_flash_sale && p.qty > 0)
+            .sort((a, b) => new Date(a.flash_sale_ends_at) - new Date(b.flash_sale_ends_at))
+            .slice(0, 4),
         [products]
     );
 
@@ -186,7 +167,6 @@ const Top = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Only show "Because you viewed" section if we have valid similar products and category info */}
                         {similarProducts.length > 0 && lastViewedCategoryName && (
                             <ProductCardBox
                                 title={`Because you viewed ${lastViewedCategoryName}`}

@@ -19,6 +19,7 @@ import Facebook from '../assets/social/facebook.svg';
 
 import { useCart } from '../Components/CartContext';
 import { useWishlist } from '../Components/WishlistContext';
+import { getEffectivePrice, isFlashSaleActive, getDiscountPercentage } from '../utils/priceHelper';
 
 // Helper component for tab buttons
 const TabButton = ({ icon, label, isActive, onClick }) => (
@@ -56,18 +57,21 @@ const ProductDetail = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalImage, setModalImage] = useState('');
-    
+
     const isFetchingRef = useRef(false);
     const abortControllerRef = useRef(null);
 
-    useEffect(() => {
+    const effectivePrice = product ? getEffectivePrice(product) : 0;
+    const isFlashSale = product ? isFlashSaleActive(product) : false;
+    const discountPercent = product ? getDiscountPercentage(product) : 0;
+        useEffect(() => {
         const fetchProductDetails = async () => {
             // Prevent duplicate requests
             if (isFetchingRef.current) {
                 console.log('Already fetching, skipping duplicate request');
                 return;
             }
-            
+
             // Cancel any pending request
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
@@ -75,16 +79,16 @@ const ProductDetail = () => {
 
             isFetchingRef.current = true;
             setLoading(true);
-            
+
             // Create new abort controller for this request
             abortControllerRef.current = new AbortController();
-            
+
             try {
                 const response = await axios.get(
                     `/api/fetchProducts/${categoryLink}/${productLink}`,
                     { signal: abortControllerRef.current.signal }
                 );
-                
+
                 if (response.data.status === 200) {
                     setProduct(response.data.product);
                     if (response.data.product.reviews) {
@@ -102,7 +106,7 @@ const ProductDetail = () => {
                 isFetchingRef.current = false;
             }
         };
-        
+
         fetchProductDetails();
 
         // Cleanup function to cancel request on unmount
@@ -204,7 +208,7 @@ const ProductDetail = () => {
                 localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
             }
         }
-    }, [product, categoryLink, productLink]); 
+    }, [product, categoryLink, productLink]);
 
     const totalReviews = reviews.length;
     const totalPagesReviews = Math.ceil(totalReviews / reviewsPerPage);
@@ -249,7 +253,7 @@ const ProductDetail = () => {
             addToWishlist(product);
         }
     };
-    
+
     const inWishlist = product ? isProductInWishlist(product.id) : false;
 
     const handleQuantityChange = (type) => {
@@ -408,28 +412,43 @@ const ProductDetail = () => {
                         </span>
                     </div>
 
-                    {product.selling_price && (
+                    {effectivePrice && (
                         <div className="mb-4 sm:mb-6">
                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4">
+                                {/* Flash Sale Badge */}
+                                {isFlashSale && (
+                                    <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-3 py-1 rounded-full animate-pulse">
+                                        🔥 FLASH SALE
+                                    </span>
+                                )}
+
+                                {/* Effective Price */}
                                 <p className="dark:text-lime-400 text-blue-600 text-3xl sm:text-4xl md:text-5xl font-bold flex items-center">
-                                    ₦{product.selling_price.toLocaleString()}
+                                    ₦{effectivePrice.toLocaleString()}
                                 </p>
 
-                                {product.original_price && product.original_price > product.selling_price && (
+                                {/* Original Price (if different from effective price) */}
+                                {product.original_price && product.original_price > effectivePrice && (
                                     <>
                                         <p className="dark:text-gray-400 text-gray-500 text-base sm:text-lg md:text-xl line-through">
                                             ₦{product.original_price.toLocaleString()}
                                         </p>
 
                                         <span className="bg-green-500 text-white text-xs sm:text-sm font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full whitespace-nowrap">
-                                            -{Math.round(((product.original_price - product.selling_price) / product.original_price) * 100)}% OFF
+                                            -{discountPercent}% OFF
                                         </span>
                                     </>
                                 )}
                             </div>
+
+                            {/* Flash Sale Timer (if active) */}
+                            {isFlashSale && product.flash_sale_ends_at && (
+                                <div className="mt-3 text-sm sm:text-base text-red-600 dark:text-red-400 font-medium">
+                                    ⏰ Sale ends: {new Date(product.flash_sale_ends_at).toLocaleString()}
+                                </div>
+                            )}
                         </div>
                     )}
-
                     {/* Quantity Selector */}
                     <div className="mb-4 sm:mb-6 flex flex-wrap items-center gap-2 sm:gap-4">
                         <span className="dark:text-gray-300 text-gray-700 text-base sm:text-lg font-medium">Quantity:</span>
@@ -468,11 +487,10 @@ const ProductDetail = () => {
                         </motion.button>
                         <motion.button
                             onClick={handleAddToWishlist}
-                            className={`flex-1 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 rounded-lg font-bold text-base sm:text-lg shadow-md transition-all duration-300 flex items-center justify-center space-x-2 ${
-                                inWishlist 
-                                    ? 'dark:bg-red-500 dark:hover:bg-red-600 dark:text-white bg-red-500 hover:bg-red-600 text-white' 
+                            className={`flex-1 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 rounded-lg font-bold text-base sm:text-lg shadow-md transition-all duration-300 flex items-center justify-center space-x-2 ${inWishlist
+                                    ? 'dark:bg-red-500 dark:hover:bg-red-600 dark:text-white bg-red-500 hover:bg-red-600 text-white'
                                     : 'dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700'
-                            }`}
+                                }`}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
@@ -485,22 +503,22 @@ const ProductDetail = () => {
                     <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 dark:border-t dark:border-gray-800 border-t border-gray-200">
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 dark:text-cyan-400 text-blue-700">Share This Product</h3>
                         <div className="flex space-x-3 sm:space-x-4">
-                            <motion.a 
-                                href={`https://www.facebook.com/sharer/sharer.php?u=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}`} 
-                                target="_blank" 
+                            <motion.a
+                                href={`https://www.facebook.com/sharer/sharer.php?u=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}`}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-blue-700 text-white p-2.5 sm:p-3 rounded-full hover:bg-blue-800 transition-colors"
-                                whileHover={{ scale: 1.1 }} 
+                                whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                             >
                                 <img src={Facebook} className="w-5 h-5 sm:w-6 sm:h-6" alt="Facebook" />
                             </motion.a>
-                            <motion.a 
-                                href={`https://twitter.com/intent/tweet?url=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}&text=${encodeURIComponent(product.name)}`} 
-                                target="_blank" 
+                            <motion.a
+                                href={`https://twitter.com/intent/tweet?url=https://spx.firstdigit.com.ng/collections/${categoryLink}/${productLink}&text=${encodeURIComponent(product.name)}`}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="dark:bg-gray-200 bg-gray-700 text-white p-2.5 sm:p-3 rounded-full hover:bg-blue-500 transition-colors"
-                                whileHover={{ scale: 1.1 }} 
+                                whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                             >
                                 <img src={Twitter} className="w-5 h-5 sm:w-6 sm:h-6" alt="Twitter" />
@@ -665,7 +683,7 @@ const ProductDetail = () => {
                                                 <p className="dark:text-gray-200 text-gray-900 leading-relaxed whitespace-pre-line text-sm sm:text-base">{review.review}</p>
                                             </div>
                                         ))}
-                                        
+
                                         {/* Pagination for Reviews */}
                                         {totalPagesReviews > 1 && (
                                             <div className="flex justify-center items-center flex-wrap gap-2 mt-6 sm:mt-8">
@@ -682,11 +700,10 @@ const ProductDetail = () => {
                                                     <motion.button
                                                         key={index}
                                                         onClick={() => changeReviewsPage(index + 1)}
-                                                        className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base ${
-                                                            currentPage === index + 1
+                                                        className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base ${currentPage === index + 1
                                                                 ? 'dark:bg-cyan-600 bg-blue-600 text-white'
                                                                 : 'dark:bg-gray-700 bg-gray-200 dark:text-gray-300 text-gray-700 dark:hover:bg-gray-600 hover:bg-gray-300'
-                                                        }`}
+                                                            }`}
                                                         whileHover={{ scale: 1.05 }}
                                                         whileTap={{ scale: 0.95 }}
                                                     >

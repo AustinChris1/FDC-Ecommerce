@@ -4,46 +4,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../Components/Loader';
-import { ShoppingCart, Star, ArrowRight, Zap, Clock } from 'lucide-react'; // Added Clock for timer icon
+import { ShoppingCart, ArrowRight, Zap, Clock } from 'lucide-react';
 import { useCart } from '../Components/CartContext';
-import CountdownTimer from '../Components/hooks/CountdownTimer'; // Import the new CountdownTimer component
-import StarRating from './StarRating'; // Assuming this path is correct
-import { Helmet } from 'react-helmet-async'; // Import Helmet
+import CountdownTimer from '../Components/hooks/CountdownTimer';
+import StarRating from './StarRating';
+import { Helmet } from 'react-helmet-async';
+import { getEffectivePrice, isFlashSaleActive, getDiscountPercentage } from '../utils/priceHelper';
 
 const FlashSale = () => {
-    const [flashSaleProducts, setFlashSaleProducts] = useState([]); // Renamed for clarity
+    const [flashSaleProducts, setFlashSaleProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { addToCart } = useCart(); // Destructure addToCart from useCart
+    const { addToCart } = useCart();
 
     useEffect(() => {
-        const fetchFlashSaleProducts = async () => { // Renamed function for clarity
+        const fetchFlashSaleProducts = async () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get('/api/allProducts'); // Adjust API endpoint as needed
+                const response = await axios.get('/api/allProducts');
 
                 if (response.data.status === 200 && response.data.products) {
-                    const now = new Date(); // Current time for comparison
+                    const now = new Date();
                     const activeFlashSales = response.data.products
                         .filter(product => {
-                            // Ensure product has flash sale specific properties
-                            if (product.is_flash_sale === true &&
-                                product.flash_sale_price !== null &&
-                                product.flash_sale_starts_at &&
-                                product.flash_sale_ends_at) {
-
-                                const startsAt = new Date(product.flash_sale_starts_at);
-                                const endsAt = new Date(product.flash_sale_ends_at);
-
-                                // Check if the current time is within the flash sale period
-                                return now >= startsAt && now <= endsAt;
-                            }
-                            return false; // Not a flash sale product or not currently active
+                            return isFlashSaleActive(product) && product.qty > 0;
                         })
-                        .sort((a, b) => new Date(a.flash_sale_ends_at) - new Date(b.flash_sale_ends_at)) // Sort by end time
-                        .slice(0, 8); // Limit to top 8 active flash sale products
+                        .sort((a, b) => new Date(a.flash_sale_ends_at) - new Date(b.flash_sale_ends_at));
 
+                    console.log(`Found ${activeFlashSales.length} active flash sale products`);
                     setFlashSaleProducts(activeFlashSales);
                 } else {
                     toast.error(response.data.message || 'Unable to fetch flash sale products.');
@@ -60,12 +49,9 @@ const FlashSale = () => {
 
         fetchFlashSaleProducts();
 
-        // Optional: Refresh flash sales periodically if they are very short-lived,
-        // but for typical flash sales, a single fetch on mount is usually sufficient.
-        // const interval = setInterval(fetchFlashSaleProducts, 60000); // Fetch every minute
-        // return () => clearInterval(interval);
-
-    }, []); // Empty dependency array means this runs once on mount
+        const interval = setInterval(fetchFlashSaleProducts, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Framer Motion Variants
     const containerVariants = {
@@ -86,9 +72,9 @@ const FlashSale = () => {
 
     const cardHoverVariants = {
         hover: {
-            scale: 1.03, // Slightly less aggressive scale
-            boxShadow: "0px 15px 35px rgba(0, 0, 0, 0.6)", // Deeper shadow
-            y: -5, // Slight lift
+            scale: 1.03,
+            boxShadow: "0px 15px 35px rgba(0, 0, 0, 0.6)",
+            y: -5,
             transition: { duration: 0.3, ease: 'easeOut' },
         },
         tap: { scale: 0.98 },
@@ -96,7 +82,7 @@ const FlashSale = () => {
 
     const imageHoverVariants = {
         hover: {
-            scale: 1.1, // Subtle zoom on image
+            scale: 1.1,
             transition: { duration: 0.4, ease: 'easeOut' },
         },
     };
@@ -135,6 +121,11 @@ const FlashSale = () => {
                     <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-400">
                         Grab these limited-time deals before they're gone! Unbeatable prices on hot products.
                     </p>
+                    {flashSaleProducts.length > 0 && (
+                        <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-4">
+                            {flashSaleProducts.length} Active Flash Sale{flashSaleProducts.length !== 1 ? 's' : ''}!
+                        </p>
+                    )}
                 </motion.div>
 
                 {error ? (
@@ -142,7 +133,7 @@ const FlashSale = () => {
                         <h3 className="text-3xl font-bold text-red-600 dark:text-red-500 mb-4">Error</h3>
                         <p className="text-xl text-gray-600 dark:text-gray-400">{error}</p>
                     </div>
-                ) : flashSaleProducts.length === 0 ? ( // Use flashSaleProducts here
+                ) : flashSaleProducts.length === 0 ? (
                     <motion.div
                         className="text-center py-20"
                         initial="hidden"
@@ -161,24 +152,21 @@ const FlashSale = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         <AnimatePresence>
-                            {flashSaleProducts.map((product) => { // Use flashSaleProducts here
-                                const handleAddToCart = (e) => {
-                                    e.preventDefault(); // Prevent default link behavior
-                                    e.stopPropagation(); // Stop event bubbling
+                            {flashSaleProducts.map((product) => {
+                                const effectivePrice = getEffectivePrice(product);
+                                const discountPercent = getDiscountPercentage(product);
 
-                                    // Check product status and quantity more robustly
+                                const handleAddToCart = (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+
                                     if (product.status === 1 || product.qty <= 0) {
                                         toast.error("This product is currently out of stock or unavailable.");
                                         return;
                                     }
 
-                                    // Add to cart with flash_sale_price if active, else selling_price
-                                    const priceToAdd = product.is_flash_sale === true &&
-                                        new Date() >= new Date(product.flash_sale_starts_at) &&
-                                        new Date() <= new Date(product.flash_sale_ends_at)
-                                        ? product.flash_sale_price : product.selling_price;
-
-                                    addToCart({ ...product, price: priceToAdd }, 1); // Pass product with correct price
+                                    // Use the cart context which now handles flash sale pricing
+                                    addToCart(product, 1);
                                 };
 
                                 return (
@@ -189,9 +177,9 @@ const FlashSale = () => {
                                         variants={cardHoverVariants}
                                         whileHover="hover"
                                         whileTap="tap"
-                                        initial="hidden" // Add initial to individual items for stagger effect
-                                        animate="visible" // Add animate to individual items for stagger effect
-                                        exit="hidden" // Add exit for AnimatePresence fade out
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="hidden"
                                     >
                                         {/* Flash Sale Badge */}
                                         <motion.div
@@ -203,8 +191,15 @@ const FlashSale = () => {
                                             <Zap className="w-4 h-4 mr-1" /> FLASH SALE
                                         </motion.div>
 
+                                        {/* Discount Badge */}
+                                        {discountPercent > 0 && (
+                                            <div className="absolute top-4 right-4 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+                                                -{discountPercent}%
+                                            </div>
+                                        )}
+
                                         <Link to={`/collections/${product.category?.link}/${product.link}`} className="block">
-                                            <motion.div className="overflow-hidden"> {/* Added a div for image overflow */}
+                                            <motion.div className="overflow-hidden">
                                                 <motion.img
                                                     src={`/${product.image}`}
                                                     alt={product.name}
@@ -212,22 +207,30 @@ const FlashSale = () => {
                                                     variants={imageHoverVariants}
                                                     initial={false}
                                                     whileHover="hover"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/cccccc/000000?text=Image+Error'; }} // Fallback image
+                                                    onError={(e) => { 
+                                                        e.target.onerror = null; 
+                                                        e.target.src = 'https://placehold.co/400x300/cccccc/000000?text=Image+Error'; 
+                                                    }}
                                                 />
                                             </motion.div>
                                             <div className="p-6 bg-white dark:bg-gray-900">
-                                                <h3 className="text-xl font-bold text-gray-800 mb-2 truncate dark:text-white">{product.name}</h3>
-                                                <p className="text-sm text-gray-600 mb-3 line-clamp-2 dark:text-gray-400">{product.description}</p>
+                                                <h3 className="text-xl font-bold text-gray-800 mb-2 truncate dark:text-white">
+                                                    {product.name}
+                                                </h3>
+                                                <p className="text-sm text-gray-600 mb-3 line-clamp-2 dark:text-gray-400">
+                                                    {product.description}
+                                                </p>
 
-                                                {/* Price Display */}
+                                                {/* Price Display - Using Effective Price */}
                                                 <div className="flex items-baseline mb-2">
                                                     <span className="text-orange-600 font-extrabold text-3xl mr-2 dark:text-orange-400">
-                                                        ₦{product.flash_sale_price?.toLocaleString()}
+                                                        ₦{effectivePrice.toLocaleString()}
                                                     </span>
-                                                    {/* Strikethrough original price */}
-                                                    <span className="text-gray-500 line-through text-lg">
-                                                        ₦{product.selling_price?.toLocaleString()}
-                                                    </span>
+                                                    {product.selling_price && effectivePrice < product.selling_price && (
+                                                        <span className="text-gray-500 line-through text-lg">
+                                                            ₦{parseFloat(product.selling_price).toLocaleString()}
+                                                        </span>
+                                                    )}
                                                 </div>
 
                                                 {/* Countdown Timer */}
@@ -239,18 +242,26 @@ const FlashSale = () => {
                                                     <CountdownTimer targetDate={product.flash_sale_ends_at} className='w-6 h-6' />
                                                 </div>
 
-                                                {/* Rating Placeholder (if you implement ratings later) */}
+                                                {/* Rating */}
                                                 {product.rating !== undefined && product.num_reviews !== undefined && (
                                                     <div className="mb-2 flex items-center">
-                                                        <StarRating rating={parseFloat(product.rating)} iconSize={14} /> {/* Slightly reduced icon size */}
-                                                        <span className="text-gray-500 text-xs ml-1 dark:text-gray-400">({product.num_reviews})</span>
+                                                        <StarRating rating={parseFloat(product.rating)} iconSize={14} />
+                                                        <span className="text-gray-500 text-xs ml-1 dark:text-gray-400">
+                                                            ({product.num_reviews})
+                                                        </span>
                                                     </div>
                                                 )}
+
+                                                {/* Stock Info */}
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                                                    {product.qty > 0 ? `${product.qty} in stock` : 'Out of stock'}
+                                                </p>
+
                                                 <div className="flex justify-between items-center mt-4">
                                                     <button
                                                         onClick={handleAddToCart}
                                                         className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        disabled={product.status === 1 || product.qty <= 0 || !product.flash_sale_price}
+                                                        disabled={product.status === 1 || product.qty <= 0}
                                                     >
                                                         <ShoppingCart className="w-5 h-5 mr-2" />
                                                         Add to Cart
